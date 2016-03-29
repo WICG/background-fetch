@@ -155,3 +155,7 @@ self.addEventListener('bgcacheerror', event => {
 There's some overlap, and background-cache may be an alternative for some of the simpler background sync use-cases, but mostly they'll be used together. For example, background sync could be used to process an outbox, but background-cache could be used within the `sync` handler for individual messages that have large attachments.
 
 Background-cache is intended to be very user-visible, as such it doesn't really make sense for non-massive transfers such as IM messages.
+
+# Future ideas
+
+I think the above is a reasonable MVP, although `BackgroundCacheRegistration` could be extended with high-level niceties like properties/events to indicate state (uploading/downloading/paused) and progress.
