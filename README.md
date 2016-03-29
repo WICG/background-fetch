@@ -17,7 +17,7 @@ This makes it difficult to download and cache large assets such as podcasts and 
 
 # API sketch
 
-[Check out the IDL](idb.md) if you're into that kind of thing.
+[Check out the IDL](idl.md) if you're into that kind of thing.
 
 ## Requesting and managing background downloads
 
