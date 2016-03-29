@@ -14,52 +14,57 @@ This makes it difficult to download and cache large assets such as podcasts and 
 * Allow the OS to show UI to indicate the progress of the fetch, and perhaps allow the user to pause/abort
 * Allow the OS to deal with poor connectivity by pausing/resuming the download/upload
 * Allow the app to react to success/failure of the fetch, perhaps by showing a notification
-* Doesn't require user-permission, as it's user-visible and cancellable, although may reject if user has explicitly disabled background activity
 
 # API sketch
 
-Creating background cache operations:
+[Check out the IDL](idb.md) if you're into that kind of thing.
 
-```
-partial interface ServiceWorkerRegistration {
-  readonly attribute BackgroundCacheManager bgCache;
-};
+## Requesting and managing background downloads
 
-[Exposed=(Window,Worker)]
-interface BackgroundCacheManager {
-  Promise<BackgroundCacheRegistration> register(DOMString cacheName, (RequestInfo or sequence<RequestInfo>) requests);
-  Promise<sequence<BackgroundCacheRegistration>> getRegistrations();
-};
-
-[Exposed=(Window,Worker)]
-interface BackgroundCacheRegistration {
-  readonly attribute DOMString cacheName;
-  readonly attribute sequence<Request> requests;
-  readonly attribute Promise<any> done;
-
-  void abort();
-};
+```js
+navigator.serviceWorker.ready
+  .then(reg => reg.bgCache.register(cacheName, requests))
+  .then(bgCacheReg => …);
 ```
 
-Reacting to success/failure:
+The above shouldn't require user-permission as the operation is user-visible and cancellable. Although `.register` may reject if the user has explicitly disabled background activity, or the operating system has (eg battery saving mode).
 
+The operation is similar to `cache.addAll` in that it's atomic, and considers `!response.ok` to be a failure.
+
+The `bgCacheReg` instance has a few properties:
+
+```js
+bgCacheReg.cacheName; // the name of the cacheName
+bgCacheReg.requests;  // an array of requests being processed
+bgCacheReg.done;      // a promise for operation success/failure
+bgCacheReg.abort();   // abort the operation
 ```
-partial interface ServiceWorkerGlobalScope {
-  attribute EventHandler onbgcache;
-  attribute EventHandler onbgcacheerror;
-  attribute EventHandler onbgcacheabort;
-};
 
-[Constructor(DOMString type, BackgroundCacheEventInit init), Exposed=ServiceWorker]
-interface BackgroundCacheEvent : ExtendableEvent {
-  readonly attribute DOMString cacheName;
-  readonly attribute sequence<Request> requests;
-};
+You can get all the pending operations using:
 
-dictionary BackgroundCacheEventInit : ExtendableEventInit {
-  required DOMString cacheName;
-  required sequence<Request> requests;
-};
+```js
+navigator.serviceWorker.ready
+  .then(reg => reg.bgCache.getRegistrations());
+```
+
+## Reacting to success/failure
+
+This is done via events in the service worker:
+
+```js
+self.addEventListener('bgcache', event => {
+  event.waitUntil(); // extend the event
+  event.cacheName;   // name of the cache that was populated
+  event.requests;    // requests that were fetched and cached
+});
+
+self.addEventListener('bgcacheerror', event => {
+  // event is same as above, but .requests are requests that failed to cache
+});
+
+self.addEventListener('bgcacheabort', event => {
+  // event is same as bgcacheerror
+});
 ```
 
 # Examples
