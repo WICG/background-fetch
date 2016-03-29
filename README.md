@@ -68,9 +68,9 @@ dictionary BackgroundCacheEventInit : ExtendableEventInit {
 
 ```js
 self.addEventListener('push', event => {
-  if (event.data == 'new-podcasts') {
+  if (event.data.text() == 'new-podcasts') {
     event.waitUntil(
-      getUrlsForNewPodcasts.then(urls => {
+      getUrlsForNewPodcasts().then(urls => {
         return Promise.all(
           urls.map(url => self.registration.bgCache.register('podcasts', url))
         );
