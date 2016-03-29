@@ -2,9 +2,9 @@ This is a proposal for a background-caching API, to handle large upload/download
 
 # The problem
 
-The service worker is capable of fetching and caching assets, the size of which is unrestricted. However, if the user navigates away from the site, or closes the browser, the service worker is likely to be killed. Even if there's a pending promise passed to `extendableEvent.waitUntil`, if it hasn't resolved within a few minutes the browser may consider it an abuse of service worker and kill the process.
+The service worker is capable of fetching and caching assets, the size of which is unrestricted. However, if the user navigates away from the site or closes the browser, the service worker is likely to be killed. This can happen even if there's a pending promise passed to `extendableEvent.waitUntil`, if it hasn't resolved within a few minutes the browser may consider it an abuse of service worker and kill the process.
 
-This makes it difficult to download and cache large assets such as podcasts and movies. Even if the service worker isn't killed, having to keep the service worker, and therefore the browser in memory during this potentially long operation is wasteful.
+This makes it difficult to download and cache large assets such as podcasts and movies. Even if the service worker isn't killed, having to keep the service worker and therefore the browser in memory during this potentially long operation is wasteful.
 
 # Goals
 
