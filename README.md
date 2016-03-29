@@ -77,6 +77,7 @@ self.addEventListener('push', event => {
     event.waitUntil(
       getUrlsForNewPodcasts().then(urls => {
         return Promise.all(
+          // using map because we *don't* want all of these to be an atomic action
           urls.map(url => self.registration.bgCache.register('podcasts', url))
         );
       })
