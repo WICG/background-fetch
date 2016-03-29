@@ -14,6 +14,7 @@ This makes it difficult to download and cache large assets such as podcasts and 
 * Allow the OS to show UI to indicate the progress of the fetch, and perhaps allow the user to pause/abort
 * Allow the OS to deal with poor connectivity by pausing/resuming the download/upload
 * Allow the app to react to success/failure of the fetch, perhaps by showing a notification
+* Doesn't require user-permission, as it's user-visible and cancellable, although may reject if user has explicitly disabled background activity
 
 # API sketch
 
