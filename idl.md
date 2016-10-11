@@ -15,7 +15,7 @@ interface BackgroundFetchManager {
 [Exposed=(Window,Worker)]
 interface BackgroundFetchRegistration {
   readonly attribute DOMString tag;
-  readonly attribute sequence<Request> requests;
+  readonly attribute FrozenArray<Request> requests;
 
   void abort();
 };
