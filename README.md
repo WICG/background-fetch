@@ -204,7 +204,7 @@ form.addEventListener('submit', async event => {
   const body = new FormData(form);
   const videoName = body.get('video').name;
   const tag = 'video-upload-' + videoName;
-  const request = new Request('/upload-video', { body });
+  const request = new Request('/upload-video', { body, method: 'POST' });
 
   const reg = await navigator.serviceWorker.ready;
 
@@ -218,7 +218,7 @@ form.addEventListener('submit', async event => {
       // Failed, try and upload from the page.
       // First store the video in IDB in case the user closes the tab
       await storeInIDB(body);
-      const response = await fetch('/upload-video', { body });
+      const response = await fetch('/upload-video', { body, method: 'POST' });
       if (!response.ok) throw Error('Upload failed');
     }
 
