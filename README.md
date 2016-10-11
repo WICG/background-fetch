@@ -1,18 +1,17 @@
-This is a proposal for a background-caching API, to handle large upload/downloads in the background.
+This is a proposal for a background-fetching API, to handle large upload/downloads in the background.
 
 # The problem
 
-The service worker is capable of fetching and caching assets, the size of which is unrestricted. However, if the user navigates away from the site or closes the browser, the service worker is likely to be killed. This can happen even if there's a pending promise passed to `extendableEvent.waitUntil`, if it hasn't resolved within a few minutes the browser may consider it an abuse of service worker and kill the process.
+The service worker is capable of fetching and caching assets, the size of which is restricted only by [origin storage](https://storage.spec.whatwg.org/#usage-and-quota). However, if the user navigates away from the site or closes the browser, the service worker is likely to be killed. This can happen even if there's a pending promise passed to `extendableEvent.waitUntil`, if it hasn't resolved within a few minutes the browser may consider it an abuse of service worker and kill the process.
 
-This makes it difficult to download and cache large assets such as podcasts and movies. Even if the service worker isn't killed, having to keep the service worker and therefore the browser in memory during this potentially long operation is wasteful.
+This makes it difficult to download and cache large assets such as podcasts and movies, and upload video and images. Even if the service worker isn't killed, having to keep the service worker and therefore the browser in memory during this potentially long operation is wasteful.
 
 # Goals
 
-* Enable background-caching of multiple resources
-* Enable background-uploading of multiple resources
+* Enable background-download/upload of multiple resources
 * Allow the OS to handle the fetch, so the browser doesn't need to continue running
 * Allow the OS to show UI to indicate the progress of the fetch, and perhaps allow the user to pause/abort
-* Allow the OS to deal with poor connectivity by pausing/resuming the download/upload
+* Allow the OS to deal with poor connectivity by pausing/resuming the download/upload (may be tricky with uploads, as ranged uploads aren't a thing)
 * Allow the app to react to success/failure of the fetch, perhaps by showing a notification
 
 # API sketch
@@ -23,47 +22,62 @@ This makes it difficult to download and cache large assets such as podcasts and 
 
 ```js
 navigator.serviceWorker.ready
-  .then(reg => reg.bgCache.register(cacheName, requests))
-  .then(bgCacheReg => …);
+  .then(reg => reg.backgroundFetch.fetch(tag, requests))
+  .then(bgFetchJob => …);
 ```
 
-The above shouldn't require user-permission as the operation is user-visible and cancellable. Although `.register` may reject if the user has explicitly disabled background activity, or the operating system has (eg battery saving mode).
+The above shouldn't require user-permission as the operation is user-visible and cancellable.
 
-The operation is similar to `cache.addAll` in that it's atomic, and considers `!response.ok` to be a failure.
+`backgroundFetch.fetch` will reject if there's already a pending job named `tag`, or if the OS is disallowing background activity (user preference or something like battery saving mode).
 
-The `bgCacheReg` instance has a few properties:
+The `bgFetchJob` instance looks like:
 
 ```js
-bgCacheReg.cacheName; // the name of the cacheName
-bgCacheReg.requests;  // an array of requests being processed
-bgCacheReg.done;      // a promise for operation success/failure
-bgCacheReg.abort();   // abort the operation
+bgFetchJob.tag;      // a tag string
+bgFetchJob.requests; // an array of requests being processed
+bgFetchJob.abort();  // abort the operation
 ```
 
-You can get all the pending operations using:
+You can get a pending job using:
 
 ```js
 navigator.serviceWorker.ready
-  .then(reg => reg.bgCache.getRegistrations());
+  .then(reg => reg.backgroundFetch.getPending(tag));
 ```
+
+…which resolves with a `bgFetchJob`. Or: 
+
+```js
+navigator.serviceWorker.ready
+  .then(reg => reg.backgroundFetch.getAllPending());
+```
+
+…which resolve to an array of `bgFetchJob`s.
 
 ## Reacting to success/failure
 
-This is done via events in the service worker:
+You can react to success using the following service worker event:
 
 ```js
-self.addEventListener('bgcache', event => {
+self.addEventListener('backgroundfetch', event => {
   event.waitUntil(); // extend the event
-  event.cacheName;   // name of the cache that was populated
-  event.requests;    // requests that were fetched and cached
+  event.tag;         // tag string
+  event.fetches;     // a map of request,response
+});
+```
+
+It's unclear whether `!response.ok` should be considered success or failure.
+
+```js
+self.addEventListener('backgroundfetcherror', event => {
+  event.waitUntil(); // extend the event
+  event.tag;         // tag string
+  event.fetches;     // a map of request,response
 });
 
-self.addEventListener('bgcacheerror', event => {
-  // event is same as above, but .requests are requests that failed to cache
-});
-
-self.addEventListener('bgcacheabort', event => {
-  // event is same as bgcacheerror
+self.addEventListener('backgroundfetchabort', event => {
+  event.waitUntil(); // extend the event
+  event.tag;         // tag string
 });
 ```
 
@@ -72,28 +86,43 @@ self.addEventListener('bgcacheabort', event => {
 ## Downloading a podcast in reaction to a push message
 
 ```js
+// in the service worker:
 self.addEventListener('push', event => {
   if (event.data.text() == 'new-podcasts') {
     event.waitUntil(
       getUrlsForNewPodcasts().then(urls => {
         return Promise.all(
           // using map because we *don't* want all of these to be an atomic action
-          urls.map(url => self.registration.bgCache.register('podcasts', url))
+          urls.map(url => self.registration.backgroundFetch.register('podcast-' + url, url))
         );
+      }).catch(() => {
+        // Can't fetch urls or background download, just tell the user
+        // there are new podcasts
+        self.registration.showNotification("New podcasts ready to download!");
       })
     );
   }
 });
 
-self.addEventListener('bgcache', event => {
-  if (event.cacheName == 'podcasts')) {
-    self.registration.showNotification("You have new podcasts!");
+self.addEventListener('backgroundfetch', event => {
+  if (event.tag.startsWith('podcast-')) {
+    event.waitUntil(
+      caches.open('podcasts').then(cache => {
+        // cache all the requests/responses
+        return Promise.all(
+          [...event.fetches].map(([req, res]) => cache.put(req, res))
+        );
+      }).then(() => {
+        self.registration.showNotification("You have new podcasts!");
+      })
+    );
   }
 });
 
-self.addEventListener('bgcacheerror', event => {
-  if (event.cacheName == 'podcasts')) {
-    self.registration.showNotification("Failed to download " + event.requests[0].url);
+self.addEventListener('backgroundfetcherror', event => {
+  if (event.tag.startsWith('podcast-')) {
+    const failedUrl = [...event.fetches.keys()][0].url;
+    self.registration.showNotification("Failed to download " + failedUrl);
   }
 });
 ```
@@ -103,55 +132,145 @@ self.addEventListener('bgcacheerror', event => {
 ```js
 // in the page:
 fetch('/level-20-assets.json').then(r => r.json()).then(data => {
+  const tag = 'level-20';
+
   return navigator.serviceWorker.ready
-    .then(reg => reg.bgCache.register('level-20', data.urls))
-    .then(bgCacheReg => bgCacheReg.done)
-    .catch(() => caches.open('level-20').then(cache => cache.addAll(data.urls)))
-    .then(() => updateUIToShowLevel20AsReady());
+    .then(reg => reg.backgroundFetch.fetch(tag, data.urls))
+    .then(() => backgroundFetchDone(tag))
+    // can't background fetch? Download from the page
+    .catch(() => {
+      return caches.open(tag)
+        .then(cache => cache.addAll(data.urls))
+    })
+    .then(() => updateUIToShowLevelReady(20))
+    .catch(() => updateUIToShowLevelFailed(20));
   });
+});
+
+function backgroundFetchDone(tag) {
+  return new Promise((resolve, reject) => {
+    const channel = new BroadcastChannel('background-fetch');
+    channel.onmessage = event => {
+      if (event.data.tag != tag) return;
+      if (event.data.ok) {
+        resolve();
+      }
+      else {
+        reject();
+      }
+    }
+    channel.close();
+  });
+}
+```
+
+```js
+// in the service worker:
+self.addEventListener('backgroundfetch', event => {
+  if (event.tag.startsWith('level-')) {
+    event.waitUntil(
+      caches.open(event.tag).then(cache => {
+        // cache all the requests/responses
+        return Promise.all(
+          [...event.fetches].map(([req, res]) => cache.put(req, res))
+        );
+      }).then(() => {
+        // tell the page
+        new BroadcastChannel('background-fetch').postMessage({
+          tag: event.tag,
+          ok: true
+        });
+      })
+    );
+  }
+});
+
+self.addEventListener('backgroundfetcherror', event => {
+  if (event.tag.startsWith('level-')) {
+    new BroadcastChannel('background-fetch').postMessage({
+      tag: event.tag,
+      ok: false
+    });
+  }
 });
 ```
 
 ## Uploading a video in the background
 
-We would need to allow the cache API to be able to store non-GET requests for this to work.
-
 ```js
 // in the page:
-form.addEventListener('submit', event => {
+form.addEventListener('submit', async event => {
   event.preventDefault();
   const body = new FormData(form);
+  const videoName = body.get('video').name;
+  const tag = 'video-upload-' + videoName;
   const request = new Request('/upload-video', { body });
 
-  navigator.serviceWorker.ready
-    .then(reg => {
-      return reg.bgCache.register('completed-uploads', request)
-        .then(bgCacheReg => bgCacheReg.done)
-        .catch(() => fetch('/upload-video', { body }))
-        .then(() => showUploadAsComplete())
-        // hide notifications - we don't need them if the page is still open
-        .then(() => reg.getNotifications({ tag: 'upload-complete' }))
-        .then(notifications => notifications[0] && notifications[0].close())
-    })
+  const reg = await navigator.serviceWorker.ready;
+
+  try {
+    // try fetching in the background or from the page
+    try {
+      await reg.backgroundFetch.fetch(tag, request);
+      await backgroundFetchDone(tag);
+    }
+    catch () {
+      // Failed, try and upload from the page.
+      // First store the video in IDB in case the user closes the tab
+      await storeInIDB(body);
+      const response = await fetch('/upload-video', { body });
+      if (!response.ok) throw Error('Upload failed');
+    }
+
+    showUploadAsComplete();
+    deleteFromIDB(body);
+  }
+  catch() {
+    showUploadAsFailed();
+  }
 });
+
+function backgroundFetchDone(tag) {
+  return new Promise((resolve, reject) => {
+    const channel = new BroadcastChannel('background-fetch');
+    channel.onmessage = event => {
+      if (event.data.tag != tag) return;
+      if (event.data.ok) {
+        resolve();
+      }
+      else {
+        reject();
+      }
+    }
+    channel.close();
+  });
+}
 ```
 
 ```js
 // in the service worker:
-self.addEventListener('bgcache', event => {
-  if (event.cacheName == 'completed-uploads')) {
+self.addEventListener('backgroundfetch', event => {
+  if (event.tag.startsWith('video-upload-')) {
     self.registration.showNotification("Photo uploaded!");
-    event.waitUntil(
-      caches.open(event.cacheName).then(c => c.delete(event.requests[0]))
-    );
+    new BroadcastChannel('background-fetch').postMessage({
+      tag: event.tag,
+      ok: true
+    });
   }
 });
 
-self.addEventListener('bgcacheerror', event => {
-  if (event.cacheName == 'completed-uploads')) {
+self.addEventListener('backgroundfetcherror', event => {
+  if (event.tag.startsWith('video-upload-')) {
     self.registration.showNotification("Photo upload failed");
+    new BroadcastChannel('background-fetch').postMessage({
+      tag: event.tag,
+      ok: true
+    });
+
+    // store video in IDB for later retry
     event.waitUntil(
-      event.requests[0].blob().then(blob => addToIndexedDBOrSomething(blob))
+      [...event.fetches.keys()][0].formData()
+        .then(body => storeInIDB(body))
     );
   }
 });
@@ -159,10 +278,9 @@ self.addEventListener('bgcacheerror', event => {
 
 # Relation to one-off background sync
 
-There's some overlap, and background-cache may be an alternative for some of the simpler background sync use-cases, but mostly they'll be used together. For example, background sync could be used to process an outbox, but background-cache could be used within the `sync` handler for individual messages that have large attachments.
-
-Background-cache is intended to be very user-visible, as such it doesn't really make sense for non-massive transfers such as IM messages.
+Background-cache is intended to be very user-visible, via OS-level UI such as a persistent notification, as such background-sync remains a better option for non-massive transfers such as IM messages.
 
 # Future ideas
 
-I think the above is a reasonable MVP, although `BackgroundCacheRegistration` could be extended with high-level niceties like properties/events to indicate state (uploading/downloading/paused) and progress.
+* A way to get progress of the up/download
+* A way to read a response mid-download (eg, start playing a downloading podcast)

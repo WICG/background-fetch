@@ -1,21 +1,21 @@
-# Creating background cache operations
+# Getting/creating background fetches
 
 ```
 partial interface ServiceWorkerRegistration {
-  readonly attribute BackgroundCacheManager bgCache;
+  readonly attribute BackgroundFetchManager backgroundFetch;
 };
 
 [Exposed=(Window,Worker)]
-interface BackgroundCacheManager {
-  Promise<BackgroundCacheRegistration> register(DOMString cacheName, (RequestInfo or sequence<RequestInfo>) requests);
-  Promise<sequence<BackgroundCacheRegistration>> getRegistrations();
+interface BackgroundFetchManager {
+  Promise<BackgroundFetchRegistration> fetch(DOMString tag, (RequestInfo or sequence<RequestInfo>) requests);
+  Promise<BackgroundFetchRegistration?> getPending(DOMString tag);
+  Promise<sequence<BackgroundFetchRegistration>> getAllPending();
 };
 
 [Exposed=(Window,Worker)]
-interface BackgroundCacheRegistration {
-  readonly attribute DOMString cacheName;
+interface BackgroundFetchRegistration {
+  readonly attribute DOMString tag;
   readonly attribute sequence<Request> requests;
-  readonly attribute Promise<any> done;
 
   void abort();
 };
@@ -25,19 +25,26 @@ interface BackgroundCacheRegistration {
 
 ```
 partial interface ServiceWorkerGlobalScope {
-  attribute EventHandler onbgcache;
-  attribute EventHandler onbgcacheerror;
-  attribute EventHandler onbgcacheabort;
+  attribute EventHandler onbackgroundfetch;
+  attribute EventHandler onbackgroundfetcherror;
+  attribute EventHandler onbackgroundfetchabort;
 };
 
-[Constructor(DOMString type, BackgroundCacheEventInit init), Exposed=ServiceWorker]
-interface BackgroundCacheEvent : ExtendableEvent {
-  readonly attribute DOMString cacheName;
-  readonly attribute sequence<Request> requests;
+[Constructor(DOMString type, BackgroundFetchEventInit init), Exposed=ServiceWorker]
+interface BackgroundFetchEvent : ExtendableEvent {
+  readonly attribute DOMString tag;
 };
 
-dictionary BackgroundCacheEventInit : ExtendableEventInit {
-  required DOMString cacheName;
-  required sequence<Request> requests;
+dictionary BackgroundFetchEventInit : ExtendableEventInit {
+  required DOMString tag;
+};
+
+[Constructor(DOMString type, BackgroundFetchResultsEventInit init), Exposed=ServiceWorker]
+interface BackgroundFetchResultsEvent : BackgroundFetchEvent {
+  readonly attribute maplike<Request, Response> fetches;
+};
+
+dictionary BackgroundFetchResultsEventInit : BackgroundFetchEventInit {
+  required maplike<Request, Response> fetches;
 };
 ```
