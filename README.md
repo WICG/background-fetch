@@ -278,7 +278,7 @@ self.addEventListener('backgroundfetcherror', event => {
 
 # Relation to one-off background sync
 
-Background-cache is intended to be very user-visible, via OS-level UI such as a persistent notification, as such background-sync remains a better option for non-massive transfers such as IM messages.
+Background-fetch is intended to be very user-visible, via OS-level UI such as a persistent notification, as such background-sync remains a better option for non-massive transfers such as IM messages.
 
 # Future ideas
 
