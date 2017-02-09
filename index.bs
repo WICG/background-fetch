@@ -66,7 +66,17 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
   <div algorithm>
     The <dfn method>fetch(|tag|, |requests|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run the following steps [=in parallel=]:
 
-      1. TODO
+      1. Let |registration| be the [=context object=]'s associated [=/service worker registration=].
+      1. If |registration|'s [=active worker=] is null, [=reject=] |promise| with an "{{InvalidStateError}}" exception, and abort these steps.
+      1. TODO check if tag exists
+        // should it add or should it fail? Think about movie downloading or photo uploading - add seems better
+      1. TODO you are here
+      1. Let |backgroundRequests| be a new [=list=].
+      1. For each |requestInit| of |requests|:
+        1. Let |request| be the associated [=Request/request=] of the result of invoking {{Request(input, init)}} with |requestInit|. If this throws an exception, [=reject=] |promise| with it and return |promise|.
+        1. [=list/Append=] |request| to |backgroundRequests|.
+      1. Let |background fetch| be a new {{BackgroundFetchRegistration}}.
+      1. Set |background fetch|'s [=background fetch/tag=] to |tag|.
   </div>
 
   <div algorithm>
