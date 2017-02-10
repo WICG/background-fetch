@@ -190,9 +190,9 @@ Eventually we'd like uploads to be resumable, but there's no standard for that.
 
 # Quota usage
 
-The request and response objects will use origin quota until the `backgroundfetched` event.
+The background fetch job, including its requests & in-progress responses, can be accessed at any time until the `backgroundfetched`, `backgroundfetcherror`, or `backgroundfetchabort` event fires, so they count against origin quota. After the point, the event receives the requests and responses (except in the case of abort) for the final time, once these copies are drained, they're gone.
 
-A requirement is to avoid doubling quota usage when transferring background-fetched items into the cache:
+A requirement is to avoid doubling quota usage when transferring background-fetched items into the cache, unless clones exist.
 
 ```js
 addEventListener('backgroundfetched', event => {
@@ -209,7 +209,7 @@ addEventListener('backgroundfetched', event => {
 });
 ```
 
-A user agent could implement this efficiently using streams. Given a response body can only be read once, it can drain it from background fetch storage, whilst feeding it into the cache.
+A user agent could implement this using streams. Given a response body can only be read once, it can drain it from background fetch storage, whilst feeding it into the cache.
 
 # Differences to fetch
 
