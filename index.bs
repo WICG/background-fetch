@@ -2,8 +2,8 @@
 Title: Background Fetch
 Shortname: background-fetch
 Level: 1
-Status: w3c/ED
-Group: jakearchibald
+Status: ED
+Group: wicg
 URL: https://jakearchibald.github.io/background-fetch
 Editor: Jake Archibald, Google, jakearchibald@google.com
 Abstract: An API to handle large uploads/downloads in the background with user visibility.
@@ -17,16 +17,20 @@ spec:infra; type:dfn; text:list
 
 # Introduction # {#intro}
 
-A [=service worker=] is capable of [=/fetching=] and [[service-workers#cache-objects|caching]] assets. However, if the user navigates away from the site or closes the browser, the service worker is [[service-workers#service-worker-lifetime|likely to be killed]]. This can happen even if there's a pending promise passed to {{ExtendableEvent/waitUntil()}}; if it hasn't resolved within a few minutes the browser may consider it an abuse of [=service worker=] and kill the process.
+A [=service worker=] is capable of fetching and caching assets, the size of which is restricted only by [origin storage](https://storage.spec.whatwg.org/#usage-and-quota). However, if the user navigates away from the site or closes the browser, the service worker is [[service-workers#service-worker-lifetime|likely to be killed]]. This can happen even if there's a pending promise passed to {{ExtendableEvent/waitUntil()}}; if it hasn't resolved within a few minutes the browser may consider it an abuse of [=service worker=] and kill the process.
 
-This makes it difficult to download and cache large assets such as podcasts and movies, and upload video and images. Even if the [=service worker=] isn't killed, having to keep the [=service worker=] and therefore the browser in memory during this potentially long operation is wasteful.
+This makes it difficult to download and cache large assets such as podcasts and movies, and upload video and images. Even if the [=service worker=] isn't killed, having to keep the [=service worker=] in memory during this potentially long operation is wasteful.
 
 This specification aims to:
 
-* Enable background-download/upload of multiple resources.
-* Enable the OS to handle the [=/fetch=], so the browser doesn't need to continue running.
-* Enable the OS to show UI to indicate the progress of the [=/fetch=].
-* Enable the site to react to success/failure of the [=/fetch=], perhaps by showing a notification.
+* Allow [=/fetches=] to continue even if the user closes all windows & worker to the origin.
+* Allow a single job to involve many requests, as defined by the app.
+* Allow the browser/OS to show UI to indicate the progress of the [=/fetch=], and allow the user to pause/abort.
+* Allow the browser/OS to deal with poor connectivity by pausing/resuming the download/upload (may be tricky with uploads, as ranged uploads aren't standardized)
+* Allow the app to react to success/failure of the background fetch group, perhaps by caching the results.
+* Allow access to background-fetched resources as they [=/fetch=].
+* Allow the app to display progress information about a background fetch.
+* Allow the app to suggest which connection types the [=/fetch=] should be restricted to.
 
 # Infrastructure # {#infrastructure}
 
@@ -36,7 +40,7 @@ A <dfn>background fetch</dfn> consists of:
 
 <div dfn-for="background fetch">
   * A <dfn>tag</dfn>, which is a DOMString.
-  * A <dfn>map of fetches</dfn>, which is an [=ordered map=] where the keys are [=/requests=] and the values are [=/responses=].
+  * TODO: add additional state
 </div>
 
 # API # {#api}
@@ -56,37 +60,43 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
 <pre class="idl">
   [Exposed=(Window,Worker)]
   interface BackgroundFetchManager {
-    Promise&lt;BackgroundFetchRegistration&gt; fetch(DOMString tag, (RequestInfo or sequence&lt;RequestInfo&gt;) requests);
-    Promise&lt;BackgroundFetchRegistration?&gt; getPending(DOMString tag);
-    Promise&lt;sequence&lt;BackgroundFetchRegistration&gt;&gt; getAllPending();
+    Promise&lt;BackgroundFetchRegistration&gt; fetch(DOMString tag, (RequestInfo or sequence&lt;RequestInfo&gt;) requests, optional BackgroundFetchOptions options);
+    Promise&lt;BackgroundFetchRegistration?&gt; get(DOMString tag);
+    Promise&lt;sequence&lt;DOMString&gt;&gt; getTags();
+    // TODO: in future this should become an async iterator for BackgroundFetchRegistration objects
+  };
+
+  dictionary BackgroundFetchOptions {
+    sequence&lt;IconDefinition&gt; icons;
+    DOMString title;
+    long totalDownloadSize;
+  };
+
+  // This is taken from https://w3c.github.io/manifest/#icons-member.
+  // This definition should probably be moved somewhere more general.
+  dictionary IconDefinition {
+    DOMString src;
+    DOMString sizes;
+    DOMString type;
   };
 </pre>
 
 <div dfn-for="BackgroundFetchManager">
   <div algorithm>
-    The <dfn method>fetch(|tag|, |requests|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run the following steps [=in parallel=]:
+    The <dfn method>fetch(|tag|, |requests|, |options|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run the following steps [=in parallel=]:
 
       1. Let |registration| be the [=context object=]'s associated [=/service worker registration=].
-      1. If |registration|'s [=active worker=] is null, [=reject=] |promise| with an "{{InvalidStateError}}" exception, and abort these steps.
-      1. TODO check if tag exists
-        // should it add or should it fail? Think about movie downloading or photo uploading - add seems better
-      1. TODO you are here
-      1. Let |backgroundRequests| be a new [=list=].
-      1. For each |requestInit| of |requests|:
-        1. Let |request| be the associated [=Request/request=] of the result of invoking {{Request(input, init)}} with |requestInit|. If this throws an exception, [=reject=] |promise| with it and return |promise|.
-        1. [=list/Append=] |request| to |backgroundRequests|.
-      1. Let |background fetch| be a new {{BackgroundFetchRegistration}}.
-      1. Set |background fetch|'s [=background fetch/tag=] to |tag|.
+      1. TODO.
   </div>
 
   <div algorithm>
-    The <dfn method>getPending(|tag|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run the following steps [=in parallel=]:
+    The <dfn method>get(|tag|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run the following steps [=in parallel=]:
 
       1. TODO
   </div>
 
   <div algorithm>
-    The <dfn method>getAllPending(|tag|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run the following steps [=in parallel=]:
+    The <dfn method>getTags()</dfn> method, when invoked, must return [=a new promise=] |promise| and run the following steps [=in parallel=]:
 
       1. TODO
   </div>
@@ -98,33 +108,40 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
   [Exposed=(Window,Worker)]
   interface BackgroundFetchRegistration {
     readonly attribute DOMString tag;
-    readonly attribute FrozenArray&lt;Request&gt; requests;
+    readonly attribute sequence&lt;IconDefinition&gt; icons;
+    readonly attribute long totalDownloadSize;
+    readonly attribute DOMString title;
+    readonly attribute sequence&lt;BackgroundFetchActiveFetches&gt; fetches;
 
     void abort();
+  };
+
+  [Exposed=(Window,Worker)]
+  interface BackgroundFetchFetches {
+    readonly attribute Request request;
+  };
+
+  [Exposed=(Window,Worker)]
+  interface BackgroundFetchActiveFetches : BackgroundFetchFetches {
+    readonly attribute Promise&lt;Response&gt; responseReady;
+    // TODO: this will include fetch controller/observer objects
   };
 </pre>
 
 <div dfn-for="BackgroundFetchRegistration">
   A {{BackgroundFetchRegistration}} has an associated <dfn>background fetch</dfn>, a [=/background fetch=].
 
-  The <dfn attribute>tag</dfn> attribute must return [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/tag=].
-
-  The <dfn attribute>requests</dfn> attribute must return the result of [=get the keys|getting the keys=] of [=BackgroundFetchRegistration/background fetch=]'s [=map of fetches=].
-
-  <div algorithm>
-    The <dfn method>abort()</dfn> method, when invoked, must run the following steps:
-
-      1. TODO
-  </div>
+  TODO
 </div>
 
 ## Events ## {#events}
 
 <pre class="idl">
   partial interface ServiceWorkerGlobalScope {
-    attribute EventHandler onbackgroundfetch;
-    attribute EventHandler onbackgroundfetcherror;
+    attribute EventHandler onbackgroundfetched;
+    attribute EventHandler onbackgroundfetchfail;
     attribute EventHandler onbackgroundfetchabort;
+    attribute EventHandler onbackgroundfetchclick;
   };
 </pre>
 
@@ -140,19 +157,24 @@ The following is the <a>event handler</a> (and its corresponding <a>event handle
   </thead>
   <tbody dfn-for="ServiceWorkerGlobalScope" dfn-type="event">
     <tr>
-      <td><dfn>backgroundfetch</dfn></td>
-      <td>{{ServiceWorkerGlobalScope/onbackgroundfetch}}</td>
-      <td>{{BackgroundFetchResultsEvent}}</td>
+      <td><dfn>backgroundfetched</dfn></td>
+      <td>{{ServiceWorkerGlobalScope/onbackgroundfetched}}</td>
+      <td>{{BackgroundFetchEndEvent}}</td>
     </tr>
     <tr>
-      <td><dfn>backgroundfetcherror</dfn></td>
-      <td>{{ServiceWorkerGlobalScope/onbackgroundfetcherror}}</td>
-      <td>{{BackgroundFetchResultsEvent}}</td>
+      <td><dfn>backgroundfetchfail</dfn></td>
+      <td>{{ServiceWorkerGlobalScope/onbackgroundfetchfail}}</td>
+      <td>{{BackgroundFetchFailEvent}}</td>
     </tr>
     <tr>
       <td><dfn>backgroundfetchabort</dfn></td>
       <td>{{ServiceWorkerGlobalScope/onbackgroundfetchabort}}</td>
       <td>{{BackgroundFetchEvent}}</td>
+    </tr>
+    <tr>
+      <td><dfn>backgroundfetchclick</dfn></td>
+      <td>{{ServiceWorkerGlobalScope/onbackgroundfetchclick}}</td>
+      <td>{{BackgroundFetchClickEvent}}</td>
     </tr>
   </tbody>
 </table>
@@ -174,6 +196,8 @@ The following is the <a>event handler</a> (and its corresponding <a>event handle
   A {{BackgroundFetchEvent}} has an associated <dfn>tag</dfn>, a DOMString.
 
   The <dfn attribute>tag</dfn> attribute must return the [=BackgroundFetchEvent/tag=].
+  
+  TODO
 </div>
 
 <div algorithm>
@@ -182,30 +206,68 @@ The following is the <a>event handler</a> (and its corresponding <a>event handle
   1. TODO
 </div>
 
-### {{BackgroundFetchResultsEvent}} ### {#background-fetch-results-event}
+### {{BackgroundFetchEndEvent}} ### {#background-fetch-end-event}
 
 <pre class="idl">
-  [Constructor(DOMString type, BackgroundFetchResultsEventInit init), Exposed=ServiceWorker]
-  interface BackgroundFetchResultsEvent : BackgroundFetchEvent {
-    readonly attribute BackgroundFetchResultsEventFetches fetches;
+  [Constructor(DOMString type, BackgroundFetchEndEventInit init), Exposed=ServiceWorker]
+  interface BackgroundFetchEndEvent : BackgroundFetchEvent {
+    readonly attribute sequence&lt;BackgroundFetchSettledFetches&gt; completeFetches;
+
+    Promise&lt;void&gt; updateUI(DOMString title);
   };
 
-  dictionary BackgroundFetchResultsEventInit : BackgroundFetchEventInit {
-    required BackgroundFetchResultsEventFetches fetches;
+  dictionary BackgroundFetchEndEventInit : BackgroundFetchEventInit {
+    required BackgroundFetchSettledFetches completeFetches;
   };
 
-  interface BackgroundFetchResultsEventFetches {
-    readonly maplike&lt;Request, Response&gt;;
+  [Exposed=ServiceWorker]
+  interface BackgroundFetchSettledFetches : BackgroundFetchFetches {
+    readonly attribute Response? response;
   };
 </pre>
 
-<div dfn-for="BackgroundFetchEvent">
-  The <dfn attribute>fetches</dfn> attribute must return TODO.
+<div dfn-for="BackgroundFetchEndEvent">
+  The <dfn attribute>completeFetches</dfn> attribute must return TODO.
+
+  <div algorithm>
+    The <dfn method>updateUI(|title|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run the following steps [=in parallel=]:
+
+      1. TODO
+  </div>
 </div>
 
 <div algorithm>
-  The <dfn constructor for="BackgroundFetchResultsEvent">BackgroundFetchResultsEvent(|type|, |init|)</dfn> constructor, when invoked, must run these steps:
+  The <dfn constructor for="BackgroundFetchEndEvent">BackgroundFetchEndEvent(|type|, |init|)</dfn> constructor, when invoked, must run these steps:
 
   1. TODO
 </div>
 
+### {{BackgroundFetchFailEvent}} ### {#background-fetch-fail-event}
+
+<pre class="idl">
+  [Constructor(DOMString type, BackgroundFetchEndEventInit init), Exposed=ServiceWorker]
+  interface BackgroundFetchFailEvent : BackgroundFetchEndEvent {
+    readonly attribute sequence&lt;BackgroundFetchSettledFetches&gt; failedFetches;
+  };
+
+  dictionary BackgroundFetchFailEventInit : BackgroundFetchEndEventInit {
+    required BackgroundFetchSettledFetches failedFetches;
+  };
+</pre>
+
+### {{BackgroundFetchClickEvent}} ### {#background-fetch-click-event}
+
+<pre class="idl">
+  [Constructor(DOMString type, BackgroundFetchEndEventInit init), Exposed=ServiceWorker]
+  interface BackgroundFetchClickEvent : BackgroundFetchEvent {
+    readonly attribute BackgroundFetchState state;
+    readonly attribute boolean done;
+    readonly attribute boolean successful;
+  };
+
+  dictionary BackgroundFetchClickEventInit : BackgroundFetchEventInit {
+    
+  };
+
+  enum BackgroundFetchState { "pending", "succeeded", "failed" };
+</pre>
