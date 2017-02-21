@@ -160,8 +160,6 @@ addEventListener('backgroundfetchclick', bgFetchClickEvent => {
 
 * `tag` - tag of the background fetch job.
 * `state` - "pending", "succeeded" or "failed".
-* `done` - has `backgroundfetched` or `backgroundfetchfail` fired for this job?
-* `successful` - true if job completed successfully, false otherwise.
 
 Since this is a user interaction event, developers can call `clients.openWindow` in response. If a window isn't created/focused, the browser may open a related URL (the root of the origin, or a `start_url` from a related manifest).
 

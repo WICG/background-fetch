@@ -261,12 +261,10 @@ The following is the <a>event handler</a> (and its corresponding <a>event handle
   [Constructor(DOMString type, BackgroundFetchEndEventInit init), Exposed=ServiceWorker]
   interface BackgroundFetchClickEvent : BackgroundFetchEvent {
     readonly attribute BackgroundFetchState state;
-    readonly attribute boolean done;
-    readonly attribute boolean successful;
   };
 
   dictionary BackgroundFetchClickEventInit : BackgroundFetchEventInit {
-    
+    required BackgroundFetchState state;
   };
 
   enum BackgroundFetchState { "pending", "succeeded", "failed" };
