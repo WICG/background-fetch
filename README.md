@@ -2,7 +2,7 @@ This is a proposal for a background-fetching API, to handle large upload/downloa
 
 # The problem
 
-The service worker is capable of fetching and caching assets, the size of which is restricted only by [origin storage](https://storage.spec.whatwg.org/#usage-and-quota). However, if the user navigates away from the site or closes the browser, the service worker is likely to be killed. This can happen even if there's a pending promise passed to `extendableEvent.waitUntil` - if it hasn't resolved within a few minutes the browser may consider it an abuse of service worker and kill the process.
+A service worker is capable of fetching and caching assets, the size of which is restricted only by [origin storage](https://storage.spec.whatwg.org/#usage-and-quota). However, if the user navigates away from the site or closes the browser, the service worker is likely to be killed. This can happen even if there's a pending promise passed to `extendableEvent.waitUntil` - if it hasn't resolved within a few minutes the browser may consider it an abuse of service worker and kill the process.
 
 This makes it difficult to download and cache large assets such as podcasts and movies, and upload video and images. Even if the service worker isn't killed, having to keep the service worker in memory during this potentially long operation is wasteful.
 
@@ -101,7 +101,7 @@ addEventListener('backgroundfetched', bgFetchEvent => {
 `bgFetchEvent` extends [`ExtendableEvent`](https://w3c.github.io/ServiceWorker/#extendableevent), with the following additional members:
 
 * `tag` - tag of the background fetch job.
-* `fetches` - a sequence of objects, which have the following members:
+* `completeFetches` - a sequence of objects, which have the following members:
   * `request` - a [`Request`](https://fetch.spec.whatwg.org/#request-class).
   * `response` - a [`Response`](https://fetch.spec.whatwg.org/#response-class).
 * `updateUI(title)` - update the title, eg "Uploaded 'Holiday in Rome'", "Downloaded 'Catastrophe season 2 episode 1'", or "Level 5 ready to play!". If this isn't called, the browser may update the title itself.
@@ -115,12 +115,16 @@ I'm a little concerned that `fetches` is a different shape here to what it looks
 As `backgroundfetched`, but one or more of the fetches encountered an error.
 
 ```js
-addEventListener('backgroundfetchfailed', bgFetchEvent => {
+addEventListener('backgroundfetchfail', bgFetchFailEvent => {
   // …
 });
 ```
 
-`bgFetchEvent` is the same as it is for `backgroundfetched`. `bgFetchEvent.fetches` will provide insight into which requests succeeded and which failed.
+`bgFetchFailEvent` extends `bgFetchEvent`, with the following additional members:
+
+* `failedFetches` - a sequence of objects, which have the following members:
+  * `request` - a [`Request`](https://fetch.spec.whatwg.org/#request-class).
+  * `response` - a [`Response`](https://fetch.spec.whatwg.org/#response-class).
 
 Again, once this event is fired, the background fetch job is no longer stored against the registration, so `backgroundFetch.get(bgFetchEvent.tag)` will resolve with undefined.
 
@@ -156,7 +160,7 @@ addEventListener('backgroundfetchclick', bgFetchClickEvent => {
 
 * `tag` - tag of the background fetch job.
 * `state` - "pending", "succeeded" or "failed".
-* `done` - has `backgroundfetched` or `backgroundfetchfailed` fired for this job?
+* `done` - has `backgroundfetched` or `backgroundfetchfail` fired for this job?
 * `successful` - true if job completed successfully, false otherwise.
 
 Since this is a user interaction event, developers can call `clients.openWindow` in response. If a window isn't created/focused, the browser may open a related URL (the root of the origin, or a `start_url` from a related manifest).
@@ -190,7 +194,7 @@ Eventually we'd like uploads to be resumable, but there's no standard for that.
 
 # Quota usage
 
-The background fetch job, including its requests & in-progress responses, can be accessed at any time until the `backgroundfetched`, `backgroundfetcherror`, or `backgroundfetchabort` event fires, so they count against origin quota. After the point, the event receives the requests and responses (except in the case of abort) for the final time, once these copies are drained, they're gone.
+The background fetch job, including its requests & in-progress responses, can be accessed at any time until the `backgroundfetched`, `backgroundfetchfail`, or `backgroundfetchabort` event fires, so they count against origin quota. After the point, the event receives the requests and responses (except in the case of abort) for the final time, once these copies are drained, they're gone.
 
 A requirement is to avoid doubling quota usage when transferring background-fetched items into the cache, unless clones exist.
 
@@ -198,7 +202,7 @@ A requirement is to avoid doubling quota usage when transferring background-fetc
 addEventListener('backgroundfetched', event => {
   event.waitUntil(async function() {
     const cache = await caches.open('my-cache');
-    const promises = event.fetches.map(({request, response}) => {
+    const promises = event.completeFetches.map(({request, response}) => {
       if (response && response.ok) {
         return cache.put(request, response);
       }
@@ -284,7 +288,7 @@ addEventListener('backgroundfetched', event => {
 
       // Cache podcasts
       const cache = caches.open(event.tag);
-      const promises = event.fetches.map(({request, response}) => {
+      const promises = event.completeFetches.map(({request, response}) => {
         return cache.put(request, response);
       });
 
@@ -295,7 +299,7 @@ addEventListener('backgroundfetched', event => {
 });
 
 // Failed!
-addEventListener('backgroundfetchfailed', event => {
+addEventListener('backgroundfetchfail', event => {
   if (event.tag.startsWith('podcast-')) {
     event.waitUntil(async function() {
       // Get podcast by ID
@@ -389,7 +393,7 @@ self.addEventListener('backgroundfetched', event => {
 
     event.waitUntil(async function() {
       const cache = await caches.open(event.tag);
-      const promises = event.fetches.map(({request, response}) => {
+      const promises = event.completeFetches.map(({request, response}) => {
         return cache.put(request, response);
       });
 
@@ -400,7 +404,7 @@ self.addEventListener('backgroundfetched', event => {
   }
 });
 
-addEventListener('backgroundfetchfailed', event => {
+addEventListener('backgroundfetchfail', event => {
   if (event.tag.startsWith('level-')) {
     const level = /^level-(.*)$/.exec(event.tag)[1];
     event.updateUI(`Failed to download level ${level}`);
@@ -450,13 +454,13 @@ addEventListener('backgroundfetched', event => {
   }
 });
 
-addEventListener('backgroundfetcherror', event => {
+addEventListener('backgroundfetchfail', event => {
   if (event.tag.startsWith('video-upload-')) {
     event.updateUI("Upload failed");
 
     // Store the data in IDB so it isn't lost:
     event.waitUntil(async function() {
-      const formData = await event.fetches[0].request.formData();
+      const formData = await event.failedFetches[0].request.formData();
       await storeInIDB(formData);
     }());
   }
