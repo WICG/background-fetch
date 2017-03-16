@@ -217,7 +217,7 @@ The following is the <a>event handler</a> (and its corresponding <a>event handle
   };
 
   dictionary BackgroundFetchedEventInit : BackgroundFetchEventInit {
-    required BackgroundFetchSettledFetch fetches;
+    required sequence&lt;BackgroundFetchSettledFetch&gt; fetches;
   };
 
   [Exposed=ServiceWorker]
@@ -251,7 +251,7 @@ The following is the <a>event handler</a> (and its corresponding <a>event handle
   };
 
   dictionary BackgroundFetchFailEventInit : BackgroundFetchedEventInit {
-    required BackgroundFetchSettledFetch fetches;
+    required sequence&lt;BackgroundFetchSettledFetch&gt; fetches;
   };
 </pre>
 

@@ -1588,7 +1588,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
   <span class="kt">readonly</span> <span class="kt">attribute</span> <span class="kt">DOMString</span> <dfn class="nv idl-code" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="attribute" data-export="" data-readonly="" data-type="DOMString" id="dom-backgroundfetchregistration-title">title<a class="self-link" href="#dom-backgroundfetchregistration-title"></a></dfn>;
   <span class="kt">readonly</span> <span class="kt">attribute</span> <span class="kt">FrozenArray</span>&lt;<a class="n" data-link-type="idl-name" href="#backgroundfetchactivefetch" id="ref-for-backgroundfetchactivefetch-1">BackgroundFetchActiveFetch</a>> <dfn class="nv idl-code" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="attribute" data-export="" data-readonly="" data-type="FrozenArray<BackgroundFetchActiveFetch>" id="dom-backgroundfetchregistration-activefetches">activeFetches<a class="self-link" href="#dom-backgroundfetchregistration-activefetches"></a></dfn>;
 
-  <span class="kt">void</span> <dfn class="nv idl-code" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="method" data-export="" data-lt="abort()" id="dom-backgroundfetchregistration-abort">abort<a class="self-link" href="#dom-backgroundfetchregistration-abort"></a></dfn>();
+  <span class="kt">Promise</span>&lt;<span class="kt">boolean</span>> <dfn class="nv idl-code" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="method" data-export="" data-lt="abort()" id="dom-backgroundfetchregistration-abort">abort<a class="self-link" href="#dom-backgroundfetchregistration-abort"></a></dfn>();
 };
 
 [<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed">Exposed</a>=(<span class="n">Window</span>,<span class="n">Worker</span>)]
@@ -1670,7 +1670,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
 };
 
 <span class="kt">dictionary</span> <dfn class="nv dfn-paneled idl-code" data-dfn-type="dictionary" data-export="" id="dictdef-backgroundfetchedeventinit">BackgroundFetchedEventInit</dfn> : <a class="n" data-link-type="idl-name" href="#dictdef-backgroundfetcheventinit" id="ref-for-dictdef-backgroundfetcheventinit-2">BackgroundFetchEventInit</a> {
-  <span class="kt">required</span> <a class="n" data-link-type="idl-name" href="#backgroundfetchsettledfetch" id="ref-for-backgroundfetchsettledfetch-2">BackgroundFetchSettledFetch</a> <dfn class="nv idl-code" data-dfn-for="BackgroundFetchedEventInit" data-dfn-type="dict-member" data-export="" data-type="BackgroundFetchSettledFetch " id="dom-backgroundfetchedeventinit-fetches">fetches<a class="self-link" href="#dom-backgroundfetchedeventinit-fetches"></a></dfn>;
+  <span class="kt">required</span> <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#backgroundfetchsettledfetch" id="ref-for-backgroundfetchsettledfetch-2">BackgroundFetchSettledFetch</a>> <dfn class="nv idl-code" data-dfn-for="BackgroundFetchedEventInit" data-dfn-type="dict-member" data-export="" data-type="sequence<BackgroundFetchSettledFetch> " id="dom-backgroundfetchedeventinit-fetches">fetches<a class="self-link" href="#dom-backgroundfetchedeventinit-fetches"></a></dfn>;
 };
 
 [<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed">Exposed</a>=<span class="n">ServiceWorker</span>]
@@ -1702,7 +1702,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
 };
 
 <span class="kt">dictionary</span> <dfn class="nv idl-code" data-dfn-type="dictionary" data-export="" id="dictdef-backgroundfetchfaileventinit">BackgroundFetchFailEventInit<a class="self-link" href="#dictdef-backgroundfetchfaileventinit"></a></dfn> : <a class="n" data-link-type="idl-name" href="#dictdef-backgroundfetchedeventinit" id="ref-for-dictdef-backgroundfetchedeventinit-3">BackgroundFetchedEventInit</a> {
-  <span class="kt">required</span> <a class="n" data-link-type="idl-name" href="#backgroundfetchsettledfetch" id="ref-for-backgroundfetchsettledfetch-4">BackgroundFetchSettledFetch</a> <dfn class="nv idl-code" data-dfn-for="BackgroundFetchFailEventInit" data-dfn-type="dict-member" data-export="" data-type="BackgroundFetchSettledFetch " id="dom-backgroundfetchfaileventinit-fetches">fetches<a class="self-link" href="#dom-backgroundfetchfaileventinit-fetches"></a></dfn>;
+  <span class="kt">required</span> <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#backgroundfetchsettledfetch" id="ref-for-backgroundfetchsettledfetch-4">BackgroundFetchSettledFetch</a>> <dfn class="nv idl-code" data-dfn-for="BackgroundFetchFailEventInit" data-dfn-type="dict-member" data-export="" data-type="sequence<BackgroundFetchSettledFetch> " id="dom-backgroundfetchfaileventinit-fetches">fetches<a class="self-link" href="#dom-backgroundfetchfaileventinit-fetches"></a></dfn>;
 };
 </pre>
    <h4 class="heading settled" data-level="3.4.4" id="background-fetch-click-event"><span class="secno">3.4.4. </span><span class="content"><code class="idl"><a data-link-type="idl" href="#backgroundfetchclickevent" id="ref-for-backgroundfetchclickevent-2">BackgroundFetchClickEvent</a></code></span><a class="self-link" href="#background-fetch-click-event"></a></h4>
@@ -2072,7 +2072,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
   <span class="kt">readonly</span> <span class="kt">attribute</span> <span class="kt">DOMString</span> <a class="nv" data-readonly="" data-type="DOMString" href="#dom-backgroundfetchregistration-title">title</a>;
   <span class="kt">readonly</span> <span class="kt">attribute</span> <span class="kt">FrozenArray</span>&lt;<a class="n" data-link-type="idl-name" href="#backgroundfetchactivefetch">BackgroundFetchActiveFetch</a>> <a class="nv" data-readonly="" data-type="FrozenArray<BackgroundFetchActiveFetch>" href="#dom-backgroundfetchregistration-activefetches">activeFetches</a>;
 
-  <span class="kt">void</span> <a class="nv" href="#dom-backgroundfetchregistration-abort">abort</a>();
+  <span class="kt">Promise</span>&lt;<span class="kt">boolean</span>> <a class="nv" href="#dom-backgroundfetchregistration-abort">abort</a>();
 };
 
 [<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed">Exposed</a>=(<span class="n">Window</span>,<span class="n">Worker</span>)]
@@ -2110,7 +2110,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
 };
 
 <span class="kt">dictionary</span> <a class="nv" href="#dictdef-backgroundfetchedeventinit">BackgroundFetchedEventInit</a> : <a class="n" data-link-type="idl-name" href="#dictdef-backgroundfetcheventinit">BackgroundFetchEventInit</a> {
-  <span class="kt">required</span> <a class="n" data-link-type="idl-name" href="#backgroundfetchsettledfetch">BackgroundFetchSettledFetch</a> <a class="nv" data-type="BackgroundFetchSettledFetch " href="#dom-backgroundfetchedeventinit-fetches">fetches</a>;
+  <span class="kt">required</span> <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#backgroundfetchsettledfetch">BackgroundFetchSettledFetch</a>> <a class="nv" data-type="sequence<BackgroundFetchSettledFetch> " href="#dom-backgroundfetchedeventinit-fetches">fetches</a>;
 };
 
 [<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed">Exposed</a>=<span class="n">ServiceWorker</span>]
@@ -2124,7 +2124,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
 };
 
 <span class="kt">dictionary</span> <a class="nv" href="#dictdef-backgroundfetchfaileventinit">BackgroundFetchFailEventInit</a> : <a class="n" data-link-type="idl-name" href="#dictdef-backgroundfetchedeventinit">BackgroundFetchedEventInit</a> {
-  <span class="kt">required</span> <a class="n" data-link-type="idl-name" href="#backgroundfetchsettledfetch">BackgroundFetchSettledFetch</a> <a class="nv" data-type="BackgroundFetchSettledFetch " href="#dom-backgroundfetchfaileventinit-fetches">fetches</a>;
+  <span class="kt">required</span> <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#backgroundfetchsettledfetch">BackgroundFetchSettledFetch</a>> <a class="nv" data-type="sequence<BackgroundFetchSettledFetch> " href="#dom-backgroundfetchfaileventinit-fetches">fetches</a>;
 };
 
 [<a class="nv" href="#dom-backgroundfetchclickevent-backgroundfetchclickevent">Constructor</a>(<span class="kt">DOMString</span> <a class="nv" href="#dom-backgroundfetchclickevent-backgroundfetchclickevent-type-init-type">type</a>, <a class="n" data-link-type="idl-name" href="#dictdef-backgroundfetchedeventinit">BackgroundFetchedEventInit</a> <a class="nv" href="#dom-backgroundfetchclickevent-backgroundfetchclickevent-type-init-init">init</a>), <a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed">Exposed</a>=<span class="n">ServiceWorker</span>]
