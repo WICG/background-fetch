@@ -113,7 +113,7 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
     readonly attribute DOMString title;
     readonly attribute FrozenArray&lt;BackgroundFetchActiveFetch&gt; activeFetches;
 
-    void abort();
+    Promise&lt;boolean&gt; abort();
   };
 
   [Exposed=(Window,Worker)]

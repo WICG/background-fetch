@@ -63,7 +63,7 @@ const bgFetchJob = await registration.backgroundFetch.get(tag);
 * `activeFetches` - a sequence of objects, which have the following members:
   * `request` - a [`Request`](https://fetch.spec.whatwg.org/#request-class).
   * `responseReady` - a promise for a [`Response`](https://fetch.spec.whatwg.org/#response-class). Rejects if the fetch has terminally failed.
-* `abort()` - abort the whole background fetch job. (Question: do we need this if each fetch is abortable?)
+* `abort()` - abort the whole background fetch job. This returns a promise that resolves with a boolean, which is true if the operation successfully aborted.
 
 `BackgroundFetch` objects will also include [fetch controller/observer objects](https://github.com/whatwg/fetch/issues/447) as they land.
 
