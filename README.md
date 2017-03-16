@@ -60,7 +60,7 @@ const bgFetchJob = await registration.backgroundFetch.get(tag);
 * `icons` - as provided.
 * `totalDownloadSize` - as provided.
 * `title` - as provided.
-* `fetches` - a sequence of objects, which have the following members:
+* `activeFetches` - a sequence of objects, which have the following members:
   * `request` - a [`Request`](https://fetch.spec.whatwg.org/#request-class).
   * `responseReady` - a promise for a [`Response`](https://fetch.spec.whatwg.org/#response-class). Rejects if the fetch has terminally failed.
 * `abort()` - abort the whole background fetch job. (Question: do we need this if each fetch is abortable?)
@@ -101,14 +101,12 @@ addEventListener('backgroundfetched', bgFetchEvent => {
 `bgFetchEvent` extends [`ExtendableEvent`](https://w3c.github.io/ServiceWorker/#extendableevent), with the following additional members:
 
 * `tag` - tag of the background fetch job.
-* `completeFetches` - a sequence of objects, which have the following members:
+* `fetches` - a sequence of objects, which have the following members:
   * `request` - a [`Request`](https://fetch.spec.whatwg.org/#request-class).
   * `response` - a [`Response`](https://fetch.spec.whatwg.org/#response-class).
 * `updateUI(title)` - update the title, eg "Uploaded 'Holiday in Rome'", "Downloaded 'Catastrophe season 2 episode 1'", or "Level 5 ready to play!". If this isn't called, the browser may update the title itself.
 
 Once this event is fired, the background fetch job is no longer stored against the registration, so `backgroundFetch.get(bgFetchEvent.tag)` will resolve with undefined.
-
-I'm a little concerned that `fetches` is a different shape here to what it looks like on background fetch jobs. We may need a different name, or find a way to combine the APIs.
 
 ## Reacting to failure
 
@@ -122,7 +120,7 @@ addEventListener('backgroundfetchfail', bgFetchFailEvent => {
 
 `bgFetchFailEvent` extends `bgFetchEvent`, with the following additional members:
 
-* `failedFetches` - a sequence of objects, which have the following members:
+* `fetches` - a sequence of objects, which have the following members:
   * `request` - a [`Request`](https://fetch.spec.whatwg.org/#request-class).
   * `response` - a [`Response`](https://fetch.spec.whatwg.org/#response-class).
 
@@ -200,7 +198,7 @@ A requirement is to avoid doubling quota usage when transferring background-fetc
 addEventListener('backgroundfetched', event => {
   event.waitUntil(async function() {
     const cache = await caches.open('my-cache');
-    const promises = event.completeFetches.map(({request, response}) => {
+    const promises = event.fetches.map(({request, response}) => {
       if (response && response.ok) {
         return cache.put(request, response);
       }
@@ -286,7 +284,7 @@ addEventListener('backgroundfetched', event => {
 
       // Cache podcasts
       const cache = caches.open(event.tag);
-      const promises = event.completeFetches.map(({request, response}) => {
+      const promises = event.fetches.map(({request, response}) => {
         return cache.put(request, response);
       });
 
@@ -334,7 +332,7 @@ addEventListener('fetch', event => {
 
       if (bgFetchJob) {
         // Look for response in fetches
-        const response = await findPodcastResponse(bgFetchJob.fetches);
+        const response = await findPodcastResponse(bgFetchJob.activeFetches);
         if (response) return response;
       }
 
@@ -391,7 +389,7 @@ self.addEventListener('backgroundfetched', event => {
 
     event.waitUntil(async function() {
       const cache = await caches.open(event.tag);
-      const promises = event.completeFetches.map(({request, response}) => {
+      const promises = event.fetches.map(({request, response}) => {
         return cache.put(request, response);
       });
 
@@ -458,7 +456,7 @@ addEventListener('backgroundfetchfail', event => {
 
     // Store the data in IDB so it isn't lost:
     event.waitUntil(async function() {
-      const formData = await event.failedFetches[0].request.formData();
+      const formData = await event.fetches[0].request.formData();
       await storeInIDB(formData);
     }());
   }

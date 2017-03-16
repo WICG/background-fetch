@@ -111,7 +111,7 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
     readonly attribute FrozenArray&lt;IconDefinition&gt; icons;
     readonly attribute long totalDownloadSize;
     readonly attribute DOMString title;
-    readonly attribute FrozenArray&lt;BackgroundFetchActiveFetches&gt; fetches;
+    readonly attribute FrozenArray&lt;BackgroundFetchActiveFetches&gt; activeFetches;
 
     void abort();
   };
@@ -211,13 +211,13 @@ The following is the <a>event handler</a> (and its corresponding <a>event handle
 <pre class="idl">
   [Constructor(DOMString type, BackgroundFetchEndEventInit init), Exposed=ServiceWorker]
   interface BackgroundFetchEndEvent : BackgroundFetchEvent {
-    readonly attribute FrozenArray&lt;BackgroundFetchSettledFetches&gt; completeFetches;
+    readonly attribute FrozenArray&lt;BackgroundFetchSettledFetches&gt; fetches;
 
     Promise&lt;void&gt; updateUI(DOMString title);
   };
 
   dictionary BackgroundFetchEndEventInit : BackgroundFetchEventInit {
-    required BackgroundFetchSettledFetches completeFetches;
+    required BackgroundFetchSettledFetches fetches;
   };
 
   [Exposed=ServiceWorker]
@@ -247,11 +247,11 @@ The following is the <a>event handler</a> (and its corresponding <a>event handle
 <pre class="idl">
   [Constructor(DOMString type, BackgroundFetchEndEventInit init), Exposed=ServiceWorker]
   interface BackgroundFetchFailEvent : BackgroundFetchEndEvent {
-    readonly attribute FrozenArray&lt;BackgroundFetchSettledFetches&gt; failedFetches;
+    readonly attribute FrozenArray&lt;BackgroundFetchSettledFetches&gt; fetches;
   };
 
   dictionary BackgroundFetchFailEventInit : BackgroundFetchEndEventInit {
-    required BackgroundFetchSettledFetches failedFetches;
+    required BackgroundFetchSettledFetches fetches;
   };
 </pre>
 
