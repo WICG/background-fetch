@@ -128,7 +128,7 @@ Again, once this event is fired, the background fetch job is no longer stored ag
 
 In an earlier draft, this event and `backgroundfetched` were the same thing, including a property that indicated success/failure. It felt wrong when writing examples, so I split them out.
 
-I'm not sure if this event should fire as early as possible (and abort any in-progress fetches) or wait for all fetches to settle.
+This event should fire after all fetches have completed or been abandoned. As in, this event *doesn't* fire as soon as a single request fails.
 
 ## Reacting to abort
 
@@ -180,7 +180,7 @@ If the job has ended, clicking the notification may close/hide it.
 
 # Retrying
 
-The browser may retry particular requests in response to network failures, or particular not-ok responses. Range requests may be used to resume particular requests.
+The browser may retry particular requests in response to network failures. Range requests may be used to resume particular requests.
 
 We need to think about which cases are "retryable", and which indicate terminal failure. Eg, a POST that results in a network failure may be "retryable", but a POST that results in a 403 may not. We also need to define how often a "retryable" request can be retried before failing, and any kind of delay before retrying.
 
