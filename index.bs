@@ -159,7 +159,7 @@ The following is the <a>event handler</a> (and its corresponding <a>event handle
     <tr>
       <td><dfn>backgroundfetched</dfn></td>
       <td>{{ServiceWorkerGlobalScope/onbackgroundfetched}}</td>
-      <td>{{BackgroundFetchEndEvent}}</td>
+      <td>{{BackgroundFetchedEvent}}</td>
     </tr>
     <tr>
       <td><dfn>backgroundfetchfail</dfn></td>
@@ -206,17 +206,17 @@ The following is the <a>event handler</a> (and its corresponding <a>event handle
   1. TODO
 </div>
 
-### {{BackgroundFetchEndEvent}} ### {#background-fetch-end-event}
+### {{BackgroundFetchedEvent}} ### {#background-fetch-end-event}
 
 <pre class="idl">
-  [Constructor(DOMString type, BackgroundFetchEndEventInit init), Exposed=ServiceWorker]
-  interface BackgroundFetchEndEvent : BackgroundFetchEvent {
+  [Constructor(DOMString type, BackgroundFetchedEventInit init), Exposed=ServiceWorker]
+  interface BackgroundFetchedEvent : BackgroundFetchEvent {
     readonly attribute FrozenArray&lt;BackgroundFetchSettledFetch&gt; fetches;
 
     Promise&lt;void&gt; updateUI(DOMString title);
   };
 
-  dictionary BackgroundFetchEndEventInit : BackgroundFetchEventInit {
+  dictionary BackgroundFetchedEventInit : BackgroundFetchEventInit {
     required BackgroundFetchSettledFetch fetches;
   };
 
@@ -226,7 +226,7 @@ The following is the <a>event handler</a> (and its corresponding <a>event handle
   };
 </pre>
 
-<div dfn-for="BackgroundFetchEndEvent">
+<div dfn-for="BackgroundFetchedEvent">
   The <dfn attribute>completeFetches</dfn> attribute must return TODO.
 
   <div algorithm>
@@ -237,7 +237,7 @@ The following is the <a>event handler</a> (and its corresponding <a>event handle
 </div>
 
 <div algorithm>
-  The <dfn constructor for="BackgroundFetchEndEvent">BackgroundFetchEndEvent(|type|, |init|)</dfn> constructor, when invoked, must run these steps:
+  The <dfn constructor for="BackgroundFetchedEvent">BackgroundFetchedEvent(|type|, |init|)</dfn> constructor, when invoked, must run these steps:
 
   1. TODO
 </div>
@@ -245,12 +245,12 @@ The following is the <a>event handler</a> (and its corresponding <a>event handle
 ### {{BackgroundFetchFailEvent}} ### {#background-fetch-fail-event}
 
 <pre class="idl">
-  [Constructor(DOMString type, BackgroundFetchEndEventInit init), Exposed=ServiceWorker]
-  interface BackgroundFetchFailEvent : BackgroundFetchEndEvent {
+  [Constructor(DOMString type, BackgroundFetchedEventInit init), Exposed=ServiceWorker]
+  interface BackgroundFetchFailEvent : BackgroundFetchedEvent {
     readonly attribute FrozenArray&lt;BackgroundFetchSettledFetch&gt; fetches;
   };
 
-  dictionary BackgroundFetchFailEventInit : BackgroundFetchEndEventInit {
+  dictionary BackgroundFetchFailEventInit : BackgroundFetchedEventInit {
     required BackgroundFetchSettledFetch fetches;
   };
 </pre>
@@ -258,7 +258,7 @@ The following is the <a>event handler</a> (and its corresponding <a>event handle
 ### {{BackgroundFetchClickEvent}} ### {#background-fetch-click-event}
 
 <pre class="idl">
-  [Constructor(DOMString type, BackgroundFetchEndEventInit init), Exposed=ServiceWorker]
+  [Constructor(DOMString type, BackgroundFetchedEventInit init), Exposed=ServiceWorker]
   interface BackgroundFetchClickEvent : BackgroundFetchEvent {
     readonly attribute BackgroundFetchState state;
   };
