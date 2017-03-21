@@ -1423,7 +1423,7 @@ pre.idl.highlight { color: #708090; }
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">Background Fetch</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Editor’s Draft, <time class="dt-updated" datetime="2017-03-16">16 March 2017</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Editor’s Draft, <time class="dt-updated" datetime="2017-03-21">21 March 2017</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1541,17 +1541,17 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
 };
 
 <span class="kt">dictionary</span> <dfn class="nv dfn-paneled idl-code" data-dfn-type="dictionary" data-export="" id="dictdef-backgroundfetchoptions">BackgroundFetchOptions</dfn> {
-  <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#dictdef-icondefinition" id="ref-for-dictdef-icondefinition-1">IconDefinition</a>> <dfn class="nv idl-code" data-dfn-for="BackgroundFetchOptions" data-dfn-type="dict-member" data-export="" data-type="sequence<IconDefinition> " id="dom-backgroundfetchoptions-icons">icons<a class="self-link" href="#dom-backgroundfetchoptions-icons"></a></dfn>;
-  <span class="kt">DOMString</span> <dfn class="nv idl-code" data-dfn-for="BackgroundFetchOptions" data-dfn-type="dict-member" data-export="" data-type="DOMString " id="dom-backgroundfetchoptions-title">title<a class="self-link" href="#dom-backgroundfetchoptions-title"></a></dfn>;
-  <span class="kt">long</span> <dfn class="nv idl-code" data-dfn-for="BackgroundFetchOptions" data-dfn-type="dict-member" data-export="" data-type="long " id="dom-backgroundfetchoptions-totaldownloadsize">totalDownloadSize<a class="self-link" href="#dom-backgroundfetchoptions-totaldownloadsize"></a></dfn>;
+  <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#dictdef-icondefinition" id="ref-for-dictdef-icondefinition-1">IconDefinition</a>> <dfn class="nv idl-code" data-default="None" data-dfn-for="BackgroundFetchOptions" data-dfn-type="dict-member" data-export="" data-type="sequence<IconDefinition> " id="dom-backgroundfetchoptions-icons">icons<a class="self-link" href="#dom-backgroundfetchoptions-icons"></a></dfn> = [];
+  <span class="kt">DOMString</span> <dfn class="nv idl-code" data-default="&quot;&quot;" data-dfn-for="BackgroundFetchOptions" data-dfn-type="dict-member" data-export="" data-type="DOMString " id="dom-backgroundfetchoptions-title">title<a class="self-link" href="#dom-backgroundfetchoptions-title"></a></dfn> = "";
+  <span class="kt">long</span> <dfn class="nv idl-code" data-default="0" data-dfn-for="BackgroundFetchOptions" data-dfn-type="dict-member" data-export="" data-type="long " id="dom-backgroundfetchoptions-totaldownloadsize">totalDownloadSize<a class="self-link" href="#dom-backgroundfetchoptions-totaldownloadsize"></a></dfn> = 0;
 };
 
 // This is taken from https://w3c.github.io/manifest/#icons-member.
 // This definition should probably be moved somewhere more general.
 <span class="kt">dictionary</span> <dfn class="nv dfn-paneled idl-code" data-dfn-type="dictionary" data-export="" id="dictdef-icondefinition">IconDefinition</dfn> {
   <span class="kt">DOMString</span> <dfn class="nv idl-code" data-dfn-for="IconDefinition" data-dfn-type="dict-member" data-export="" data-type="DOMString " id="dom-icondefinition-src">src<a class="self-link" href="#dom-icondefinition-src"></a></dfn>;
-  <span class="kt">DOMString</span> <dfn class="nv idl-code" data-dfn-for="IconDefinition" data-dfn-type="dict-member" data-export="" data-type="DOMString " id="dom-icondefinition-sizes">sizes<a class="self-link" href="#dom-icondefinition-sizes"></a></dfn>;
-  <span class="kt">DOMString</span> <dfn class="nv idl-code" data-dfn-for="IconDefinition" data-dfn-type="dict-member" data-export="" data-type="DOMString " id="dom-icondefinition-type">type<a class="self-link" href="#dom-icondefinition-type"></a></dfn>;
+  <span class="kt">DOMString</span> <dfn class="nv idl-code" data-default="&quot;&quot;" data-dfn-for="IconDefinition" data-dfn-type="dict-member" data-export="" data-type="DOMString " id="dom-icondefinition-sizes">sizes<a class="self-link" href="#dom-icondefinition-sizes"></a></dfn> = "";
+  <span class="kt">DOMString</span> <dfn class="nv idl-code" data-default="&quot;&quot;" data-dfn-for="IconDefinition" data-dfn-type="dict-member" data-export="" data-type="DOMString " id="dom-icondefinition-type">type<a class="self-link" href="#dom-icondefinition-type"></a></dfn> = "";
 };
 </pre>
    <div>
@@ -2051,17 +2051,17 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
 };
 
 <span class="kt">dictionary</span> <a class="nv" href="#dictdef-backgroundfetchoptions">BackgroundFetchOptions</a> {
-  <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#dictdef-icondefinition">IconDefinition</a>> <a class="nv" data-type="sequence<IconDefinition> " href="#dom-backgroundfetchoptions-icons">icons</a>;
-  <span class="kt">DOMString</span> <a class="nv" data-type="DOMString " href="#dom-backgroundfetchoptions-title">title</a>;
-  <span class="kt">long</span> <a class="nv" data-type="long " href="#dom-backgroundfetchoptions-totaldownloadsize">totalDownloadSize</a>;
+  <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#dictdef-icondefinition">IconDefinition</a>> <a class="nv" data-default="None" data-type="sequence<IconDefinition> " href="#dom-backgroundfetchoptions-icons">icons</a> = [];
+  <span class="kt">DOMString</span> <a class="nv" data-default="&quot;&quot;" data-type="DOMString " href="#dom-backgroundfetchoptions-title">title</a> = "";
+  <span class="kt">long</span> <a class="nv" data-default="0" data-type="long " href="#dom-backgroundfetchoptions-totaldownloadsize">totalDownloadSize</a> = 0;
 };
 
 // This is taken from https://w3c.github.io/manifest/#icons-member.
 // This definition should probably be moved somewhere more general.
 <span class="kt">dictionary</span> <a class="nv" href="#dictdef-icondefinition">IconDefinition</a> {
   <span class="kt">DOMString</span> <a class="nv" data-type="DOMString " href="#dom-icondefinition-src">src</a>;
-  <span class="kt">DOMString</span> <a class="nv" data-type="DOMString " href="#dom-icondefinition-sizes">sizes</a>;
-  <span class="kt">DOMString</span> <a class="nv" data-type="DOMString " href="#dom-icondefinition-type">type</a>;
+  <span class="kt">DOMString</span> <a class="nv" data-default="&quot;&quot;" data-type="DOMString " href="#dom-icondefinition-sizes">sizes</a> = "";
+  <span class="kt">DOMString</span> <a class="nv" data-default="&quot;&quot;" data-type="DOMString " href="#dom-icondefinition-type">type</a> = "";
 };
 
 [<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed">Exposed</a>=(<span class="n">Window</span>,<span class="n">Worker</span>)]

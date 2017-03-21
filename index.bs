@@ -67,17 +67,17 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
   };
 
   dictionary BackgroundFetchOptions {
-    sequence&lt;IconDefinition&gt; icons;
-    DOMString title;
-    long totalDownloadSize;
+    sequence&lt;IconDefinition&gt; icons = [];
+    DOMString title = "";
+    long totalDownloadSize = 0;
   };
 
   // This is taken from https://w3c.github.io/manifest/#icons-member.
   // This definition should probably be moved somewhere more general.
   dictionary IconDefinition {
     DOMString src;
-    DOMString sizes;
-    DOMString type;
+    DOMString sizes = "";
+    DOMString type = "";
   };
 </pre>
 
