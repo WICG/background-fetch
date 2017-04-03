@@ -29,7 +29,7 @@ const bgFetchJob = await registration.backgroundFetch.fetch(tag, requests, optio
 ```
 
 * `tag` - a name for this job.
-* `request` - a sequence of URLs or `Request` objects.
+* `requests` - a sequence of URLs or `Request` objects.
 * `options` - an object containing any of:
   * `icons` - A sequence of icon definitions, similar to [`icons` in the manifest spec](https://w3c.github.io/manifest/#icons-member).
   * `title` - Something descriptive to show in UI, such as "Uploading 'Holiday in Rome'" or "Downloading 'Catastrophe season 2 episode 1'".
