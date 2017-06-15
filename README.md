@@ -283,7 +283,7 @@ addEventListener('backgroundfetched', event => {
 
 
       // Cache podcasts
-      const cache = caches.open(event.tag);
+      const cache = await caches.open(event.tag);
       const promises = event.fetches.map(({request, response}) => {
         return cache.put(request, response);
       });
