@@ -1537,7 +1537,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
 <span class="kt">interface</span> <dfn class="nv dfn-paneled idl-code" data-dfn-type="interface" data-export="" id="backgroundfetchmanager"><code>BackgroundFetchManager</code></dfn> {
   <span class="kt">Promise</span>&lt;<a class="n" data-link-type="idl-name" href="#backgroundfetchregistration" id="ref-for-backgroundfetchregistration">BackgroundFetchRegistration</a>> <a class="nv idl-code" data-link-type="method" href="#dom-backgroundfetchmanager-fetch" id="ref-for-dom-backgroundfetchmanager-fetch">fetch</a>(<a class="n idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString"><span class="kt">DOMString</span></a> <dfn class="nv idl-code" data-dfn-for="BackgroundFetchManager/fetch(id, requests, options), BackgroundFetchManager/fetch(id, requests)" data-dfn-type="argument" data-export="" id="dom-backgroundfetchmanager-fetch-id-requests-options-id"><code>id</code><a class="self-link" href="#dom-backgroundfetchmanager-fetch-id-requests-options-id"></a></dfn>, (<a class="n" data-link-type="idl-name" href="https://fetch.spec.whatwg.org/#requestinfo" id="ref-for-requestinfo">RequestInfo</a> <span class="kt">or</span> <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="https://fetch.spec.whatwg.org/#requestinfo" id="ref-for-requestinfo-0">RequestInfo</a>>) <dfn class="nv idl-code" data-dfn-for="BackgroundFetchManager/fetch(id, requests, options), BackgroundFetchManager/fetch(id, requests)" data-dfn-type="argument" data-export="" id="dom-backgroundfetchmanager-fetch-id-requests-options-requests"><code>requests</code><a class="self-link" href="#dom-backgroundfetchmanager-fetch-id-requests-options-requests"></a></dfn>, <span class="kt">optional</span> <a class="n" data-link-type="idl-name" href="#dictdef-backgroundfetchoptions" id="ref-for-dictdef-backgroundfetchoptions">BackgroundFetchOptions</a> <dfn class="nv idl-code" data-dfn-for="BackgroundFetchManager/fetch(id, requests, options), BackgroundFetchManager/fetch(id, requests)" data-dfn-type="argument" data-export="" id="dom-backgroundfetchmanager-fetch-id-requests-options-options"><code>options</code><a class="self-link" href="#dom-backgroundfetchmanager-fetch-id-requests-options-options"></a></dfn>);
   <span class="kt">Promise</span>&lt;<a class="n" data-link-type="idl-name" href="#backgroundfetchregistration" id="ref-for-backgroundfetchregistration-0">BackgroundFetchRegistration</a>?> <a class="nv idl-code" data-link-type="method" href="#dom-backgroundfetchmanager-get" id="ref-for-dom-backgroundfetchmanager-get">get</a>(<a class="n idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString-0"><span class="kt">DOMString</span></a> <dfn class="nv idl-code" data-dfn-for="BackgroundFetchManager/get(id)" data-dfn-type="argument" data-export="" id="dom-backgroundfetchmanager-get-id-id"><code>id</code><a class="self-link" href="#dom-backgroundfetchmanager-get-id-id"></a></dfn>);
-  <span class="kt">Promise</span>&lt;<span class="kt">FrozenArray</span>&lt;<a class="n idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString-1"><span class="kt">DOMString</span></a>>> <a class="nv idl-code" data-link-type="method" href="#dom-backgroundfetchmanager-getidentifiers" id="ref-for-dom-backgroundfetchmanager-getidentifiers">getIdentifiers</a>();
+  <span class="kt">Promise</span>&lt;<span class="kt">FrozenArray</span>&lt;<a class="n idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString-1"><span class="kt">DOMString</span></a>>> <a class="nv idl-code" data-link-type="method" href="#dom-backgroundfetchmanager-getids" id="ref-for-dom-backgroundfetchmanager-getids">getIds</a>();
   // TODO: in future this should become an async iterator for BackgroundFetchRegistration objects
 };
 
@@ -1572,8 +1572,8 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
        <p>TODO</p>
      </ol>
     </div>
-    <div class="algorithm" data-algorithm="getIdentifiers()">
-      The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchManager" data-dfn-type="method" data-export="" id="dom-backgroundfetchmanager-getidentifiers"><code>getIdentifiers()</code></dfn> method, when invoked, must return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-new-promise" id="ref-for-a-new-promise-1">a new promise</a> <var>promise</var> and run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel-1">in parallel</a>: 
+    <div class="algorithm" data-algorithm="getIds()">
+      The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchManager" data-dfn-type="method" data-export="" id="dom-backgroundfetchmanager-getids"><code>getIds()</code></dfn> method, when invoked, must return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-new-promise" id="ref-for-a-new-promise-1">a new promise</a> <var>promise</var> and run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel-1">in parallel</a>: 
      <ol>
       <li data-md="">
        <p>TODO</p>
@@ -1914,7 +1914,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
    <li><a href="#dom-backgroundfetchmanager-fetch">fetch(id, requests)</a><span>, in §3.2</span>
    <li><a href="#dom-backgroundfetchmanager-fetch">fetch(id, requests, options)</a><span>, in §3.2</span>
    <li><a href="#dom-backgroundfetchmanager-get">get(id)</a><span>, in §3.2</span>
-   <li><a href="#dom-backgroundfetchmanager-getidentifiers">getIdentifiers()</a><span>, in §3.2</span>
+   <li><a href="#dom-backgroundfetchmanager-getids">getIds()</a><span>, in §3.2</span>
    <li><a href="#dictdef-icondefinition">IconDefinition</a><span>, in §3.2</span>
    <li>
     icons
@@ -2050,7 +2050,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
 <span class="kt">interface</span> <a class="nv" href="#backgroundfetchmanager"><code>BackgroundFetchManager</code></a> {
   <span class="kt">Promise</span>&lt;<a class="n" data-link-type="idl-name" href="#backgroundfetchregistration" id="ref-for-backgroundfetchregistration-0-0">BackgroundFetchRegistration</a>> <a class="nv idl-code" data-link-type="method" href="#dom-backgroundfetchmanager-fetch" id="ref-for-dom-backgroundfetchmanager-fetch-0">fetch</a>(<a class="n idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString-0-0"><span class="kt">DOMString</span></a> <a class="nv" href="#dom-backgroundfetchmanager-fetch-id-requests-options-id"><code>id</code></a>, (<a class="n" data-link-type="idl-name" href="https://fetch.spec.whatwg.org/#requestinfo" id="ref-for-requestinfo-0-0">RequestInfo</a> <span class="kt">or</span> <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="https://fetch.spec.whatwg.org/#requestinfo" id="ref-for-requestinfo-0-0">RequestInfo</a>>) <a class="nv" href="#dom-backgroundfetchmanager-fetch-id-requests-options-requests"><code>requests</code></a>, <span class="kt">optional</span> <a class="n" data-link-type="idl-name" href="#dictdef-backgroundfetchoptions" id="ref-for-dictdef-backgroundfetchoptions-0">BackgroundFetchOptions</a> <a class="nv" href="#dom-backgroundfetchmanager-fetch-id-requests-options-options"><code>options</code></a>);
   <span class="kt">Promise</span>&lt;<a class="n" data-link-type="idl-name" href="#backgroundfetchregistration" id="ref-for-backgroundfetchregistration-0-0">BackgroundFetchRegistration</a>?> <a class="nv idl-code" data-link-type="method" href="#dom-backgroundfetchmanager-get" id="ref-for-dom-backgroundfetchmanager-get-0">get</a>(<a class="n idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString-0-0"><span class="kt">DOMString</span></a> <a class="nv" href="#dom-backgroundfetchmanager-get-id-id"><code>id</code></a>);
-  <span class="kt">Promise</span>&lt;<span class="kt">FrozenArray</span>&lt;<a class="n idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString-1-0"><span class="kt">DOMString</span></a>>> <a class="nv idl-code" data-link-type="method" href="#dom-backgroundfetchmanager-getidentifiers" id="ref-for-dom-backgroundfetchmanager-getidentifiers-0">getIdentifiers</a>();
+  <span class="kt">Promise</span>&lt;<span class="kt">FrozenArray</span>&lt;<a class="n idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString-1-0"><span class="kt">DOMString</span></a>>> <a class="nv idl-code" data-link-type="method" href="#dom-backgroundfetchmanager-getids" id="ref-for-dom-backgroundfetchmanager-getids-0">getIds</a>();
   // TODO: in future this should become an async iterator for BackgroundFetchRegistration objects
 };
 
@@ -2188,10 +2188,10 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
     <li><a href="#ref-for-dom-backgroundfetchmanager-get">3.2. BackgroundFetchManager</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="dom-backgroundfetchmanager-getidentifiers">
-   <b><a href="#dom-backgroundfetchmanager-getidentifiers">#dom-backgroundfetchmanager-getidentifiers</a></b><b>Referenced in:</b>
+  <aside class="dfn-panel" data-for="dom-backgroundfetchmanager-getids">
+   <b><a href="#dom-backgroundfetchmanager-getids">#dom-backgroundfetchmanager-getids</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-backgroundfetchmanager-getidentifiers">3.2. BackgroundFetchManager</a>
+    <li><a href="#ref-for-dom-backgroundfetchmanager-getids">3.2. BackgroundFetchManager</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="backgroundfetchregistration">

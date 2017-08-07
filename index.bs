@@ -62,7 +62,7 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
   interface BackgroundFetchManager {
     Promise&lt;BackgroundFetchRegistration&gt; fetch(DOMString id, (RequestInfo or sequence&lt;RequestInfo&gt;) requests, optional BackgroundFetchOptions options);
     Promise&lt;BackgroundFetchRegistration?&gt; get(DOMString id);
-    Promise&lt;FrozenArray&lt;DOMString&gt;&gt; getIdentifiers();
+    Promise&lt;FrozenArray&lt;DOMString&gt;&gt; getIds();
     // TODO: in future this should become an async iterator for BackgroundFetchRegistration objects
   };
 
@@ -96,7 +96,7 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
   </div>
 
   <div algorithm>
-    The <dfn method>getIdentifiers()</dfn> method, when invoked, must return [=a new promise=] |promise| and run the following steps [=in parallel=]:
+    The <dfn method>getIds()</dfn> method, when invoked, must return [=a new promise=] |promise| and run the following steps [=in parallel=]:
 
       1. TODO
   </div>
