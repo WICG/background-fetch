@@ -25,10 +25,10 @@ These are eventual goals, some features be missing from "v1".
 
 ```js
 const registration = await navigator.serviceWorker.ready;
-const bgFetchJob = await registration.backgroundFetch.fetch(tag, requests, options);
+const bgFetchJob = await registration.backgroundFetch.fetch(id, requests, options);
 ```
 
-* `tag` - a name for this job.
+* `id` - a unique identifier for this job.
 * `requests` - a sequence of URLs or `Request` objects.
 * `options` - an object containing any of:
   * `icons` - A sequence of icon definitions, similar to [`icons` in the manifest spec](https://w3c.github.io/manifest/#icons-member).
@@ -42,7 +42,7 @@ const bgFetchJob = await registration.backgroundFetch.fetch(tag, requests, optio
 `backgroundFetch.fetch` will reject if:
 
 * The user does not want background downloads, which may be a origin/browser/OS level setting.
-* If there's already a registered background fetch job associated with `registration` with the name `tag`.
+* If there's already a registered background fetch job associated with `registration` identified by `id`.
 * Any of the requests have mode `no-cors`.
 * The browser fails to store the requests and their bodies.
 * `totalDownloadSize` suggests there isn't enough quota to complete the job.
@@ -51,12 +51,12 @@ const bgFetchJob = await registration.backgroundFetch.fetch(tag, requests, optio
 
 ```js
 const registration = await navigator.serviceWorker.ready;
-const bgFetchJob = await registration.backgroundFetch.get(tag);
+const bgFetchJob = await registration.backgroundFetch.get(id);
 ```
 
 `bgFetchJob` has the following members:
 
-* `tag` - tag string.
+* `id` - identifier string.
 * `icons` - as provided.
 * `totalDownloadSize` - as provided.
 * `title` - as provided.
@@ -67,7 +67,7 @@ const bgFetchJob = await registration.backgroundFetch.get(tag);
 
 `BackgroundFetch` objects will also include [fetch controller/observer objects](https://github.com/whatwg/fetch/issues/447) as they land.
 
-If no job with tag `tag` exists, `get` resolves with undefined.
+If no job with the identifier `id` exists, `get` resolves with undefined.
 
 I don't like the naming of `responseReady` above. Ideas?
 
@@ -75,10 +75,10 @@ I don't like the naming of `responseReady` above. Ideas?
 
 ```js
 const registration = await navigator.serviceWorker.ready;
-const tags = await registration.backgroundFetch.getTags();
+const identifiers = await registration.backgroundFetch.getIdentifiers();
 ```
 
-…where `tags` is a sequence of tag strings.
+…where `identifiers` is a sequence of unique identifier strings.
 
 Eventually, `registration.backgroundFetch` will become an async iterator, allowing:
 
@@ -100,13 +100,13 @@ addEventListener('backgroundfetched', bgFetchEvent => {
 
 `bgFetchEvent` extends [`ExtendableEvent`](https://w3c.github.io/ServiceWorker/#extendableevent), with the following additional members:
 
-* `tag` - tag of the background fetch job.
+* `id` - identifier of the background fetch job.
 * `fetches` - a sequence of objects, which have the following members:
   * `request` - a [`Request`](https://fetch.spec.whatwg.org/#request-class).
   * `response` - a [`Response`](https://fetch.spec.whatwg.org/#response-class).
 * `updateUI(title)` - update the title, eg "Uploaded 'Holiday in Rome'", "Downloaded 'Catastrophe season 2 episode 1'", or "Level 5 ready to play!". If this isn't called, the browser may update the title itself.
 
-Once this event is fired, the background fetch job is no longer stored against the registration, so `backgroundFetch.get(bgFetchEvent.tag)` will resolve with undefined.
+Once this event is fired, the background fetch job is no longer stored against the registration, so `backgroundFetch.get(bgFetchEvent.id)` will resolve with undefined.
 
 ## Reacting to failure
 
@@ -124,7 +124,7 @@ addEventListener('backgroundfetchfail', bgFetchFailEvent => {
   * `request` - a [`Request`](https://fetch.spec.whatwg.org/#request-class).
   * `response` - a [`Response`](https://fetch.spec.whatwg.org/#response-class).
 
-Again, once this event is fired, the background fetch job is no longer stored against the registration, so `backgroundFetch.get(bgFetchEvent.tag)` will resolve with undefined.
+Again, once this event is fired, the background fetch job is no longer stored against the registration, so `backgroundFetch.get(bgFetchEvent.id)` will resolve with undefined.
 
 In an earlier draft, this event and `backgroundfetched` were the same thing, including a property that indicated success/failure. It felt wrong when writing examples, so I split them out.
 
@@ -142,9 +142,9 @@ addEventListener('backgroundfetchabort', bgFetchAbortEvent => {
 
 `bgFetchAbortEvent` extends [`ExtendableEvent`](https://w3c.github.io/ServiceWorker/#extendableevent), with the following additional members:
 
-* `tag` - tag of the background fetch job.
+* `id` - identifier of the background fetch job.
 
-Again, once this event is fired, the background fetch job is no longer stored against the registration, so `backgroundFetch.get(bgFetchAbortEvent.tag)` will resolve with undefined.
+Again, once this event is fired, the background fetch job is no longer stored against the registration, so `backgroundFetch.get(bgFetchAbortEvent.id)` will resolve with undefined.
 
 ## Reacting to click
 
@@ -156,7 +156,7 @@ addEventListener('backgroundfetchclick', bgFetchClickEvent => {
 });
 ```
 
-* `tag` - tag of the background fetch job.
+* `id` - identifier of the background fetch job.
 * `state` - "pending", "succeeded" or "failed".
 
 Since this is a user interaction event, developers can call `clients.openWindow` in response. If a window isn't created/focused, the browser may open a related URL (the root of the origin, or a `start_url` from a related manifest).
@@ -276,14 +276,14 @@ addEventListener('push', event => {
 
 // Success!
 addEventListener('backgroundfetched', event => {
-  if (event.tag.startsWith('podcast-')) {
+  if (event.id.startsWith('podcast-')) {
     event.waitUntil(async function() {
       // Get podcast by ID
-      const podcast = await getPodcast(/podcast-(.*)$/.exec(event.tag)[0]);
+      const podcast = await getPodcast(/podcast-(.*)$/.exec(event.id)[0]);
 
 
       // Cache podcasts
-      const cache = await caches.open(event.tag);
+      const cache = await caches.open(event.id);
       const promises = event.fetches.map(({request, response}) => {
         return cache.put(request, response);
       });
@@ -296,10 +296,10 @@ addEventListener('backgroundfetched', event => {
 
 // Failed!
 addEventListener('backgroundfetchfail', event => {
-  if (event.tag.startsWith('podcast-')) {
+  if (event.id.startsWith('podcast-')) {
     event.waitUntil(async function() {
       // Get podcast by ID
-      const podcast = await getPodcast(/podcast-(.*)$/.exec(event.tag)[0]);
+      const podcast = await getPodcast(/podcast-(.*)$/.exec(event.id)[0]);
       // Aww.
       event.updateUI(`Failed to download ${podcast.showName} - ${podcast.episodeName}`);
     }());
@@ -308,10 +308,10 @@ addEventListener('backgroundfetchfail', event => {
 
 // Clicked!
 addEventListener('backgroundfetchclick', event => {
-  if (event.tag.startsWith('podcast-')) {
+  if (event.id.startsWith('podcast-')) {
     event.waitUntil(async function() {
       // Get podcast by ID
-      const podcast = await getPodcast(/podcast-(.*)$/.exec(event.tag)[0]);
+      const podcast = await getPodcast(/podcast-(.*)$/.exec(event.id)[0]);
 
       // Happy to open this url no matter what the state is.
       clients.openWindow(podcast.pageUrl);
@@ -361,12 +361,12 @@ async function findPodcastResponse(fetches) {
 (async function() {
   const response = await fetch('/level-20-assets.json');
   const data = await response.json();
-  const tag = 'level-20';
+  const id = 'level-20';
 
   const reg = await navigator.serviceWorker.ready;
 
   try {
-    await self.registration.backgroundFetch.fetch(tag, data.urls, {
+    await self.registration.backgroundFetch.fetch(id, data.urls, {
       icons: data.icons,
       title: "Download level 20",
       totalDownloadSize: data.totalDownloadSize
@@ -374,7 +374,7 @@ async function findPodcastResponse(fetches) {
   }
   catch {
     // Can't background fetch? Fallback to downloading from the page:
-    const cache = await caches.open(tag);
+    const cache = await caches.open(id);
     await cache.addAll(data.urls);
     showInPageNotification('Level 20 ready to play!');
   }
@@ -384,11 +384,11 @@ async function findPodcastResponse(fetches) {
 ```js
 // in the service worker:
 self.addEventListener('backgroundfetched', event => {
-  if (event.tag.startsWith('level-')) {
-    const level = /^level-(.*)$/.exec(event.tag)[1];
+  if (event.id.startsWith('level-')) {
+    const level = /^level-(.*)$/.exec(event.id)[1];
 
     event.waitUntil(async function() {
-      const cache = await caches.open(event.tag);
+      const cache = await caches.open(event.id);
       const promises = event.fetches.map(({request, response}) => {
         return cache.put(request, response);
       });
@@ -401,14 +401,14 @@ self.addEventListener('backgroundfetched', event => {
 });
 
 addEventListener('backgroundfetchfail', event => {
-  if (event.tag.startsWith('level-')) {
-    const level = /^level-(.*)$/.exec(event.tag)[1];
+  if (event.id.startsWith('level-')) {
+    const level = /^level-(.*)$/.exec(event.id)[1];
     event.updateUI(`Failed to download level ${level}`);
   }
 });
 
 addEventListener('backgroundfetchclick', event => {
-  if (event.tag.startsWith('level-')) {
+  if (event.id.startsWith('level-')) {
     clients.openWindow(`/`);
   }
 });
@@ -422,13 +422,13 @@ form.addEventListener('submit', async event => {
   event.preventDefault();
   const body = new FormData(form);
   const videoName = body.get('video').name;
-  const tag = 'video-upload-' + videoName;
+  const id = 'video-upload-' + videoName;
   const request = new Request('/upload-video', { body, method: 'POST' });
 
   const reg = await navigator.serviceWorker.ready;
 
   try {
-    await reg.backgroundFetch.fetch(tag, request, {
+    await reg.backgroundFetch.fetch(id, request, {
       title: "Uploading video"
     });
   }
@@ -445,13 +445,13 @@ form.addEventListener('submit', async event => {
 ```js
 // in the service worker:
 addEventListener('backgroundfetched', event => {
-  if (event.tag.startsWith('video-upload-')) {
+  if (event.id.startsWith('video-upload-')) {
     event.updateUI("Video uploaded!");
   }
 });
 
 addEventListener('backgroundfetchfail', event => {
-  if (event.tag.startsWith('video-upload-')) {
+  if (event.id.startsWith('video-upload-')) {
     event.updateUI("Upload failed");
 
     // Store the data in IDB so it isn't lost:

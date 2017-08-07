@@ -39,7 +39,7 @@ A [=service worker registration=] has an associated <dfn for="service worker reg
 A <dfn>background fetch</dfn> consists of:
 
 <div dfn-for="background fetch">
-  * A <dfn>tag</dfn>, which is a DOMString.
+  * An <dfn>id</dfn>, which is a DOMString.
   * TODO: add additional state
 </div>
 
@@ -60,9 +60,9 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
 <pre class="idl">
   [Exposed=(Window,Worker)]
   interface BackgroundFetchManager {
-    Promise&lt;BackgroundFetchRegistration&gt; fetch(DOMString tag, (RequestInfo or sequence&lt;RequestInfo&gt;) requests, optional BackgroundFetchOptions options);
-    Promise&lt;BackgroundFetchRegistration?&gt; get(DOMString tag);
-    Promise&lt;FrozenArray&lt;DOMString&gt;&gt; getTags();
+    Promise&lt;BackgroundFetchRegistration&gt; fetch(DOMString id, (RequestInfo or sequence&lt;RequestInfo&gt;) requests, optional BackgroundFetchOptions options);
+    Promise&lt;BackgroundFetchRegistration?&gt; get(DOMString id);
+    Promise&lt;FrozenArray&lt;DOMString&gt;&gt; getIdentifiers();
     // TODO: in future this should become an async iterator for BackgroundFetchRegistration objects
   };
 
@@ -83,20 +83,20 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
 
 <div dfn-for="BackgroundFetchManager">
   <div algorithm>
-    The <dfn method>fetch(|tag|, |requests|, |options|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run the following steps [=in parallel=]:
+    The <dfn method>fetch(|id|, |requests|, |options|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run the following steps [=in parallel=]:
 
       1. Let |registration| be the [=context object=]'s associated [=/service worker registration=].
       1. TODO.
   </div>
 
   <div algorithm>
-    The <dfn method>get(|tag|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run the following steps [=in parallel=]:
+    The <dfn method>get(|id|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run the following steps [=in parallel=]:
 
       1. TODO
   </div>
 
   <div algorithm>
-    The <dfn method>getTags()</dfn> method, when invoked, must return [=a new promise=] |promise| and run the following steps [=in parallel=]:
+    The <dfn method>getIdentifiers()</dfn> method, when invoked, must return [=a new promise=] |promise| and run the following steps [=in parallel=]:
 
       1. TODO
   </div>
@@ -107,7 +107,7 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
 <pre class="idl">
   [Exposed=(Window,Worker)]
   interface BackgroundFetchRegistration {
-    readonly attribute DOMString tag;
+    readonly attribute DOMString id;
     readonly attribute FrozenArray&lt;IconDefinition&gt; icons;
     readonly attribute long totalDownloadSize;
     readonly attribute DOMString title;
@@ -184,19 +184,19 @@ The following is the <a>event handler</a> (and its corresponding <a>event handle
 <pre class="idl">
   [Constructor(DOMString type, BackgroundFetchEventInit init), Exposed=ServiceWorker]
   interface BackgroundFetchEvent : ExtendableEvent {
-    readonly attribute DOMString tag;
+    readonly attribute DOMString id;
   };
 
   dictionary BackgroundFetchEventInit : ExtendableEventInit {
-    required DOMString tag;
+    required DOMString id;
   };
 </pre>
 
 <div dfn-for="BackgroundFetchEvent">
-  A {{BackgroundFetchEvent}} has an associated <dfn>tag</dfn>, a DOMString.
+  A {{BackgroundFetchEvent}} has an associated <dfn>id</dfn>, a DOMString.
 
-  The <dfn attribute>tag</dfn> attribute must return the [=BackgroundFetchEvent/tag=].
-  
+  The <dfn attribute>id</dfn> attribute must return the [=BackgroundFetchEvent/id=].
+
   TODO
 </div>
 
