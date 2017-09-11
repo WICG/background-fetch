@@ -6,6 +6,7 @@ Status: ED
 Group: wicg
 URL: https://jakearchibald.github.io/background-fetch
 Editor: Jake Archibald, Google, jakearchibald@google.com
+Editor: Peter Beverloo, Google, beverloo@google.com
 Abstract: An API to handle large uploads/downloads in the background with user visibility.
 Markup Shorthands: css no, markdown yes
 Indent: 2
@@ -34,7 +35,7 @@ This specification aims to:
 
 # Infrastructure # {#infrastructure}
 
-A [=service worker registration=] has an associated <dfn for="service worker registration">list of active background fetches</dfn> a [=list=] where each item is a [=/background fetch=].
+A [=service worker registration=] has an associated <dfn for="service worker registration">list of active background fetches</dfn>, a [=list=], where each item is a [=/background fetch=].
 
 A <dfn>background fetch</dfn> consists of:
 
@@ -52,6 +53,8 @@ A <dfn>background fetch</dfn> consists of:
     readonly attribute BackgroundFetchManager backgroundFetch;
   };
 </pre>
+
+Each {{ServiceWorkerRegistration}} instance has a unique instance of {{BackgroundFetchManager}}, allocated when the {{ServiceWorkerRegistration}} object is created.
 
 The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribute must return the {{BackgroundFetchManager}} object that is associated with the [=context object=].
 
@@ -106,10 +109,13 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
 
 <pre class="idl">
   [Exposed=(Window,Worker)]
-  interface BackgroundFetchRegistration {
+  interface BackgroundFetchRegistration extends EventTarget {
     readonly attribute DOMString id;
     readonly attribute FrozenArray&lt;IconDefinition&gt; icons;
-    readonly attribute long totalDownloadSize;
+    readonly attribute long uploadTotal;
+    readonly attribute long uploaded;
+    readonly attribute long downloadTotal;
+    readonly attribute long downloaded;
     readonly attribute DOMString title;
     readonly attribute FrozenArray&lt;BackgroundFetchActiveFetch&gt; activeFetches;
 
@@ -129,9 +135,29 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
 </pre>
 
 <div dfn-for="BackgroundFetchRegistration">
-  A {{BackgroundFetchRegistration}} has an associated <dfn>background fetch</dfn>, a [=/background fetch=].
+  A {{BackgroundFetchRegistration}} instance has an associated <dfn>background fetch</dfn>, a [=/background fetch=].
 
-  TODO
+  The <dfn attribute>id</dfn> attribute's getter must return the [=context object=]'s [=background fetch/id=].
+
+  The <dfn attribute>icons</dfn> attribute's getter must return the [=context object=]'s TODO.
+
+  The <dfn attribute>uploadTotal</dfn> attribute's getter must return the [=context object=]'s TODO.
+
+  The <dfn attribute>uploaded</dfn> attribute's getter must return the [=context object=]'s TODO.
+
+  The <dfn attribute>downloadTotal</dfn> attribute's getter must return the [=context object=]'s TODO.
+
+  The <dfn attribute>downloaded</dfn> attribute's getter must return the [=context object=]'s TODO.
+
+  The <dfn attribute>title</dfn> attribute's getter must return the [=context object=]'s TODO.
+
+  The <dfn attribute>activeFetches</dfn> attribute's getter must return the [=context object=]'s TODO.
+
+  <div algorithm>
+    The <dfn method>abort()</dfn> method, when invoked, must return [=a new promise=] |promise| and run the following steps [=in parallel=]:
+
+      1. TODO
+  </div>
 </div>
 
 ## Events ## {#events}
