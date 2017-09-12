@@ -109,13 +109,13 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
 
 <pre class="idl">
   [Exposed=(Window,Worker)]
-  interface BackgroundFetchRegistration extends EventTarget {
+  interface BackgroundFetchRegistration : EventTarget {
     readonly attribute DOMString id;
     readonly attribute FrozenArray&lt;IconDefinition&gt; icons;
     readonly attribute long uploadTotal;
-    readonly attribute long uploaded;
+    readonly attribute long uploadProgress;
     readonly attribute long downloadTotal;
-    readonly attribute long downloaded;
+    readonly attribute long downloadProgress;
     readonly attribute DOMString title;
     readonly attribute FrozenArray&lt;BackgroundFetchActiveFetch&gt; activeFetches;
 
@@ -143,11 +143,11 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
 
   The <dfn attribute>uploadTotal</dfn> attribute's getter must return the [=context object=]'s TODO.
 
-  The <dfn attribute>uploaded</dfn> attribute's getter must return the [=context object=]'s TODO.
+  The <dfn attribute>uploadProgress</dfn> attribute's getter must return the [=context object=]'s TODO.
 
   The <dfn attribute>downloadTotal</dfn> attribute's getter must return the [=context object=]'s TODO.
 
-  The <dfn attribute>downloaded</dfn> attribute's getter must return the [=context object=]'s TODO.
+  The <dfn attribute>downloadProgress</dfn> attribute's getter must return the [=context object=]'s TODO.
 
   The <dfn attribute>title</dfn> attribute's getter must return the [=context object=]'s TODO.
 

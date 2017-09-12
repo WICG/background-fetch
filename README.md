@@ -33,7 +33,7 @@ const bgFetchJob = await registration.backgroundFetch.fetch(id, requests, option
 * `options` - an object containing any of:
   * `icons` - A sequence of icon definitions, similar to [`icons` in the manifest spec](https://w3c.github.io/manifest/#icons-member).
   * `title` - Something descriptive to show in UI, such as "Uploading 'Holiday in Rome'" or "Downloading 'Catastrophe season 2 episode 1'".
-  * `totalDownloadSize` - A hint for the UI, so it can display progress before receiving all `Content-Length` headers, or if any are missing. This is in bytes, before transport compression. This is only a hint, the browser will disregard the value if/once it's found to be incorrect.
+  * `downloadTotal` - A hint for the UI, so it can display progress before receiving all `Content-Length` headers, or if any are missing. This is in bytes, before transport compression. This is only a hint, the browser will disregard the value if/once it's found to be incorrect.
   * `networkType` - "auto" or "avoid-cellular", defaults to "auto".
   * `powerStatus` - "auto" or "avoid-draining", defaults to "auto".
 
@@ -45,7 +45,7 @@ const bgFetchJob = await registration.backgroundFetch.fetch(id, requests, option
 * If there's already a registered background fetch job associated with `registration` identified by `id`.
 * Any of the requests have mode `no-cors`.
 * The browser fails to store the requests and their bodies.
-* `totalDownloadSize` suggests there isn't enough quota to complete the job.
+* `downloadTotal` suggests there isn't enough quota to complete the job.
 
 ## Getting an instance of a background fetch
 
@@ -58,12 +58,17 @@ const bgFetchJob = await registration.backgroundFetch.get(id);
 
 * `id` - identifier string.
 * `icons` - as provided.
-* `totalDownloadSize` - as provided.
+* `downloadTotal` - as provided.
+* `uploadTotal` - total bytes to send.
+* `uploadProgress` - bytes sent so far.
+* `downloadTotal` - as provided.
+* `downloadProgress` - bytes received so far.
 * `title` - as provided.
 * `activeFetches` - a sequence of objects, which have the following members:
   * `request` - a [`Request`](https://fetch.spec.whatwg.org/#request-class).
   * `responseReady` - a promise for a [`Response`](https://fetch.spec.whatwg.org/#response-class). Rejects if the fetch has terminally failed.
 * `abort()` - abort the whole background fetch job. This returns a promise that resolves with a boolean, which is true if the operation successfully aborted.
+* `onprogress` - Event when `downloadProgress` or `uploadProgress` update.
 
 `BackgroundFetch` objects will also include [fetch controller/observer objects](https://github.com/whatwg/fetch/issues/447) as they land.
 
@@ -259,7 +264,7 @@ addEventListener('push', event => {
           return self.registration.backgroundFetch.fetch(`podcast-${podcast.id}`, podcast.urls, {
             icons: podcast.icons,
             title: `Downloading ${podcast.showName} - ${podcast.episodeName}`,
-            totalDownloadSize: podcast.totalDownloadSize
+            downloadTotal: podcast.downloadTotal
           });
         });
 
@@ -369,7 +374,7 @@ async function findPodcastResponse(fetches) {
     await self.registration.backgroundFetch.fetch(id, data.urls, {
       icons: data.icons,
       title: "Download level 20",
-      totalDownloadSize: data.totalDownloadSize
+      downloadTotal: data.downloadTotal
     });
   }
   catch {
