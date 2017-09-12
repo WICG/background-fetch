@@ -35,7 +35,11 @@ This specification aims to:
 
 # Infrastructure # {#infrastructure}
 
+## Extensions to service worker registration ## {#service-worker-registration-concept-extensions}
+
 A [=service worker registration=] has an associated <dfn for="service worker registration">list of active background fetches</dfn>, a [=list=], where each item is a [=/background fetch=].
+
+## Background fetch ## {#background-fetch-concept}
 
 A <dfn>background fetch</dfn> consists of:
 
@@ -48,11 +52,11 @@ A <dfn>background fetch</dfn> consists of:
 
 ## Extensions to {{ServiceWorkerRegistration}} ## {#extensions-to-service-worker-registration}
 
-<pre class="idl">
+<pre class="idl"><xmp>
   partial interface ServiceWorkerRegistration {
     readonly attribute BackgroundFetchManager backgroundFetch;
   };
-</pre>
+</xmp></pre>
 
 Each {{ServiceWorkerRegistration}} instance has a unique instance of {{BackgroundFetchManager}}, allocated when the {{ServiceWorkerRegistration}} object is created.
 
@@ -60,17 +64,17 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
 
 ## {{BackgroundFetchManager}} ## {#background-fetch-manager}
 
-<pre class="idl">
+<pre class="idl"><xmp>
   [Exposed=(Window,Worker)]
   interface BackgroundFetchManager {
-    Promise&lt;BackgroundFetchRegistration&gt; fetch(DOMString id, (RequestInfo or sequence&lt;RequestInfo&gt;) requests, optional BackgroundFetchOptions options);
-    Promise&lt;BackgroundFetchRegistration?&gt; get(DOMString id);
-    Promise&lt;FrozenArray&lt;DOMString&gt;&gt; getIds();
+    Promise<BackgroundFetchRegistration> fetch(DOMString id, (RequestInfo or sequence<RequestInfo>) requests, optional BackgroundFetchOptions options);
+    Promise<BackgroundFetchRegistration?> get(DOMString id);
+    Promise<FrozenArray<DOMString>> getIds();
     // TODO: in future this should become an async iterator for BackgroundFetchRegistration objects
   };
 
   dictionary BackgroundFetchOptions {
-    sequence&lt;IconDefinition&gt; icons = [];
+    sequence<IconDefinition> icons = [];
     DOMString title = "";
     long totalDownloadSize = 0;
   };
@@ -82,7 +86,7 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
     DOMString sizes = "";
     DOMString type = "";
   };
-</pre>
+</xmp></pre>
 
 <div dfn-for="BackgroundFetchManager">
   <div algorithm>
@@ -107,19 +111,19 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
 
 ## {{BackgroundFetchRegistration}} ## {#background-fetch-registration}
 
-<pre class="idl">
+<pre class="idl"><xmp>
   [Exposed=(Window,Worker)]
   interface BackgroundFetchRegistration : EventTarget {
     readonly attribute DOMString id;
-    readonly attribute FrozenArray&lt;IconDefinition&gt; icons;
+    readonly attribute FrozenArray<IconDefinition> icons;
     readonly attribute unsigned long long uploadTotal;
     readonly attribute unsigned long long uploaded;
     readonly attribute unsigned long long downloadTotal;
     readonly attribute unsigned long long downloaded;
     readonly attribute DOMString title;
-    readonly attribute FrozenArray&lt;BackgroundFetchActiveFetch&gt; activeFetches;
+    readonly attribute FrozenArray<BackgroundFetchActiveFetch> activeFetches;
 
-    Promise&lt;boolean&gt; abort();
+    Promise<boolean> abort();
   };
 
   [Exposed=(Window,Worker)]
@@ -129,10 +133,10 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
 
   [Exposed=(Window,Worker)]
   interface BackgroundFetchActiveFetch : BackgroundFetchFetch {
-    readonly attribute Promise&lt;Response&gt; responseReady;
+    readonly attribute Promise<Response> responseReady;
     // TODO: this will include fetch controller/observer objects
   };
-</pre>
+</xmp></pre>
 
 <div dfn-for="BackgroundFetchRegistration">
   A {{BackgroundFetchRegistration}} instance has an associated <dfn>background fetch</dfn>, a [=/background fetch=].
@@ -162,14 +166,14 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
 
 ## Events ## {#events}
 
-<pre class="idl">
+<pre class="idl"><xmp>
   partial interface ServiceWorkerGlobalScope {
     attribute EventHandler onbackgroundfetched;
     attribute EventHandler onbackgroundfetchfail;
     attribute EventHandler onbackgroundfetchabort;
     attribute EventHandler onbackgroundfetchclick;
   };
-</pre>
+</xmp></pre>
 
 The following is the <a>event handler</a> (and its corresponding <a>event handler event type</a>) that must be supported, as <a>event handler IDL attributes</a>, by all objects implementing {{ServiceWorker}} interface:
 
@@ -207,7 +211,7 @@ The following is the <a>event handler</a> (and its corresponding <a>event handle
 
 ### {{BackgroundFetchEvent}} ### {#background-fetch-event}
 
-<pre class="idl">
+<pre class="idl"><xmp>
   [Constructor(DOMString type, BackgroundFetchEventInit init), Exposed=ServiceWorker]
   interface BackgroundFetchEvent : ExtendableEvent {
     readonly attribute DOMString id;
@@ -216,7 +220,7 @@ The following is the <a>event handler</a> (and its corresponding <a>event handle
   dictionary BackgroundFetchEventInit : ExtendableEventInit {
     required DOMString id;
   };
-</pre>
+</xmp></pre>
 
 <div dfn-for="BackgroundFetchEvent">
   A {{BackgroundFetchEvent}} has an associated <dfn>id</dfn>, a DOMString.
@@ -234,23 +238,23 @@ The following is the <a>event handler</a> (and its corresponding <a>event handle
 
 ### {{BackgroundFetchedEvent}} ### {#background-fetch-end-event}
 
-<pre class="idl">
+<pre class="idl"><xmp>
   [Constructor(DOMString type, BackgroundFetchedEventInit init), Exposed=ServiceWorker]
   interface BackgroundFetchedEvent : BackgroundFetchEvent {
-    readonly attribute FrozenArray&lt;BackgroundFetchSettledFetch&gt; fetches;
+    readonly attribute FrozenArray<BackgroundFetchSettledFetch> fetches;
 
-    Promise&lt;void&gt; updateUI(DOMString title);
+    Promise<void> updateUI(DOMString title);
   };
 
   dictionary BackgroundFetchedEventInit : BackgroundFetchEventInit {
-    required sequence&lt;BackgroundFetchSettledFetch&gt; fetches;
+    required sequence<BackgroundFetchSettledFetch> fetches;
   };
 
   [Exposed=ServiceWorker]
   interface BackgroundFetchSettledFetch : BackgroundFetchFetch {
     readonly attribute Response? response;
   };
-</pre>
+</xmp></pre>
 
 <div dfn-for="BackgroundFetchedEvent">
   The <dfn attribute>completeFetches</dfn> attribute must return TODO.
@@ -270,20 +274,20 @@ The following is the <a>event handler</a> (and its corresponding <a>event handle
 
 ### {{BackgroundFetchFailEvent}} ### {#background-fetch-fail-event}
 
-<pre class="idl">
+<pre class="idl"><xmp>
   [Constructor(DOMString type, BackgroundFetchedEventInit init), Exposed=ServiceWorker]
   interface BackgroundFetchFailEvent : BackgroundFetchedEvent {
-    readonly attribute FrozenArray&lt;BackgroundFetchSettledFetch&gt; fetches;
+    readonly attribute FrozenArray<BackgroundFetchSettledFetch> fetches;
   };
 
   dictionary BackgroundFetchFailEventInit : BackgroundFetchedEventInit {
-    required sequence&lt;BackgroundFetchSettledFetch&gt; fetches;
+    required sequence<BackgroundFetchSettledFetch> fetches;
   };
-</pre>
+</xmp></pre>
 
 ### {{BackgroundFetchClickEvent}} ### {#background-fetch-click-event}
 
-<pre class="idl">
+<pre class="idl"><xmp>
   [Constructor(DOMString type, BackgroundFetchedEventInit init), Exposed=ServiceWorker]
   interface BackgroundFetchClickEvent : BackgroundFetchEvent {
     readonly attribute BackgroundFetchState state;
@@ -294,4 +298,4 @@ The following is the <a>event handler</a> (and its corresponding <a>event handle
   };
 
   enum BackgroundFetchState { "pending", "succeeded", "failed" };
-</pre>
+</xmp></pre>
