@@ -66,7 +66,7 @@ The HTML spec allows us to run steps [=in parallel=], but doesn't provide a way 
   Parallel queues solve this. |nameListQueue| would be the result of [=creating a parallel queue=] for the same origin as |nameList|, then:
 
   1. Let |p| be [=a new promise=].
-  1. [=queue/Enqueue=] the following steps to |nameListQueue|:
+  1. <strong>[=queue/Enqueue=] the following steps to |nameListQueue|:</strong>
     1. If |nameList| [=list/contains=] |name|, [=reject=] |p| with a {{TypeError}} and abort these steps.
     1. Do some potentially lengthy work.
     1. [=list/Append=] |name| to |nameList|.
