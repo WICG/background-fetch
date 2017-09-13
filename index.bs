@@ -35,6 +35,47 @@ This specification aims to:
 
 # Infrastructure # {#infrastructure}
 
+## Parallel queues ## {#parallel-queues}
+
+The HTML spec allows us to run steps [=in parallel=], but doesn't provide a way to create queues of parallel steps. This is an attempt to solve that problem generally. See [whatwg/html/issues/1843](https://github.com/whatwg/html/issues/1843) for discussion.
+
+<div algorithm>
+  To <dfn export lt="create a parallel queue|creating a parallel queue">create a parallel queue</dfn>, run the following steps:
+
+  1. Let |stepsQueue| be a new [=queue=].
+  1. Run the following steps [=in parallel=]:
+    1. While true:
+      1. Let |steps| be the result of [=dequeueing=] |stepsQueue|.
+      1. If |steps| is not nothing, run |steps| and catch any error.
+  1. Return |stepsQueue|.
+</div>
+
+<div class="example">
+  Imagine each origin has a [=list=], and |nameList| is one of those. If we wanted to add |name| to |nameList|, but reject if |nameList| already [=list/contains=] |nameList|, the following would be racy:
+
+  1. Let |p| be [=a new promise=].
+  1. Run the following steps [=in parallel=]:
+    1. If |nameList| [=list/contains=] |name|, [=reject=] |p| with a {{TypeError}} and abort these steps.
+    1. Do some potentially lengthy work.
+    1. [=list/Append=] |name| to |nameList|.
+    1. [=Resolve=] |p| with undefined.
+  1. Return |p|.
+
+  Two invocations of the above could run simultaneously, meaning |name| isn't in |nameList| during step 2.1, but it *is there* before step 2.3, meaning |name| ends up in |nameList| twice.
+
+  Parallel queues solve this. |nameListQueue| would be the result of [=creating a parallel queue=] for the same origin as |nameList|, then:
+
+  1. Let |p| be [=a new promise=].
+  1. [=queue/Enqueue=] the following steps to |nameListQueue|:
+    1. If |nameList| [=list/contains=] |name|, [=reject=] |p| with a {{TypeError}} and abort these steps.
+    1. Do some potentially lengthy work.
+    1. [=list/Append=] |name| to |nameList|.
+    1. [=Resolve=] |p| with undefined.
+  1. Return |p|.
+
+  The steps would now queue, and the race is avoided.
+</div>
+
 ## Extensions to service worker registration ## {#service-worker-registration-concept-extensions}
 
 A [=service worker registration=] has an associated <dfn for="service worker registration">list of active background fetches</dfn>, a [=list=], where each item is a [=/background fetch=].
