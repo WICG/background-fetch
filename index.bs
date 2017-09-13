@@ -134,7 +134,14 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
     The <dfn method>fetch(|id|, |requests|, |options|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run the following steps [=in parallel=]:
 
       1. Let |registration| be the [=context object=]'s associated [=/service worker registration=].
-      1. TODO.
+      1. TODO: remove the 'in parallel' bit above
+      1. TODO: Check requests. What won't we allow?
+      1. TODO: Check options.
+      1. TODO: go parallel.
+      1. TODO: queue a job of sorts, to avoid race conditions (see service worker, but may need our own)
+      1. TODO: is there a fetch with this ID already? Reject if so.
+      1. TODO: store all the data
+      1. TODO: if I need to create an object, do I need to queue a task? Probably.
   </div>
 
   <div algorithm>
