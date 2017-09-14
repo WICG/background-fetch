@@ -78,14 +78,19 @@ The HTML spec allows us to run steps [=in parallel=], but doesn't provide a way 
 
 ## Extensions to service worker registration ## {#service-worker-registration-concept-extensions}
 
-A [=service worker registration=] has an associated <dfn for="service worker registration">list of active background fetches</dfn>, a [=list=], where each item is a [=/background fetch=].
+<div dfn-for="service worker registration">
+  A [=service worker registration=] has an associated <dfn>active background fetches</dfn> (a [=map=]), where each key is a DOMString, and each item is a [=/background fetch=]. It is initially an empty [=map=].
+
+  A [=service worker registration=] has an associated <dfn>active background fetches edit queue</dfn> (a [=queue=]), initially the result of [=creating a parallel queue=].
+</div>
 
 ## Background fetch ## {#background-fetch-concept}
 
 A <dfn>background fetch</dfn> consists of:
 
 <div dfn-for="background fetch">
-  * An <dfn>id</dfn>, which is a DOMString.
+  * An <dfn>id</dfn> (a DOMString).
+  * <dfn>Requests</dfn> (a [=list=] of [=/requests=]).
   * TODO: add additional state
 </div>
 
@@ -131,29 +136,61 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
 
 <div dfn-for="BackgroundFetchManager">
   <div algorithm>
-    The <dfn method>fetch(|id|, |requests|, |options|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run the following steps [=in parallel=]:
+    The <dfn method>fetch(|id|, |requests|, |options|)</dfn> method, when invoked, run the following steps:
 
-      1. Let |registration| be the [=context object=]'s associated [=/service worker registration=].
-      1. TODO: remove the 'in parallel' bit above
-      1. TODO: Check requests. What won't we allow?
-      1. TODO: Check options.
-      1. TODO: go parallel.
-      1. TODO: queue a job of sorts, to avoid race conditions (see service worker, but may need our own)
-      1. TODO: is there a fetch with this ID already? Reject if so.
-      1. TODO: store all the data
-      1. TODO: if I need to create an object, do I need to queue a task? Probably.
+    1. Let |registration| be the [=context object=]'s associated [=/service worker registration=].
+    1. If |registration|'s [=service worker registration/active worker=] is null, then return [=a promise rejected with=] an {{InvalidStateError}} {{DOMException}}.
+    1. Let |internalRequests| be a new [=list=].
+    1. If |requests| is a {{RequestInfo}}, set |requests| to « |requests| ».
+    1. [=list/For each=] |request| of |requests|:
+      1. Let |internalRequest| be the [=Request/request=] of the result of invoking the {{Request}} constructor with |request|.
+
+        TODO: I'm assuming this disturbs the body of the original. Need to check.
+      1. If |internalRequest|'s [=request/mode=] is "`no-cors`", then return [=a promise rejected with=] a {{TypeError}}.
+      1. [=list/Append=] |internalRequest| to |internalRequests|.
+    1. Let |promise| be [=a new promise=].
+    1. [=queue/Enqueue=] the following steps to [=active background fetches edit queue=]:
+      1. If |registration|'s [=active background fetches=] [=contains=] a [=/background fetch=] with [=background fetch/id=] |id|, reject |promise| with a {{TypeError}} and abort these steps.
+      1. Let |originalBodies| be a new [=list=].
+      1. For each [=list/For each=] |request| of |internalRequests|:
+        1. If |request|'s [=request/body=] is not null, then:
+          1. [=list/Append=] |request|'s [=request/body=] to |originalBodies|.
+          1. Run the following steps [=in parallel=]:
+            1. Let |bytesPromise| be the result of [=ReadableStream/read all bytes|reading all bytes=] of |request|'s [=request/body=]'s [=body/stream=].
+            1. [=Upon fulfillment=] of |bytesPromise| with |bytes|:
+              1. Let |body| be a new [=/body=].
+              1. [=ReadableStream/Enqueue=] |bytes| into |body|'s [=body/stream=].
+              1. Set |request|'s [=request/body=] to |body|.
+
+          Note: This ensures all bytes of the request bodies are available and can be stored.
+      1. If any [=/body=]'s [=body/stream=] in |originalBodies| becomes [=ReadableStream/errored=], reject |promise| with a {{TypeError}} and abort these steps.
+      1. [=body/Wait=] for all [=/bodies=] in |originalBodies|.
+      1. Let |bgFetch| be a new [=/background fetch=] with:
+        : [=background fetch/id=]
+        :: |id|
+        : [=background fetch/requests=]
+        :: |internalRequests|
+        : TODO
+        :: icon, title, download size
+      1. [=list/Append=] |bgFetch| to |registration|'s [=active background fetches=].
+
+        TODO: Handle quota error.
+    1. Return |promise|.
   </div>
 
   <div algorithm>
     The <dfn method>get(|id|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run the following steps [=in parallel=]:
 
-      1. TODO
+    1. Let |registration| be the [=context object=]'s associated [=/service worker registration=].
+    1. Let |bgFetch| be |registration|'s [=active background fetches=][|id|].
+    1. If |bgFetch| is nothing, then [=resolve=] |promise| with undefined and abort these steps.
+    1. [=Resolve=] |promise| with a new {{BackgroundFetchRegistration}} whose [=BackgroundFetchRegistration/background fetch=] is set to |bgFetch|.
   </div>
 
   <div algorithm>
     The <dfn method>getIds()</dfn> method, when invoked, must return [=a new promise=] |promise| and run the following steps [=in parallel=]:
 
-      1. TODO
+    1. TODO
   </div>
 </div>
 
@@ -208,7 +245,7 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
   <div algorithm>
     The <dfn method>abort()</dfn> method, when invoked, must return [=a new promise=] |promise| and run the following steps [=in parallel=]:
 
-      1. TODO
+    1. TODO
   </div>
 </div>
 
@@ -310,7 +347,7 @@ The following is the <a>event handler</a> (and its corresponding <a>event handle
   <div algorithm>
     The <dfn method>updateUI(|title|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run the following steps [=in parallel=]:
 
-      1. TODO
+    1. TODO
   </div>
 </div>
 
