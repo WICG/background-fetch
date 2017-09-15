@@ -91,7 +91,9 @@ A <dfn>background fetch</dfn> consists of:
 <div dfn-for="background fetch">
   * An <dfn>id</dfn> (a DOMString).
   * <dfn>Requests</dfn> (a [=list=] of [=/requests=]).
-  * TODO: add additional state
+  * A <dfn>title</dfn> (a DOMString).
+  * A <dfn>total download size</dfn> (a number).
+  * <dfn>Icons</dfn> (a [=list=] of {{IconDefinition}}s).
 </div>
 
 # API # {#api}
@@ -122,7 +124,7 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
   dictionary BackgroundFetchOptions {
     sequence<IconDefinition> icons = [];
     DOMString title = "";
-    long totalDownloadSize = 0;
+    unsigned long long totalDownloadSize = 0;
   };
 
   // This is taken from https://w3c.github.io/manifest/#icons-member.
@@ -144,8 +146,6 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
     1. If |requests| is a {{RequestInfo}}, set |requests| to « |requests| ».
     1. [=list/For each=] |request| of |requests|:
       1. Let |internalRequest| be the [=Request/request=] of the result of invoking the {{Request}} constructor with |request|.
-
-        TODO: I'm assuming this disturbs the body of the original. Need to check.
       1. If |internalRequest|'s [=request/mode=] is "`no-cors`", then return [=a promise rejected with=] a {{TypeError}}.
       1. [=list/Append=] |internalRequest| to |internalRequests|.
     1. Let |promise| be [=a new promise=].
@@ -170,11 +170,15 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
         :: |id|
         : [=background fetch/requests=]
         :: |internalRequests|
-        : TODO
-        :: icon, title, download size
+        : [=background fetch/total download size=]
+        :: |options|' `totalDownloadSize` member.
+        : [=background fetch/icons=]
+        :: |options|' `icons` member.
+        : [=background fetch/title=]
+        :: |options|' `title` member.
       1. [=list/Append=] |bgFetch| to |registration|'s [=active background fetches=].
-
-        TODO: Handle quota error.
+      1. If storing |bgFetch| fails due to exceeding a quota limit, [=reject=] |promise| with a {{QuotaExceededError}} {{DOMException}} and abort these steps.
+      1. [=Resolve=] |promise| with a new {{BackgroundFetchRegistration}} whose [=BackgroundFetchRegistration/background fetch=] is set to |bgFetch|.
     1. Return |promise|.
   </div>
 
