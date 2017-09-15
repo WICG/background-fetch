@@ -93,7 +93,8 @@ A <dfn>background fetch</dfn> consists of:
   * An <dfn>id</dfn> (a DOMString).
   * <dfn>Requests</dfn> (a [=list=] of [=/requests=]).
   * A <dfn>title</dfn> (a DOMString).
-  * A <dfn>total download size</dfn> (a number).
+  * A <dfn>download total</dfn> (a number).
+  * An <dfn>upload total</dfn> (a number).
   * <dfn>Icons</dfn> (a [=list=] of {{IconDefinition}}s).
 </div>
 
@@ -125,7 +126,7 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
   dictionary BackgroundFetchOptions {
     sequence<IconDefinition> icons = [];
     DOMString title = "";
-    unsigned long long totalDownloadSize = 0;
+    unsigned long long downloadTotal = 0;
   };
 
   // This is taken from https://w3c.github.io/manifest/#icons-member.
@@ -166,18 +167,24 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
             1. [=Upon fulfillment=] of |bytesPromise| with |bytes|:
               1. Let |body| be a new [=/body=].
               1. [=ReadableStream/Enqueue=] |bytes| into |body|'s [=body/stream=].
+              1. Set |body|'s [=body/total bytes=] to |bytes|' length.
               1. Set |request|'s [=request/body=] to |body|.
 
           Note: This ensures all bytes of the request bodies are available and can be stored.
       1. If any [=/body=]'s [=body/stream=] in |originalBodies| becomes [=ReadableStream/errored=], reject |promise| with a {{TypeError}} and abort these steps.
-      1. [=body/Wait=] for all [=/bodies=] in |originalBodies|.
+      1. [=body/Wait=] for all [=/bodies=] in |originalBodies|. TODO: this doesn't feel accurate enough, as the request's body may not have been replaced by this point.
+      1. Let |uploadTotal| be 0.
+      1. For each [=list/For each=] |request| of |internalRequests|:
+        1. If |request|'s [=request/body=] is not null, then increment |uploadTotal| by |request|'s [=request/body=]'s [=body/total bytes=].
       1. Let |bgFetch| be a new [=/background fetch=] with:
         : [=background fetch/id=]
-        :: |id|
+        :: |id|.
         : [=background fetch/requests=]
-        :: |internalRequests|
-        : [=background fetch/total download size=]
-        :: |options|' `totalDownloadSize` member.
+        :: |internalRequests|.
+        : [=background fetch/download total=]
+        :: |options|' `downloadTotal` member.
+        : [=background fetch/upload total=]
+        :: |uploadTotal|.
         : [=background fetch/icons=]
         :: |options|' `icons` member.
         : [=background fetch/title=]
@@ -249,21 +256,21 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
 <div dfn-for="BackgroundFetchRegistration">
   A {{BackgroundFetchRegistration}} instance has an associated <dfn>background fetch</dfn>, a [=/background fetch=].
 
-  The <dfn attribute>id</dfn> attribute's getter must return the [=context object=]'s [=background fetch/id=].
+  The <dfn attribute>id</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/id=].
 
-  The <dfn attribute>icons</dfn> attribute's getter must return the [=context object=]'s TODO.
+  The <dfn attribute>icons</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/icons=].
 
-  The <dfn attribute>uploadTotal</dfn> attribute's getter must return the [=context object=]'s TODO.
+  The <dfn attribute>uploadTotal</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/upload total=].
 
-  The <dfn attribute>uploaded</dfn> attribute's getter must return the [=context object=]'s TODO.
+  The <dfn attribute>uploaded</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchRegistration/background fetch=]'s TODO.
 
-  The <dfn attribute>downloadTotal</dfn> attribute's getter must return the [=context object=]'s TODO.
+  The <dfn attribute>downloadTotal</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/download total=].
 
-  The <dfn attribute>downloaded</dfn> attribute's getter must return the [=context object=]'s TODO.
+  The <dfn attribute>downloaded</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchRegistration/background fetch=]'s TODO.
 
-  The <dfn attribute>title</dfn> attribute's getter must return the [=context object=]'s TODO.
+  The <dfn attribute>title</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/title=].
 
-  The <dfn attribute>activeFetches</dfn> attribute's getter must return the [=context object=]'s TODO.
+  The <dfn attribute>activeFetches</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchRegistration/background fetch=]'s TODO.
 
   <div algorithm>
     The <dfn method>abort()</dfn> method, when invoked, must return [=a new promise=] |promise| and run the following steps [=in parallel=]:
