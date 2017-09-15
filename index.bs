@@ -40,7 +40,7 @@ This specification aims to:
 The HTML spec allows us to run steps [=in parallel=], but doesn't provide a way to create queues of parallel steps. This is an attempt to solve that problem generally. See [whatwg/html/issues/1843](https://github.com/whatwg/html/issues/1843) for discussion.
 
 <div algorithm>
-  To <dfn export lt="create a parallel queue|creating a parallel queue">create a parallel queue</dfn>, run the following steps:
+  To <dfn export lt="start a parallel queue|starting a parallel queue">start a parallel queue</dfn>, run the following steps:
 
   1. Let |stepsQueue| be a new [=queue=].
   1. Run the following steps [=in parallel=]:
@@ -63,7 +63,7 @@ The HTML spec allows us to run steps [=in parallel=], but doesn't provide a way 
 
   Two invocations of the above could run simultaneously, meaning |name| isn't in |nameList| during step 2.1, but it *is there* before step 2.3, meaning |name| ends up in |nameList| twice.
 
-  Parallel queues solve this. |nameListQueue| would be the result of [=creating a parallel queue=] for the same origin as |nameList|, then:
+  Parallel queues solve this. |nameListQueue| would be the result of [=starting a parallel queue=] for the same origin as |nameList|, then:
 
   1. Let |p| be [=a new promise=].
   1. <strong>[=queue/Enqueue=] the following steps to |nameListQueue|:</strong>
@@ -76,12 +76,21 @@ The HTML spec allows us to run steps [=in parallel=], but doesn't provide a way 
   The steps would now queue, and the race is avoided.
 </div>
 
+## Extensions to the environment settings object ## {#environment-settings-object-extensions}
+
+An [=environment settings object=] additionally has:
+
+<div dfn-for="environment settings object">
+  * An associated <dfn>BackgroundFetchRegistration instances</dfn> (a [=map=]), where the keys are [=/background fetch|background fetches=] and the values are {{BackgroundFetchRegistration}} objects. It is initially empty.
+</div>
+
 ## Extensions to service worker registration ## {#service-worker-registration-concept-extensions}
 
-<div dfn-for="service worker registration">
-  A [=service worker registration=] has an associated <dfn>active background fetches</dfn> (a [=map=]), where each key is a DOMString, and each item is a [=/background fetch=]. It is initially an empty [=map=].
+A [=service worker registration=] additionally has:
 
-  A [=service worker registration=] has an associated <dfn>active background fetches edit queue</dfn> (a [=queue=]), initially the result of [=creating a parallel queue=].
+<div dfn-for="service worker registration">
+  * An associated <dfn>active background fetches</dfn> (a [=map=]), where each key is a DOMString, and each item is a [=/background fetch=]. It is initially an empty [=map=].
+  * An associated <dfn>active background fetches edit queue</dfn> (a [=queue=]), initially the result of [=starting a parallel queue=].
 </div>
 
 ## Background fetch ## {#background-fetch-concept}
@@ -94,6 +103,18 @@ A <dfn>background fetch</dfn> consists of:
   * A <dfn>title</dfn> (a DOMString).
   * A <dfn>total download size</dfn> (a number).
   * <dfn>Icons</dfn> (a [=list=] of {{IconDefinition}}s).
+</div>
+
+<div algorithm>
+  To <dfn data-lt="get a BackgroundFetchRegistration instance|getting a BackgroundFetchRegistration instance">get a BackgroundFetchRegistration instance</dfn> for |bgFetch| (a [=/background fetch=]), run the following steps:
+
+  1. Let |instancesMap| be the [=relevant settings object=]'s [=BackgroundFetchRegistration instances=].
+  1. If |instancesMap|[|bgFetch|] [=map/exists=], then return |instancesMap|[|bgFetch|].
+  1. Let |instance| be a new {{BackgroundFetchRegistration}} whose [=BackgroundFetchRegistration/background fetch=] is set to |bgFetch|.
+  1. Set |instancesMap|[|bgFetch|] to |instance|.
+  1. Return |instance|.
+
+  Note: This is to ensure the same instance is returned for a given [=/background fetch=] throughout the life of an [=environment settings object=].
 </div>
 
 # API # {#api}
@@ -178,7 +199,7 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
         :: |options|' `title` member.
       1. [=list/Append=] |bgFetch| to |registration|'s [=active background fetches=].
       1. If storing |bgFetch| fails due to exceeding a quota limit, [=reject=] |promise| with a {{QuotaExceededError}} {{DOMException}} and abort these steps.
-      1. [=Resolve=] |promise| with a new {{BackgroundFetchRegistration}} whose [=BackgroundFetchRegistration/background fetch=] is set to |bgFetch|.
+      1. [=Resolve=] |promise| with the result of [=getting a BackgroundFetchRegistration instance=] for |bgFetch|.
     1. Return |promise|.
   </div>
 
@@ -188,7 +209,7 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
     1. Let |registration| be the [=context object=]'s associated [=/service worker registration=].
     1. Let |bgFetch| be |registration|'s [=active background fetches=][|id|].
     1. If |bgFetch| is nothing, then [=resolve=] |promise| with undefined and abort these steps.
-    1. [=Resolve=] |promise| with a new {{BackgroundFetchRegistration}} whose [=BackgroundFetchRegistration/background fetch=] is set to |bgFetch|.
+    1. [=Resolve=] |promise| with the result of [=getting a BackgroundFetchRegistration instance=] for |bgFetch|.
   </div>
 
   <div algorithm>
