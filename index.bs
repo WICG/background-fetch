@@ -162,15 +162,16 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
     The <dfn method>fetch(|id|, |requests|, |options|)</dfn> method, when invoked, run the following steps:
 
     1. Let |registration| be the [=context object=]'s associated [=/service worker registration=].
-    1. If |registration|'s [=service worker registration/active worker=] is null, then return [=a promise rejected with=] an {{InvalidStateError}} {{DOMException}}.
     1. Let |internalRequests| be a new [=list=].
     1. If |requests| is a {{RequestInfo}}, set |requests| to « |requests| ».
+    1. If |requests| is [=list/empty=], then return [=a promise rejected with=] a {{TypeError}}.
     1. [=list/For each=] |request| of |requests|:
       1. Let |internalRequest| be the [=Request/request=] of the result of invoking the {{Request}} constructor with |request|.
       1. If |internalRequest|'s [=request/mode=] is "`no-cors`", then return [=a promise rejected with=] a {{TypeError}}.
       1. [=list/Append=] |internalRequest| to |internalRequests|.
     1. Let |promise| be [=a new promise=].
     1. [=queue/Enqueue=] the following steps to [=active background fetches edit queue=]:
+      1. If |registration|'s [=service worker registration/active worker=] is null, then reject |promise| with a {{TypeError}} and abort these steps.
       1. If |registration|'s [=active background fetches=] [=contains=] a [=/background fetch=] with [=background fetch/id=] |id|, reject |promise| with a {{TypeError}} and abort these steps.
       1. Let |originalBodies| be a new [=list=].
       1. For each [=list/For each=] |request| of |internalRequests|:
