@@ -200,7 +200,9 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
   <div algorithm>
     The <dfn method>getIds()</dfn> method, when invoked, must return [=a new promise=] |promise| and run the following steps [=in parallel=]:
 
-    1. TODO
+    1. Let |registration| be the [=context object=]'s associated [=/service worker registration=].
+    1. Let |ids| be the result of [=map/getting the keys=] of |registration|'s [=active background fetches=].
+    1. [=Resolve=] |promise| with |ids|.
   </div>
 </div>
 
