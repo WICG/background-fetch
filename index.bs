@@ -171,8 +171,9 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
       1. [=list/Append=] |internalRequest| to |internalRequests|.
     1. Let |promise| be [=a new promise=].
     1. [=queue/Enqueue=] the following steps to [=active background fetches edit queue=]:
+      1. Let |bgFetchMap| be |registration|'s [=active background fetches=].
       1. If |registration|'s [=service worker registration/active worker=] is null, then reject |promise| with a {{TypeError}} and abort these steps.
-      1. If |registration|'s [=active background fetches=] [=contains=] a [=/background fetch=] with [=background fetch/id=] |id|, reject |promise| with a {{TypeError}} and abort these steps.
+      1. If |bgFetchMap|[|id|] [=map/exists=], reject |promise| with a {{TypeError}} and abort these steps.
       1. Let |originalBodies| be a new [=list=].
       1. For each [=list/For each=] |request| of |internalRequests|:
         1. If |request|'s [=request/body=] is not null, then:
@@ -198,7 +199,7 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
         :: |options|' `icons` member.
         : [=background fetch/title=]
         :: |options|' `title` member.
-      1. [=list/Append=] |bgFetch| to |registration|'s [=active background fetches=].
+      1. Set |bgFetchMap|[|id|] to |bgFetch|.
       1. If storing |bgFetch| fails due to exceeding a quota limit, [=reject=] |promise| with a {{QuotaExceededError}} {{DOMException}} and abort these steps.
       1. [=Resolve=] |promise| with the result of [=getting a BackgroundFetchRegistration instance=] for |bgFetch|.
     1. Return |promise|.
