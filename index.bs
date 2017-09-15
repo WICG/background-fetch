@@ -35,17 +35,66 @@ This specification aims to:
 
 # Infrastructure # {#infrastructure}
 
+## Parallel queues ## {#parallel-queues}
+
+The HTML spec allows us to run steps [=in parallel=], but doesn't provide a way to create queues of parallel steps. This is an attempt to solve that problem generally. See [whatwg/html/issues/1843](https://github.com/whatwg/html/issues/1843) for discussion.
+
+<div algorithm>
+  To <dfn export lt="start a parallel queue|starting a parallel queue">start a parallel queue</dfn>, run the following steps:
+
+  1. Let |stepsQueue| be a new [=queue=].
+  1. Run the following steps [=in parallel=]:
+    1. While true:
+      1. Let |steps| be the result of [=dequeueing=] |stepsQueue|.
+      1. If |steps| is not nothing, run |steps| and catch any error.
+  1. Return |stepsQueue|.
+</div>
+
+<div class="example">
+  Imagine each origin has a [=list=], and |nameList| is one of those. If we wanted to add |name| to |nameList|, but reject if |nameList| already [=list/contains=] |nameList|, the following would be racy:
+
+  1. Let |p| be [=a new promise=].
+  1. Run the following steps [=in parallel=]:
+    1. If |nameList| [=list/contains=] |name|, [=reject=] |p| with a {{TypeError}} and abort these steps.
+    1. Do some potentially lengthy work.
+    1. [=list/Append=] |name| to |nameList|.
+    1. [=Resolve=] |p| with undefined.
+  1. Return |p|.
+
+  Two invocations of the above could run simultaneously, meaning |name| isn't in |nameList| during step 2.1, but it *is there* before step 2.3, meaning |name| ends up in |nameList| twice.
+
+  Parallel queues solve this. |nameListQueue| would be the result of [=starting a parallel queue=] for the same origin as |nameList|, then:
+
+  1. Let |p| be [=a new promise=].
+  1. <strong>[=queue/Enqueue=] the following steps to |nameListQueue|:</strong>
+    1. If |nameList| [=list/contains=] |name|, [=reject=] |p| with a {{TypeError}} and abort these steps.
+    1. Do some potentially lengthy work.
+    1. [=list/Append=] |name| to |nameList|.
+    1. [=Resolve=] |p| with undefined.
+  1. Return |p|.
+
+  The steps would now queue, and the race is avoided.
+</div>
+
 ## Extensions to service worker registration ## {#service-worker-registration-concept-extensions}
 
-A [=service worker registration=] has an associated <dfn for="service worker registration">list of active background fetches</dfn>, a [=list=], where each item is a [=/background fetch=].
+A [=service worker registration=] additionally has:
+
+<div dfn-for="service worker registration">
+  * An associated <dfn>active background fetches</dfn> (a [=map=]), where each key is a DOMString, and each item is a [=/background fetch=]. It is initially an empty [=map=].
+  * An associated <dfn>active background fetches edit queue</dfn> (a [=queue=]), initially the result of [=starting a parallel queue=].
+</div>
 
 ## Background fetch ## {#background-fetch-concept}
 
 A <dfn>background fetch</dfn> consists of:
 
 <div dfn-for="background fetch">
-  * An <dfn>id</dfn>, which is a DOMString.
-  * TODO: add additional state
+  * An <dfn>id</dfn> (a DOMString).
+  * <dfn>Requests</dfn> (a [=list=] of [=/requests=]).
+  * A <dfn>title</dfn> (a DOMString).
+  * A <dfn>total download size</dfn> (a number).
+  * <dfn>Icons</dfn> (a [=list=] of {{IconDefinition}}s).
 </div>
 
 # API # {#api}
@@ -76,7 +125,7 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
   dictionary BackgroundFetchOptions {
     sequence<IconDefinition> icons = [];
     DOMString title = "";
-    long totalDownloadSize = 0;
+    unsigned long long totalDownloadSize = 0;
   };
 
   // This is taken from https://w3c.github.io/manifest/#icons-member.
@@ -89,24 +138,83 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
 </xmp></pre>
 
 <div dfn-for="BackgroundFetchManager">
-  <div algorithm>
-    The <dfn method>fetch(|id|, |requests|, |options|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run the following steps [=in parallel=]:
 
-      1. Let |registration| be the [=context object=]'s associated [=/service worker registration=].
-      1. TODO.
+  A {{BackgroundFetchManager}} has a <dfn>BackgroundFetchRegistration instances</dfn> (a [=map=]), where the keys are [=/background fetch|background fetches=] and the values are {{BackgroundFetchRegistration}} objects. It is initially empty.
+
+  <div algorithm>
+    The <dfn method>fetch(|id|, |requests|, |options|)</dfn> method, when invoked, run the following steps:
+
+    1. Let |registration| be the [=context object=]'s associated [=/service worker registration=].
+    1. Let |internalRequests| be a new [=list=].
+    1. If |requests| is a {{RequestInfo}}, set |requests| to « |requests| ».
+    1. If |requests| is [=list/empty=], then return [=a promise rejected with=] a {{TypeError}}.
+    1. [=list/For each=] |request| of |requests|:
+      1. Let |internalRequest| be the [=Request/request=] of the result of invoking the {{Request}} constructor with |request|.
+      1. If |internalRequest|'s [=request/mode=] is "`no-cors`", then return [=a promise rejected with=] a {{TypeError}}.
+      1. [=list/Append=] |internalRequest| to |internalRequests|.
+    1. Let |promise| be [=a new promise=].
+    1. [=queue/Enqueue=] the following steps to [=active background fetches edit queue=]:
+      1. Let |bgFetchMap| be |registration|'s [=active background fetches=].
+      1. If |registration|'s [=service worker registration/active worker=] is null, then reject |promise| with a {{TypeError}} and abort these steps.
+      1. If |bgFetchMap|[|id|] [=map/exists=], reject |promise| with a {{TypeError}} and abort these steps.
+      1. Let |originalBodies| be a new [=list=].
+      1. For each [=list/For each=] |request| of |internalRequests|:
+        1. If |request|'s [=request/body=] is not null, then:
+          1. [=list/Append=] |request|'s [=request/body=] to |originalBodies|.
+          1. Run the following steps [=in parallel=]:
+            1. Let |bytesPromise| be the result of [=ReadableStream/read all bytes|reading all bytes=] of |request|'s [=request/body=]'s [=body/stream=].
+            1. [=Upon fulfillment=] of |bytesPromise| with |bytes|:
+              1. Let |body| be a new [=/body=].
+              1. [=ReadableStream/Enqueue=] |bytes| into |body|'s [=body/stream=].
+              1. Set |request|'s [=request/body=] to |body|.
+
+          Note: This ensures all bytes of the request bodies are available and can be stored.
+      1. If any [=/body=]'s [=body/stream=] in |originalBodies| becomes [=ReadableStream/errored=], reject |promise| with a {{TypeError}} and abort these steps.
+      1. [=body/Wait=] for all [=/bodies=] in |originalBodies|.
+      1. Let |bgFetch| be a new [=/background fetch=] with:
+        : [=background fetch/id=]
+        :: |id|
+        : [=background fetch/requests=]
+        :: |internalRequests|
+        : [=background fetch/total download size=]
+        :: |options|' `totalDownloadSize` member.
+        : [=background fetch/icons=]
+        :: |options|' `icons` member.
+        : [=background fetch/title=]
+        :: |options|' `title` member.
+      1. Set |bgFetchMap|[|id|] to |bgFetch|.
+      1. If storing |bgFetch| fails due to exceeding a quota limit, [=reject=] |promise| with a {{QuotaExceededError}} {{DOMException}} and abort these steps.
+      1. [=Resolve=] |promise| with the result of [=getting a BackgroundFetchRegistration instance=] passing the [=context object=]'s [=BackgroundFetchRegistration instances=] and |bgFetch|.
+    1. Return |promise|.
   </div>
 
   <div algorithm>
     The <dfn method>get(|id|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run the following steps [=in parallel=]:
 
-      1. TODO
+    1. Let |registration| be the [=context object=]'s associated [=/service worker registration=].
+    1. Let |bgFetch| be |registration|'s [=active background fetches=][|id|].
+    1. If |bgFetch| is nothing, then [=resolve=] |promise| with undefined and abort these steps.
+    1. [=Resolve=] |promise| with the result of [=getting a BackgroundFetchRegistration instance=] passing the [=context object=]'s [=BackgroundFetchRegistration instances=] and |bgFetch|.
   </div>
 
   <div algorithm>
     The <dfn method>getIds()</dfn> method, when invoked, must return [=a new promise=] |promise| and run the following steps [=in parallel=]:
 
-      1. TODO
+    1. Let |registration| be the [=context object=]'s associated [=/service worker registration=].
+    1. Let |ids| be the result of [=map/getting the keys=] of |registration|'s [=active background fetches=].
+    1. [=Resolve=] |promise| with |ids|.
   </div>
+</div>
+
+<div algorithm>
+  To <dfn data-lt="get a BackgroundFetchRegistration instance|getting a BackgroundFetchRegistration instance">get a BackgroundFetchRegistration instance</dfn> for an |instancesMap| (a [=BackgroundFetchRegistration instances=]) and a |bgFetch| (a [=/background fetch=]), run the following steps:
+
+  1. If |instancesMap|[|bgFetch|] [=map/exists=], then return |instancesMap|[|bgFetch|].
+  1. Let |instance| be a new {{BackgroundFetchRegistration}} whose [=BackgroundFetchRegistration/background fetch=] is set to |bgFetch|.
+  1. Set |instancesMap|[|bgFetch|] to |instance|.
+  1. Return |instance|.
+
+  Note: This is to ensure the same instance is returned for a given [=/background fetch=] throughout the life of a {{BackgroundFetchManager}}. It's okay for browsers to optimise here, as long as there's no way to tell a new instance has been created (e.g through equality, expandos, or weakly associated data).
 </div>
 
 ## {{BackgroundFetchRegistration}} ## {#background-fetch-registration}
@@ -160,7 +268,7 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
   <div algorithm>
     The <dfn method>abort()</dfn> method, when invoked, must return [=a new promise=] |promise| and run the following steps [=in parallel=]:
 
-      1. TODO
+    1. TODO
   </div>
 </div>
 
@@ -262,7 +370,7 @@ The following is the <a>event handler</a> (and its corresponding <a>event handle
   <div algorithm>
     The <dfn method>updateUI(|title|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run the following steps [=in parallel=]:
 
-      1. TODO
+    1. TODO
   </div>
 </div>
 
