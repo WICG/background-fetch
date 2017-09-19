@@ -415,3 +415,13 @@ The following is the <a>event handler</a> (and its corresponding <a>event handle
 
   enum BackgroundFetchState { "pending", "succeeded", "failed" };
 </xmp></pre>
+
+# Privacy and bandwidth usage # {#privacy-and-bandwidth-use}
+
+It's the recommendation of this standard that user agents make background fetch operations highly visible and easily abortable rather than asking permission up front. However, given that background fetches can be paused and retried, a user agent that immediately paused a background fetch and user interaction to resume would be compliant.
+
+The [=/origin=] of a background fetch should have equal or great visibility to the developer-provided information, such as a the [=background fetch/icons=] and [=background fetch/title=].
+
+A user agent may pause background downloads depending on network conditions or battery state. For example, a user agent may download automatically when connected to WiFi, but require user confirmation to download using mobile data. If an implementation has this restriction, the user should be able to persist granting mobile data use for the [=/origin=].
+
+A background fetch exposes the user's external IPs to the server throughout the duration of the background fetch. An attacker could use an extremely slow background fetch as a way to persistently track the user once they've left the site. Good visibility into the progress of the background fetch will help the user identify unwanted use.
