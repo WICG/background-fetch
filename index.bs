@@ -92,18 +92,18 @@ A <dfn>background fetch</dfn> consists of:
 
 <div dfn-for="background fetch">
   * An <dfn>id</dfn> (a DOMString).
-  * <dfn>Items</dfn> (a [=list=] of [=/background fetch items=]).
+  * <dfn>Records</dfn> (a [=list=] of [=/background fetch records=]).
   * A <dfn>title</dfn> (a DOMString).
   * A <dfn>download total</dfn> (a number).
   * An <dfn>upload total</dfn> (a number).
   * <dfn>Icons</dfn> (a [=list=] of {{IconDefinition}}s).
 </div>
 
-## Background fetch item ## {#background-fetch-item-concept}
+## Background fetch record ## {#background-fetch-record-concept}
 
-A <dfn>background fetch item</dfn> consists of:
+A <dfn>background fetch record</dfn> consists of:
 
-<div dfn-for="background fetch item">
+<div dfn-for="background fetch record">
   * A <dfn>request</dfn> (a [=/request=]).
   * A <dfn>response</dfn> (a [=/response=]), initially null.
   * A <dfn>response body</dfn> (a byte sequence), initially null.
@@ -157,7 +157,7 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
     The <dfn method>fetch(|id|, |requests|, |options|)</dfn> method, when invoked, run the following steps:
 
     1. Let |registration| be the [=context object=]'s associated [=/service worker registration=].
-    1. Let |items| be a new [=list=].
+    1. Let |records| be a new [=list=].
     1. Let |uploadTotal| be 0.
     1. If |requests| is a {{RequestInfo}}, set |requests| to « |requests| ».
     1. If |requests| is [=list/empty=], then return [=a promise rejected with=] a {{TypeError}}.
@@ -169,9 +169,9 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
         1. Increment |uploadTotal| by |internalRequest|'s [=request/body=]'s [=body/total bytes=].
 
           Issue: This isn't correctly set in fetch ([issue](https://github.com/whatwg/fetch/issues/604)).
-      1. Let |item| be a new [=background fetch item=].
-      1. Set |item|'s [=background fetch item/request=] to |internalReqeust|.
-      1. [=list/Append=] |item| to |items|.
+      1. Let |record| be a new [=background fetch record=].
+      1. Set |record|'s [=background fetch record/request=] to |internalReqeust|.
+      1. [=list/Append=] |record| to |records|.
     1. Let |promise| be [=a new promise=].
     1. [=queue/Enqueue=] the following steps to [=active background fetches edit queue=]:
       1. Let |bgFetchMap| be |registration|'s [=active background fetches=].
@@ -180,8 +180,8 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
       1. Let |bgFetch| be a new [=/background fetch=] with:
         : [=background fetch/id=]
         :: |id|.
-        : [=background fetch/items=]
-        :: |items|.
+        : [=background fetch/records=]
+        :: |records|.
         : [=background fetch/download total=]
         :: |options|' `downloadTotal` member.
         : [=background fetch/upload total=]
@@ -237,7 +237,7 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
     readonly attribute unsigned long long downloadTotal;
     readonly attribute unsigned long long downloaded;
     readonly attribute DOMString title;
-    readonly attribute FrozenArray<BackgroundFetchActiveFetch> activeFetches;
+    readonly attribute BackgroundFetchActiveFetches activeFetches;
 
     Promise<boolean> abort();
   };
@@ -248,9 +248,15 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
   };
 
   [Exposed=(Window,Worker)]
+  interface BackgroundFetchActiveFetches {
+    Promise<BackgroundFetchActiveFetch> match(RequestInfo request);
+    Promise<FrozenArray<BackgroundFetchActiveFetch>> values();
+  };
+
+  [Exposed=(Window,Worker)]
   interface BackgroundFetchActiveFetch : BackgroundFetchFetch {
     readonly attribute Promise<Response> responseReady;
-    // TODO: this will include fetch controller/observer objects
+    // In future this will include a fetch observer
   };
 </xmp></pre>
 
@@ -357,13 +363,19 @@ The following is the <a>event handler</a> (and its corresponding <a>event handle
 <pre class="idl"><xmp>
   [Constructor(DOMString type, BackgroundFetchedEventInit init), Exposed=ServiceWorker]
   interface BackgroundFetchedEvent : BackgroundFetchEvent {
-    readonly attribute FrozenArray<BackgroundFetchSettledFetch> fetches;
+    readonly attribute BackgroundFetchSettledFetches fetches;
 
     Promise<void> updateUI(DOMString title);
   };
 
   dictionary BackgroundFetchedEventInit : BackgroundFetchEventInit {
-    required sequence<BackgroundFetchSettledFetch> fetches;
+    required BackgroundFetchSettledFetches fetches;
+  };
+
+  [Exposed=(Window,Worker)]
+  interface BackgroundFetchSettledFetches {
+    Promise<BackgroundFetchSettledFetch> match(RequestInfo request);
+    Promise<FrozenArray<BackgroundFetchSettledFetch>> values();
   };
 
   [Exposed=ServiceWorker]
@@ -393,11 +405,11 @@ The following is the <a>event handler</a> (and its corresponding <a>event handle
 <pre class="idl"><xmp>
   [Constructor(DOMString type, BackgroundFetchedEventInit init), Exposed=ServiceWorker]
   interface BackgroundFetchFailEvent : BackgroundFetchedEvent {
-    readonly attribute FrozenArray<BackgroundFetchSettledFetch> fetches;
+    readonly attribute BackgroundFetchSettledFetches fetches;
   };
 
   dictionary BackgroundFetchFailEventInit : BackgroundFetchedEventInit {
-    required sequence<BackgroundFetchSettledFetch> fetches;
+    required BackgroundFetchSettledFetches fetches;
   };
 </xmp></pre>
 

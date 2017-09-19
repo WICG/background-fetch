@@ -64,9 +64,7 @@ const bgFetchJob = await registration.backgroundFetch.get(id);
 * `downloadTotal` - as provided.
 * `downloadProgress` - bytes received so far.
 * `title` - as provided.
-* `activeFetches` - a sequence of objects, which have the following members:
-  * `request` - a [`Request`](https://fetch.spec.whatwg.org/#request-class).
-  * `responseReady` - a promise for a [`Response`](https://fetch.spec.whatwg.org/#response-class). Rejects if the fetch has terminally failed.
+* `activeFetches` - provides access to the in-progress fetches.
 * `abort()` - abort the whole background fetch job. This returns a promise that resolves with a boolean, which is true if the operation successfully aborted.
 * `onprogress` - Event when `downloadProgress` or `uploadProgress` update.
 
@@ -106,9 +104,7 @@ addEventListener('backgroundfetched', bgFetchEvent => {
 `bgFetchEvent` extends [`ExtendableEvent`](https://w3c.github.io/ServiceWorker/#extendableevent), with the following additional members:
 
 * `id` - identifier of the background fetch job.
-* `fetches` - a sequence of objects, which have the following members:
-  * `request` - a [`Request`](https://fetch.spec.whatwg.org/#request-class).
-  * `response` - a [`Response`](https://fetch.spec.whatwg.org/#response-class).
+* `fetches` - provides access to the fetches.
 * `updateUI(title)` - update the title, eg "Uploaded 'Holiday in Rome'", "Downloaded 'Catastrophe season 2 episode 1'", or "Level 5 ready to play!". If this isn't called, the browser may update the title itself.
 
 Once this event is fired, the background fetch job is no longer stored against the registration, so `backgroundFetch.get(bgFetchEvent.id)` will resolve with undefined.
@@ -125,9 +121,7 @@ addEventListener('backgroundfetchfail', bgFetchFailEvent => {
 
 `bgFetchFailEvent` extends `bgFetchEvent`, with the following additional members:
 
-* `fetches` - a sequence of objects, which have the following members:
-  * `request` - a [`Request`](https://fetch.spec.whatwg.org/#request-class).
-  * `response` - a [`Response`](https://fetch.spec.whatwg.org/#response-class).
+* `fetches` - provides access to the fetches.
 
 Again, once this event is fired, the background fetch job is no longer stored against the registration, so `backgroundFetch.get(bgFetchEvent.id)` will resolve with undefined.
 
@@ -203,7 +197,8 @@ A requirement is to avoid doubling quota usage when transferring background-fetc
 addEventListener('backgroundfetched', event => {
   event.waitUntil(async function() {
     const cache = await caches.open('my-cache');
-    const promises = event.fetches.map(({request, response}) => {
+    const fetches = await event.fetches.values();
+    const promises = fetches.map(({request, response}) => {
       if (response && response.ok) {
         return cache.put(request, response);
       }
@@ -289,6 +284,7 @@ addEventListener('backgroundfetched', event => {
 
       // Cache podcasts
       const cache = await caches.open(event.id);
+      const fetches = await event.fetches.values();
       const promises = event.fetches.map(({request, response}) => {
         return cache.put(request, response);
       });
@@ -337,8 +333,8 @@ addEventListener('fetch', event => {
 
       if (bgFetchJob) {
         // Look for response in fetches
-        const response = await findPodcastResponse(bgFetchJob.activeFetches);
-        if (response) return response;
+        const activeFetch = await bgFetchJob.activeFetches.match(event.request);
+        if (activeFetch) return activeFetch.responseDone;
       }
 
       // Else fall back to cache or network
@@ -347,16 +343,6 @@ addEventListener('fetch', event => {
     }());
   }
 });
-
-async function findPodcastResponse(fetches) {
-  for (const {request, responseReady} of fetches) {
-    const url = new URL(request.url);
-
-    if (/\.(mp3|aac|ogg)$/.test(url.pathname)) {
-      return responseReady.catch(() => undefined);
-    }
-  }
-}
 ```
 
 ## Downloading a level of a game
@@ -394,6 +380,7 @@ self.addEventListener('backgroundfetched', event => {
 
     event.waitUntil(async function() {
       const cache = await caches.open(event.id);
+      const fetches = await event.fetches.values();
       const promises = event.fetches.map(({request, response}) => {
         return cache.put(request, response);
       });
@@ -461,7 +448,8 @@ addEventListener('backgroundfetchfail', event => {
 
     // Store the data in IDB so it isn't lost:
     event.waitUntil(async function() {
-      const formData = await event.fetches[0].request.formData();
+      const fetches = await event.fetches.values();
+      const formData = fetches[0].request.formData();
       await storeInIDB(formData);
     }());
   }
