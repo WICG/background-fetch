@@ -14,6 +14,7 @@ Indent: 2
 
 <pre class="link-defaults">
 spec:infra; type:dfn; text:list
+spec:fetch; type:interface; text:ReadableStream
 </pre>
 
 # Introduction # {#intro}
@@ -91,11 +92,21 @@ A <dfn>background fetch</dfn> consists of:
 
 <div dfn-for="background fetch">
   * An <dfn>id</dfn> (a DOMString).
-  * <dfn>Requests</dfn> (a [=list=] of [=/requests=]).
+  * <dfn>Items</dfn> (a [=list=] of [=/background fetch items=]).
   * A <dfn>title</dfn> (a DOMString).
   * A <dfn>download total</dfn> (a number).
   * An <dfn>upload total</dfn> (a number).
   * <dfn>Icons</dfn> (a [=list=] of {{IconDefinition}}s).
+</div>
+
+## Background fetch item ## {#background-fetch-item-concept}
+
+A <dfn>background fetch item</dfn> consists of:
+
+<div dfn-for="background fetch item">
+  * A <dfn>request</dfn> (a [=/request=]).
+  * A <dfn>response</dfn> (a [=/response=]), initially null.
+  * A <dfn>response body</dfn> (a byte sequence), initially null.
 </div>
 
 # API # {#api}
@@ -146,41 +157,31 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
     The <dfn method>fetch(|id|, |requests|, |options|)</dfn> method, when invoked, run the following steps:
 
     1. Let |registration| be the [=context object=]'s associated [=/service worker registration=].
-    1. Let |internalRequests| be a new [=list=].
+    1. Let |items| be a new [=list=].
+    1. Let |uploadTotal| be 0.
     1. If |requests| is a {{RequestInfo}}, set |requests| to « |requests| ».
     1. If |requests| is [=list/empty=], then return [=a promise rejected with=] a {{TypeError}}.
     1. [=list/For each=] |request| of |requests|:
       1. Let |internalRequest| be the [=Request/request=] of the result of invoking the {{Request}} constructor with |request|.
       1. If |internalRequest|'s [=request/mode=] is "`no-cors`", then return [=a promise rejected with=] a {{TypeError}}.
-      1. [=list/Append=] |internalRequest| to |internalRequests|.
+      1. If |internalRequest|'s [=request/body=] is not null, then:
+        1. If |internalRequest|'s [=request/body=]'s [=body/source=] is a {{ReadableStream}}, then return [=a promise rejected with=] a {{TypeError}}.
+        1. Increment |uploadTotal| by |internalRequest|'s [=request/body=]'s [=body/total bytes=].
+
+          Issue: This isn't correctly set in fetch ([issue](https://github.com/whatwg/fetch/issues/604)).
+      1. Let |item| be a new [=background fetch item=].
+      1. Set |item|'s [=background fetch item/request=] to |internalReqeust|.
+      1. [=list/Append=] |item| to |items|.
     1. Let |promise| be [=a new promise=].
     1. [=queue/Enqueue=] the following steps to [=active background fetches edit queue=]:
       1. Let |bgFetchMap| be |registration|'s [=active background fetches=].
       1. If |registration|'s [=service worker registration/active worker=] is null, then reject |promise| with a {{TypeError}} and abort these steps.
       1. If |bgFetchMap|[|id|] [=map/exists=], reject |promise| with a {{TypeError}} and abort these steps.
-      1. Let |originalBodies| be a new [=list=].
-      1. For each [=list/For each=] |request| of |internalRequests|:
-        1. If |request|'s [=request/body=] is not null, then:
-          1. [=list/Append=] |request|'s [=request/body=] to |originalBodies|.
-          1. Run the following steps [=in parallel=]:
-            1. Let |bytesPromise| be the result of [=ReadableStream/read all bytes|reading all bytes=] of |request|'s [=request/body=]'s [=body/stream=].
-            1. [=Upon fulfillment=] of |bytesPromise| with |bytes|:
-              1. Let |body| be a new [=/body=].
-              1. [=ReadableStream/Enqueue=] |bytes| into |body|'s [=body/stream=].
-              1. Set |body|'s [=body/total bytes=] to |bytes|' length.
-              1. Set |request|'s [=request/body=] to |body|.
-
-          Note: This ensures all bytes of the request bodies are available and can be stored.
-      1. If any [=/body=]'s [=body/stream=] in |originalBodies| becomes [=ReadableStream/errored=], reject |promise| with a {{TypeError}} and abort these steps.
-      1. [=body/Wait=] for all [=/bodies=] in |originalBodies|. TODO: this doesn't feel accurate enough, as the request's body may not have been replaced by this point.
-      1. Let |uploadTotal| be 0.
-      1. For each [=list/For each=] |request| of |internalRequests|:
-        1. If |request|'s [=request/body=] is not null, then increment |uploadTotal| by |request|'s [=request/body=]'s [=body/total bytes=].
       1. Let |bgFetch| be a new [=/background fetch=] with:
         : [=background fetch/id=]
         :: |id|.
-        : [=background fetch/requests=]
-        :: |internalRequests|.
+        : [=background fetch/items=]
+        :: |items|.
         : [=background fetch/download total=]
         :: |options|' `downloadTotal` member.
         : [=background fetch/upload total=]
