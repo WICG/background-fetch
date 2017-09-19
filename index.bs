@@ -222,7 +222,39 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
   1. Set |instancesMap|[|bgFetch|] to |instance|.
   1. Return |instance|.
 
-  Note: This is to ensure the same instance is returned for a given [=/background fetch=] throughout the life of a {{BackgroundFetchManager}}. It's okay for browsers to optimise here, as long as there's no way to tell a new instance has been created (e.g through equality, expandos, or weakly associated data).
+  Note: This is to ensure the same instance is returned for a given [=/background fetch=] throughout the life of a {{BackgroundFetchManager}}. It's okay for browsers to optimise this, as long as there's no way to tell that more than one instance has been created for a given [=/background fetch=] (e.g through equality, expandos, or weakly-associated data).
+</div>
+
+<div algorithm>
+  To <dfn>attempt a background fetch</dfn> for |bgFetch| (a [=/background fetch=]), run the following steps:
+
+  1. Let |settledFetches| be 0.
+  1. Let |abandonedReason| be null.
+  1. Let |abandonedReasonQueue| be the result of [=starting a parallel queue=].
+  1. For each |item| in |bgFetch|'s [=background fetch/items=], run the following steps [=in parallel=]:
+    1. Let |request| be a copy of |item|'s [=background fetch item/request=].
+    1. Set |request|'s [=request/keepalive flag=].
+    1. Set |request|'s [=request/synchronous flag=].
+    1. Let |response| be the result of [=/fetching=] |request|.
+
+      Issue: Fetch waits for the whole body before returning |response|. Let's pretend it *doesn't* do that [issue](https://github.com/whatwg/fetch/issues/536#issuecomment-330184276).
+
+    1. If one of the following is true:
+      * |response| failed due to a failed CORS check.
+
+        Issue: Fetch doesn't currently expose this [(issue)](https://github.com/whatwg/fetch/issues/605).
+      * |response|'s [=response/status=] is not an [=ok status=].
+
+      Then [=queue/enqueue=] the following steps to |abandonedReasonQueue|:
+      1. If |abandonedReason| is not null, abort these steps.
+      1. Set |abandonedReason| to `"bad status"`.
+      1.
+    1. TODO: abandon if response is bad. Abandoning should abort all in progress fetches.
+    1. TODO: copy response except body, and save in |item|.
+    1. TODO: consume response into |item|'s [=background fetch item/response body=]. Update progress along the way.
+    1. TODO: if stream failed. either abandon, or attempt resume
+
+  TODO: check the interaction with the request's client. Does any data here need to be changed or cached? The interaction with [event queuing](https://fetch.spec.whatwg.org/#queue-a-fetch-task) makes me think something needs changing.
 </div>
 
 ## {{BackgroundFetchRegistration}} ## {#background-fetch-registration}
