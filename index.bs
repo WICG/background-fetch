@@ -195,7 +195,7 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
   ### {{BackgroundFetchManager/fetch()}} ### {#background-fetch-manager-fetch}
 
   <div algorithm>
-    The <dfn method lt="fetch()">fetch(|id|, |requests|, |options|)</dfn> method, when invoked, run the following steps:
+    The <dfn method>fetch(|id|, |requests|, |options|)</dfn> method, when invoked, run the following steps:
 
     1. Let |registration| be the [=context object=]'s [=BackgroundFetchManager/service worker registration=].
     1. Let |records| be a new [=list=].
@@ -243,7 +243,7 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
   ### {{BackgroundFetchManager/get()}} ### {#background-fetch-manager-get}
 
   <div algorithm>
-    The <dfn method lt="get()">get(|id|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run the following steps [=in parallel=]:
+    The <dfn method>get(|id|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run the following steps [=in parallel=]:
 
     1. Let |registration| be the [=context object=]'s associated [=BackgroundFetchManager/service worker registration=].
     1. Let |bgFetch| be |registration|'s [=active background fetches=][|id|].
