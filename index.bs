@@ -45,6 +45,15 @@ A [=/service worker registration=] additionally has:
   * An associated <dfn>active background fetches edit queue</dfn> (a [=parallel queue=]), initially the result of [=starting a new parallel queue=].
 </div>
 
+<div algorithm>
+  To determine whether an [=active background fetches=] <dfn for="active background fetches">contains</dfn> |bgFetch| (a [=/background fetch=]), run the following steps:
+
+  1. Let |id| be |bgFetch|'s [=background fetch/id=].
+  1. If |activeBgFetches|[|id|] does not [=map/exist=], then return false.
+  1. If |activeBgFetches|[|id|] does not equal |bgFetch|, then return false.
+  1. Return true.
+</div>
+
 ## Background fetch ## {#background-fetch-concept}
 
 A <dfn>background fetch</dfn> consists of:
@@ -110,7 +119,7 @@ A <dfn>background fetch record</dfn> consists of:
     1. [=Enqueue the following steps=] to |swRegistration|'s [=active background fetches edit queue=]:
       1. Let |activeBgFetches| be |swRegistration|'s [=active background fetches=].
       1. Let |id| be |bgFetch|'s [=background fetch/id=].
-      1. If |activeBgFetches|[|id|] does not [=map/exist=], then abort these steps.
+      1. If |activeBgFetches| does not [=active background fetches/contain=] |bgFetch|, then [=resolve=] |promise| with false and abort these steps.
 
         Note: This means the background fetch was {{BackgroundFetchRegistration/abort()|aborted}}.
       1. Remove |activeBgFetches|[|id|].
@@ -317,7 +326,7 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
     1. [=Enqueue the following steps=] to |swRegistration|'s [=active background fetches edit queue=]:
       1. Let |activeBgFetches| be |swRegistration|'s [=active background fetches=].
       1. Let |id| be |bgFetch|'s [=background fetch/id=].
-      1. If |activeBgFetches|[|id|] does not [=map/exist=], then [=resolve=] |promise| with false and abort these steps.
+      1. If |activeBgFetches| does not [=active background fetches/contain=] |bgFetch|, then [=resolve=] |promise| with false and abort these steps.
       1. Remove |activeBgFetches|[|id|].
       1. [=Resolve=] |promise| with true.
       1. TODO: terminate the fetches
