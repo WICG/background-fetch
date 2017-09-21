@@ -1424,7 +1424,7 @@ pre.highlight, pre > code.highlight { display: block; padding: 1em; margin: .5em
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">Background Fetch</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Editor’s Draft, <time class="dt-updated" datetime="2017-09-19">19 September 2017</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Editor’s Draft, <time class="dt-updated" datetime="2017-09-21">21 September 2017</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1627,9 +1627,9 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
      <li data-md="">
       <p>A <dfn class="dfn-paneled" data-dfn-for="background fetch record" data-dfn-type="dfn" data-noexport="" id="background-fetch-record-request">request</dfn> (a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request" id="ref-for-concept-request">request</a>).</p>
      <li data-md="">
-      <p>A <dfn data-dfn-for="background fetch record" data-dfn-type="dfn" data-noexport="" id="background-fetch-record-response">response<a class="self-link" href="#background-fetch-record-response"></a></dfn> (a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response" id="ref-for-concept-response">response</a>), initially null.</p>
+      <p>A <dfn class="dfn-paneled" data-dfn-for="background fetch record" data-dfn-type="dfn" data-noexport="" id="background-fetch-record-response">response</dfn> (a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response" id="ref-for-concept-response">response</a>), initially null.</p>
      <li data-md="">
-      <p>A <dfn data-dfn-for="background fetch record" data-dfn-type="dfn" data-noexport="" id="background-fetch-record-response-body">response body<a class="self-link" href="#background-fetch-record-response-body"></a></dfn> (a byte sequence), initially null.</p>
+      <p>A <dfn class="dfn-paneled" data-dfn-for="background fetch record" data-dfn-type="dfn" data-noexport="" id="background-fetch-record-response-body">response body</dfn> (a byte sequence), initially null.</p>
     </ul>
    </div>
    <h2 class="heading settled" data-level="3" id="api"><span class="secno">3. </span><span class="content">API</span><a class="self-link" href="#api"></a></h2>
@@ -1695,6 +1695,8 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
            <p class="issue" id="issue-9b0afb74"><a class="self-link" href="#issue-9b0afb74"></a> This isn’t correctly set in fetch (<a href="https://github.com/whatwg/fetch/issues/604">issue</a>).</p>
          </ol>
         <li data-md="">
+         <p>Set <var>internalRequest</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-client" id="ref-for-concept-request-client">client</a> to null.</p>
+        <li data-md="">
          <p>Let <var>record</var> be a new <a data-link-type="dfn" href="#background-fetch-record" id="ref-for-background-fetch-record①">background fetch record</a>.</p>
         <li data-md="">
          <p>Set <var>record</var>’s <a data-link-type="dfn" href="#background-fetch-record-request" id="ref-for-background-fetch-record-request">request</a> to <var>internalReqeust</var>.</p>
@@ -1704,7 +1706,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
       <li data-md="">
        <p>Let <var>promise</var> be <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-new-promise" id="ref-for-a-new-promise②">a new promise</a>.</p>
       <li data-md="">
-       <p><a data-link-type="dfn" href="https://infra.spec.whatwg.org/#queue-enqueue" id="ref-for-queue-enqueue①">Enqueue</a> the following steps to <a data-link-type="dfn" href="#service-worker-registration-active-background-fetches-edit-queue" id="ref-for-service-worker-registration-active-background-fetches-edit-queue">active background fetches edit queue</a>:</p>
+       <p><a data-link-type="dfn" href="https://infra.spec.whatwg.org/#queue-enqueue" id="ref-for-queue-enqueue①">Enqueue</a> the following steps to <var>registration</var>’s <a data-link-type="dfn" href="#service-worker-registration-active-background-fetches-edit-queue" id="ref-for-service-worker-registration-active-background-fetches-edit-queue">active background fetches edit queue</a>:</p>
        <ol>
         <li data-md="">
          <p>Let <var>bgFetchMap</var> be <var>registration</var>’s <a data-link-type="dfn" href="#service-worker-registration-active-background-fetches" id="ref-for-service-worker-registration-active-background-fetches">active background fetches</a>.</p>
@@ -1782,7 +1784,84 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
      <li data-md="">
       <p>Return <var>instance</var>.</p>
     </ol>
-    <p class="note" role="note"><span>Note:</span> This is to ensure the same instance is returned for a given <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch④">background fetch</a> throughout the life of a <code class="idl"><a data-link-type="idl" href="#backgroundfetchmanager" id="ref-for-backgroundfetchmanager⑤">BackgroundFetchManager</a></code>. It’s okay for browsers to optimise here, as long as there’s no way to tell a new instance has been created (e.g through equality, expandos, or weakly associated data).</p>
+    <p class="note" role="note"><span>Note:</span> This is to ensure the same instance is returned for a given <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch④">background fetch</a> throughout the life of a <code class="idl"><a data-link-type="idl" href="#backgroundfetchmanager" id="ref-for-backgroundfetchmanager⑤">BackgroundFetchManager</a></code>. It’s okay for browsers to optimise this, as long as there’s no way to tell that more than one instance has been created for a given <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch⑤">background fetch</a> (e.g through equality, expandos, or weakly-associated data).</p>
+   </div>
+   <div class="algorithm" data-algorithm="attempt a background fetch">
+     To <dfn data-dfn-type="dfn" data-noexport="" id="attempt-a-background-fetch">attempt a background fetch<a class="self-link" href="#attempt-a-background-fetch"></a></dfn> for <var>bgFetch</var> (a <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch⑥">background fetch</a>), run the following steps: 
+    <ol>
+     <li data-md="">
+      <p>Let <var>completeFetches</var> be 0.</p>
+     <li data-md="">
+      <p>Let <var>abandoned</var> be false.</p>
+     <li data-md="">
+      <p>Let <var>completeFetchesEditQueue</var> be the result of <a data-link-type="dfn" href="#start-a-parallel-queue" id="ref-for-start-a-parallel-queue②">starting a parallel queue</a>.</p>
+     <li data-md="">
+      <p>For each <var>record</var> in <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-records" id="ref-for-background-fetch-records①">records</a>, run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel⑤">in parallel</a>:</p>
+      <ol>
+       <li data-md="">
+        <p>Let <var>request</var> be a copy of <var>record</var>’s <a data-link-type="dfn" href="#background-fetch-record-request" id="ref-for-background-fetch-record-request①">request</a>.</p>
+       <li data-md="">
+        <p>Set <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#request-keepalive-flag" id="ref-for-request-keepalive-flag">keepalive flag</a>.</p>
+       <li data-md="">
+        <p>Set <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#synchronous-flag" id="ref-for-synchronous-flag">synchronous flag</a>.</p>
+       <li data-md="">
+        <p>Let <var>response</var> be the result of <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-fetch" id="ref-for-concept-fetch④">fetching</a> <var>request</var>.</p>
+        <p class="issue" id="issue-ba3b5fd8"><a class="self-link" href="#issue-ba3b5fd8"></a> Fetch waits for the whole body before returning <var>response</var>. Let’s pretend it <em>doesn’t</em> do that <a href="https://github.com/whatwg/fetch/issues/536#issuecomment-330184276">issue</a>.</p>
+       <li data-md="">
+        <p>If one of the following is true:</p>
+        <ul>
+         <li data-md="">
+          <p><var>response</var> failed due to a failed CORS check.</p>
+          <p class="issue" id="issue-8840f7f0"><a class="self-link" href="#issue-8840f7f0"></a> Fetch doesn’t currently expose this <a href="https://github.com/whatwg/fetch/issues/605">(issue)</a>.</p>
+         <li data-md="">
+          <p>TODO: other failure reasons?</p>
+        </ul>
+        <p>Then set <var>abandoned</var> to true.</p>
+       <li data-md="">
+        <p>Otherwise, if <var>response</var> wasn’t a terminal failure:</p>
+        <ol>
+         <li data-md="">
+          <p>Resume download somehow.</p>
+        </ol>
+        <p class="issue" id="issue-b09a6b17"><a class="self-link" href="#issue-b09a6b17"></a> Not yet defined.</p>
+       <li data-md="">
+        <p>Otherwise:</p>
+        <ol>
+         <li data-md="">
+          <p>Let <var>storedResponse</var> be a copy of <var>response</var> except for its <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-body" id="ref-for-concept-response-body">body</a>.</p>
+         <li data-md="">
+          <p>Set <var>record</var>’s <a data-link-type="dfn" href="#background-fetch-record-response" id="ref-for-background-fetch-record-response">response</a> to <var>storedResponse</var>.</p>
+         <li data-md="">
+          <p>Whenever one or more bytes are transmitted from <var>response</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-body" id="ref-for-concept-response-body①">body</a>'s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-body-stream" id="ref-for-concept-body-stream">stream</a>, let <var>bytes</var> be the transmitted bytes and run these steps:</p>
+          <ol>
+           <li data-md="">
+            <p>Append <var>bytes</var> to <var>record</var>’s <a data-link-type="dfn" href="#background-fetch-record-response-body" id="ref-for-background-fetch-record-response-body">response body</a>.</p>
+           <li data-md="">
+            <p>TODO: progress events</p>
+          </ol>
+         <li data-md="">
+          <p>If at any point the bytes transmission for <var>response</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-body" id="ref-for-concept-response-body②">body</a>'s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-body-stream" id="ref-for-concept-body-stream①">stream</a> is done normally, then <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#queue-enqueue" id="ref-for-queue-enqueue②">enqueue</a> the following steps to <var>completeFetchesEditQueue</var>:</p>
+          <ol>
+           <li data-md="">
+            <p>Increment <var>completeFetches</var>.</p>
+          </ol>
+         <li data-md="">
+          <p>If at any point the ongoing <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-fetch" id="ref-for-concept-fetch⑤">fetch</a> is <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-fetch-terminate" id="ref-for-concept-fetch-terminate">terminated</a>, then set <var>abandoned</var> to true.</p>
+        </ol>
+       <li data-md="">
+        <p>Wait for either <var>abandoned</var> to be true, or <var>completeFetches</var> to be <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-records" id="ref-for-background-fetch-records②">records</a>'s <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-size" id="ref-for-list-size">size</a>.</p>
+       <li data-md="">
+        <p>If <var>abandoned</var> is true:</p>
+        <ol>
+         <li data-md="">
+          <p>TODO: terminate all related fetches.</p>
+         <li data-md="">
+          <p>TODO: failure event.</p>
+        </ol>
+       <li data-md="">
+        <p>TODO: success event.</p>
+      </ol>
+    </ol>
    </div>
    <h3 class="heading settled" data-level="3.3" id="background-fetch-registration"><span class="secno">3.3. </span><span class="content"><code class="idl"><a data-link-type="idl" href="#backgroundfetchregistration" id="ref-for-backgroundfetchregistration④">BackgroundFetchRegistration</a></code></span><a class="self-link" href="#background-fetch-registration"></a></h3>
 <pre class="idl highlight def">[<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed①">Exposed</a>=(<span class="n">Window</span>,<span class="n">Worker</span>)]
@@ -1817,7 +1896,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
   };
 </pre>
    <div>
-     A <code class="idl"><a data-link-type="idl" href="#backgroundfetchregistration" id="ref-for-backgroundfetchregistration⑤">BackgroundFetchRegistration</a></code> instance has an associated <dfn class="dfn-paneled" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="dfn" data-noexport="" id="backgroundfetchregistration-background-fetch">background fetch</dfn>, a <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch⑤">background fetch</a>. 
+     A <code class="idl"><a data-link-type="idl" href="#backgroundfetchregistration" id="ref-for-backgroundfetchregistration⑤">BackgroundFetchRegistration</a></code> instance has an associated <dfn class="dfn-paneled" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="dfn" data-noexport="" id="backgroundfetchregistration-background-fetch">background fetch</dfn>, a <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch⑦">background fetch</a>. 
     <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="attribute" data-export="" id="dom-backgroundfetchregistration-id"><code>id</code></dfn> attribute’s getter must return the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object⑥">context object</a>'s <a data-link-type="dfn" href="#backgroundfetchregistration-background-fetch" id="ref-for-backgroundfetchregistration-background-fetch①">background fetch</a>'s <a data-link-type="dfn" href="#background-fetch-id" id="ref-for-background-fetch-id①">id</a>.</p>
     <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="attribute" data-export="" id="dom-backgroundfetchregistration-icons"><code>icons</code></dfn> attribute’s getter must return the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object⑦">context object</a>'s <a data-link-type="dfn" href="#backgroundfetchregistration-background-fetch" id="ref-for-backgroundfetchregistration-background-fetch②">background fetch</a>'s <a data-link-type="dfn" href="#background-fetch-icons" id="ref-for-background-fetch-icons①">icons</a>.</p>
     <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="attribute" data-export="" id="dom-backgroundfetchregistration-uploadtotal"><code>uploadTotal</code></dfn> attribute’s getter must return the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object⑧">context object</a>'s <a data-link-type="dfn" href="#backgroundfetchregistration-background-fetch" id="ref-for-backgroundfetchregistration-background-fetch③">background fetch</a>'s <a data-link-type="dfn" href="#background-fetch-upload-total" id="ref-for-background-fetch-upload-total①">upload total</a>.</p>
@@ -1827,7 +1906,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
     <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="attribute" data-export="" id="dom-backgroundfetchregistration-title"><code>title</code></dfn> attribute’s getter must return the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object①②">context object</a>'s <a data-link-type="dfn" href="#backgroundfetchregistration-background-fetch" id="ref-for-backgroundfetchregistration-background-fetch⑦">background fetch</a>'s <a data-link-type="dfn" href="#background-fetch-title" id="ref-for-background-fetch-title①">title</a>.</p>
     <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="attribute" data-export="" id="dom-backgroundfetchregistration-activefetches"><code>activeFetches</code></dfn> attribute’s getter must return the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object①③">context object</a>'s <a data-link-type="dfn" href="#backgroundfetchregistration-background-fetch" id="ref-for-backgroundfetchregistration-background-fetch⑧">background fetch</a>'s TODO.</p>
     <div class="algorithm" data-algorithm="abort()">
-      The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="method" data-export="" id="dom-backgroundfetchregistration-abort"><code>abort()</code></dfn> method, when invoked, must return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-new-promise" id="ref-for-a-new-promise⑤">a new promise</a> <var>promise</var> and run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel⑤">in parallel</a>: 
+      The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="method" data-export="" id="dom-backgroundfetchregistration-abort"><code>abort()</code></dfn> method, when invoked, must return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-new-promise" id="ref-for-a-new-promise⑤">a new promise</a> <var>promise</var> and run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel⑥">in parallel</a>: 
      <ol>
       <li data-md="">
        <p>TODO</p>
@@ -1915,7 +1994,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
    <div>
      The <dfn class="idl-code" data-dfn-for="BackgroundFetchedEvent" data-dfn-type="attribute" data-export="" id="dom-backgroundfetchedevent-completefetches"><code>completeFetches</code><a class="self-link" href="#dom-backgroundfetchedevent-completefetches"></a></dfn> attribute must return TODO. 
     <div class="algorithm" data-algorithm="updateUI(|title|)">
-      The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchedEvent" data-dfn-type="method" data-export="" id="dom-backgroundfetchedevent-updateui"><code>updateUI(<var>title</var>)</code></dfn> method, when invoked, must return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-new-promise" id="ref-for-a-new-promise⑥">a new promise</a> <var>promise</var> and run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel⑥">in parallel</a>: 
+      The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchedEvent" data-dfn-type="method" data-export="" id="dom-backgroundfetchedevent-updateui"><code>updateUI(<var>title</var>)</code></dfn> method, when invoked, must return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-new-promise" id="ref-for-a-new-promise⑥">a new promise</a> <var>promise</var> and run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel⑦">in parallel</a>: 
      <ol>
       <li data-md="">
        <p>TODO</p>
@@ -2110,6 +2189,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
    <li><a href="#service-worker-registration-active-background-fetches">active background fetches</a><span>, in §2.2</span>
    <li><a href="#service-worker-registration-active-background-fetches-edit-queue">active background fetches edit queue</a><span>, in §2.2</span>
    <li><a href="#dom-backgroundfetchregistration-activefetches">activeFetches</a><span>, in §3.3</span>
+   <li><a href="#attempt-a-background-fetch">attempt a background fetch</a><span>, in §3.2</span>
    <li><a href="#dom-serviceworkerregistration-backgroundfetch">backgroundFetch</a><span>, in §3.1</span>
    <li>
     background fetch
@@ -2259,13 +2339,19 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
      <li><a href="https://fetch.spec.whatwg.org/#request">Request</a>
      <li><a href="https://fetch.spec.whatwg.org/#requestinfo">RequestInfo</a>
      <li><a href="https://fetch.spec.whatwg.org/#response">Response</a>
-     <li><a href="https://fetch.spec.whatwg.org/#concept-request-body">body</a>
+     <li><a href="https://fetch.spec.whatwg.org/#concept-request-body">body <small>(for request)</small></a>
+     <li><a href="https://fetch.spec.whatwg.org/#concept-response-body">body <small>(for response)</small></a>
+     <li><a href="https://fetch.spec.whatwg.org/#concept-request-client">client</a>
      <li><a href="https://fetch.spec.whatwg.org/#concept-fetch">fetch</a>
+     <li><a href="https://fetch.spec.whatwg.org/#request-keepalive-flag">keepalive flag</a>
      <li><a href="https://fetch.spec.whatwg.org/#concept-request-mode">mode</a>
      <li><a href="https://fetch.spec.whatwg.org/#concept-request">request</a>
      <li><a href="https://fetch.spec.whatwg.org/#concept-request-request">request <small>(for Request)</small></a>
      <li><a href="https://fetch.spec.whatwg.org/#concept-response">response</a>
      <li><a href="https://fetch.spec.whatwg.org/#concept-body-source">source</a>
+     <li><a href="https://fetch.spec.whatwg.org/#concept-body-stream">stream</a>
+     <li><a href="https://fetch.spec.whatwg.org/#synchronous-flag">synchronous flag</a>
+     <li><a href="https://fetch.spec.whatwg.org/#concept-fetch-terminate">terminated</a>
      <li><a href="https://fetch.spec.whatwg.org/#concept-body-total-bytes">total bytes</a>
     </ul>
    <li>
@@ -2292,6 +2378,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
      <li><a href="https://infra.spec.whatwg.org/#list">list</a>
      <li><a href="https://infra.spec.whatwg.org/#ordered-map">map</a>
      <li><a href="https://infra.spec.whatwg.org/#queue">queue</a>
+     <li><a href="https://infra.spec.whatwg.org/#list-size">size</a>
     </ul>
    <li>
     <a data-link-type="biblio">[promises-guide]</a> defines the following terms:
@@ -2479,12 +2566,16 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
   <h2 class="no-num no-ref heading settled" id="issues-index"><span class="content">Issues Index</span><a class="self-link" href="#issues-index"></a></h2>
   <div style="counter-reset:issue">
    <div class="issue"> This isn’t correctly set in fetch (<a href="https://github.com/whatwg/fetch/issues/604">issue</a>).<a href="#issue-9b0afb74"> ↵ </a></div>
+   <div class="issue"> Fetch waits for the whole body before returning <var>response</var>. Let’s pretend it <em>doesn’t</em> do that <a href="https://github.com/whatwg/fetch/issues/536#issuecomment-330184276">issue</a>.<a href="#issue-ba3b5fd8"> ↵ </a></div>
+   <div class="issue"> Fetch doesn’t currently expose this <a href="https://github.com/whatwg/fetch/issues/605">(issue)</a>.<a href="#issue-8840f7f0"> ↵ </a></div>
+   <div class="issue"> Not yet defined.<a href="#issue-b09a6b17"> ↵ </a></div>
   </div>
   <aside class="dfn-panel" data-for="start-a-parallel-queue">
    <b><a href="#start-a-parallel-queue">#start-a-parallel-queue</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-start-a-parallel-queue">2.1. Parallel queues</a>
     <li><a href="#ref-for-start-a-parallel-queue①">2.2. Extensions to service worker registration</a>
+    <li><a href="#ref-for-start-a-parallel-queue②">3.2. BackgroundFetchManager</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="service-worker-registration-active-background-fetches">
@@ -2503,8 +2594,8 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
    <b><a href="#background-fetch">#background-fetch</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-background-fetch">2.2. Extensions to service worker registration</a>
-    <li><a href="#ref-for-background-fetch①">3.2. BackgroundFetchManager</a> <a href="#ref-for-background-fetch②">(2)</a> <a href="#ref-for-background-fetch③">(3)</a> <a href="#ref-for-background-fetch④">(4)</a>
-    <li><a href="#ref-for-background-fetch⑤">3.3. BackgroundFetchRegistration</a>
+    <li><a href="#ref-for-background-fetch①">3.2. BackgroundFetchManager</a> <a href="#ref-for-background-fetch②">(2)</a> <a href="#ref-for-background-fetch③">(3)</a> <a href="#ref-for-background-fetch④">(4)</a> <a href="#ref-for-background-fetch⑤">(5)</a> <a href="#ref-for-background-fetch⑥">(6)</a>
+    <li><a href="#ref-for-background-fetch⑦">3.3. BackgroundFetchRegistration</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="background-fetch-id">
@@ -2517,7 +2608,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
   <aside class="dfn-panel" data-for="background-fetch-records">
    <b><a href="#background-fetch-records">#background-fetch-records</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-background-fetch-records">3.2. BackgroundFetchManager</a>
+    <li><a href="#ref-for-background-fetch-records">3.2. BackgroundFetchManager</a> <a href="#ref-for-background-fetch-records①">(2)</a> <a href="#ref-for-background-fetch-records②">(3)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="background-fetch-title">
@@ -2560,7 +2651,19 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
   <aside class="dfn-panel" data-for="background-fetch-record-request">
    <b><a href="#background-fetch-record-request">#background-fetch-record-request</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-background-fetch-record-request">3.2. BackgroundFetchManager</a>
+    <li><a href="#ref-for-background-fetch-record-request">3.2. BackgroundFetchManager</a> <a href="#ref-for-background-fetch-record-request①">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="background-fetch-record-response">
+   <b><a href="#background-fetch-record-response">#background-fetch-record-response</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-background-fetch-record-response">3.2. BackgroundFetchManager</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="background-fetch-record-response-body">
+   <b><a href="#background-fetch-record-response-body">#background-fetch-record-response-body</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-background-fetch-record-response-body">3.2. BackgroundFetchManager</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-serviceworkerregistration-backgroundfetch">
