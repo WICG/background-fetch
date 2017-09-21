@@ -169,11 +169,12 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
         1. Increment |uploadTotal| by |internalRequest|'s [=request/body=]'s [=body/total bytes=].
 
           Issue: This isn't correctly set in fetch ([issue](https://github.com/whatwg/fetch/issues/604)).
+      1. Set |internalRequest|'s [=request/client=] to null.
       1. Let |record| be a new [=background fetch record=].
       1. Set |record|'s [=background fetch record/request=] to |internalReqeust|.
       1. [=list/Append=] |record| to |records|.
     1. Let |promise| be [=a new promise=].
-    1. [=queue/Enqueue=] the following steps to [=active background fetches edit queue=]:
+    1. [=queue/Enqueue=] the following steps to |registration|'s [=active background fetches edit queue=]:
       1. Let |bgFetchMap| be |registration|'s [=active background fetches=].
       1. If |registration|'s [=service worker registration/active worker=] is null, then reject |promise| with a {{TypeError}} and abort these steps.
       1. If |bgFetchMap|[|id|] [=map/exists=], reject |promise| with a {{TypeError}} and abort these steps.
@@ -228,11 +229,11 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
 <div algorithm>
   To <dfn>attempt a background fetch</dfn> for |bgFetch| (a [=/background fetch=]), run the following steps:
 
-  1. Let |settledFetches| be 0.
-  1. Let |abandonedReason| be null.
-  1. Let |abandonedReasonQueue| be the result of [=starting a parallel queue=].
-  1. For each |item| in |bgFetch|'s [=background fetch/items=], run the following steps [=in parallel=]:
-    1. Let |request| be a copy of |item|'s [=background fetch item/request=].
+  1. Let |completeFetches| be 0.
+  1. Let |abandoned| be false.
+  1. Let |completeFetchesEditQueue| be the result of [=starting a parallel queue=].
+  1. For each |record| in |bgFetch|'s [=background fetch/records=], run the following steps [=in parallel=]:
+    1. Let |request| be a copy of |record|'s [=background fetch record/request=].
     1. Set |request|'s [=request/keepalive flag=].
     1. Set |request|'s [=request/synchronous flag=].
     1. Let |response| be the result of [=/fetching=] |request|.
@@ -243,18 +244,27 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
       * |response| failed due to a failed CORS check.
 
         Issue: Fetch doesn't currently expose this [(issue)](https://github.com/whatwg/fetch/issues/605).
-      * |response|'s [=response/status=] is not an [=ok status=].
+      * TODO: other failure reasons?
 
-      Then [=queue/enqueue=] the following steps to |abandonedReasonQueue|:
-      1. If |abandonedReason| is not null, abort these steps.
-      1. Set |abandonedReason| to `"bad status"`.
-      1.
-    1. TODO: abandon if response is bad. Abandoning should abort all in progress fetches.
-    1. TODO: copy response except body, and save in |item|.
-    1. TODO: consume response into |item|'s [=background fetch item/response body=]. Update progress along the way.
-    1. TODO: if stream failed. either abandon, or attempt resume
+      Then set |abandoned| to true.
+    1. Otherwise, if |response| wasn't a terminal failure:
+      1. Resume download somehow.
 
-  TODO: check the interaction with the request's client. Does any data here need to be changed or cached? The interaction with [event queuing](https://fetch.spec.whatwg.org/#queue-a-fetch-task) makes me think something needs changing.
+      Issue: Not yet defined.
+    1. Otherwise:
+      1. Let |storedResponse| be a copy of |response| except for its [=response/body=].
+      1. Set |record|'s [=background fetch record/response=] to |storedResponse|.
+      1. Whenever one or more bytes are transmitted from |response|'s [=response/body=]'s [=body/stream=], let |bytes| be the transmitted bytes and run these steps:
+        1. Append |bytes| to |record|'s [=background fetch record/response body=].
+        1. TODO: progress events
+      1. If at any point the bytes transmission for |response|'s [=response/body=]'s [=body/stream=] is done normally, then [=queue/enqueue=] the following steps to |completeFetchesEditQueue|:
+        1. Increment |completeFetches|.
+      1. If at any point the ongoing [=/fetch=] is [=fetch/terminated=], then set |abandoned| to true.
+    1. Wait for either |abandoned| to be true, or |completeFetches| to be |bgFetch|'s [=background fetch/records=]'s [=list/size=].
+    1. If |abandoned| is true:
+      1. TODO: terminate all related fetches.
+      1. TODO: failure event.
+    1. TODO: success event.
 </div>
 
 ## {{BackgroundFetchRegistration}} ## {#background-fetch-registration}
