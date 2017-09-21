@@ -169,11 +169,12 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
         1. Increment |uploadTotal| by |internalRequest|'s [=request/body=]'s [=body/total bytes=].
 
           Issue: This isn't correctly set in fetch ([issue](https://github.com/whatwg/fetch/issues/604)).
+      1. Set |internalRequest|'s [=request/client=] to null.
       1. Let |record| be a new [=background fetch record=].
       1. Set |record|'s [=background fetch record/request=] to |internalReqeust|.
       1. [=list/Append=] |record| to |records|.
     1. Let |promise| be [=a new promise=].
-    1. [=queue/Enqueue=] the following steps to [=active background fetches edit queue=]:
+    1. [=queue/Enqueue=] the following steps to |registration|'s [=active background fetches edit queue=]:
       1. Let |bgFetchMap| be |registration|'s [=active background fetches=].
       1. If |registration|'s [=service worker registration/active worker=] is null, then reject |promise| with a {{TypeError}} and abort these steps.
       1. If |bgFetchMap|[|id|] [=map/exists=], reject |promise| with a {{TypeError}} and abort these steps.
@@ -222,7 +223,48 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
   1. Set |instancesMap|[|bgFetch|] to |instance|.
   1. Return |instance|.
 
-  Note: This is to ensure the same instance is returned for a given [=/background fetch=] throughout the life of a {{BackgroundFetchManager}}. It's okay for browsers to optimise here, as long as there's no way to tell a new instance has been created (e.g through equality, expandos, or weakly associated data).
+  Note: This is to ensure the same instance is returned for a given [=/background fetch=] throughout the life of a {{BackgroundFetchManager}}. It's okay for browsers to optimise this, as long as there's no way to tell that more than one instance has been created for a given [=/background fetch=] (e.g through equality, expandos, or weakly-associated data).
+</div>
+
+<div algorithm>
+  To <dfn>attempt a background fetch</dfn> for |bgFetch| (a [=/background fetch=]), run the following steps:
+
+  1. Let |completeFetches| be 0.
+  1. Let |abandoned| be false.
+  1. Let |completeFetchesEditQueue| be the result of [=starting a parallel queue=].
+  1. For each |record| in |bgFetch|'s [=background fetch/records=], run the following steps [=in parallel=]:
+    1. Let |request| be a copy of |record|'s [=background fetch record/request=].
+    1. Set |request|'s [=request/keepalive flag=].
+    1. Set |request|'s [=request/synchronous flag=].
+    1. Let |response| be the result of [=/fetching=] |request|.
+
+      Issue: Fetch waits for the whole body before returning |response|. Let's pretend it *doesn't* do that [issue](https://github.com/whatwg/fetch/issues/536#issuecomment-330184276).
+
+    1. If one of the following is true:
+      * |response| failed due to a failed CORS check.
+
+        Issue: Fetch doesn't currently expose this [(issue)](https://github.com/whatwg/fetch/issues/605).
+      * TODO: other failure reasons?
+
+      Then set |abandoned| to true.
+    1. Otherwise, if |response| wasn't a terminal failure:
+      1. Resume download somehow.
+
+      Issue: Not yet defined.
+    1. Otherwise:
+      1. Let |storedResponse| be a copy of |response| except for its [=response/body=].
+      1. Set |record|'s [=background fetch record/response=] to |storedResponse|.
+      1. Whenever one or more bytes are transmitted from |response|'s [=response/body=]'s [=body/stream=], let |bytes| be the transmitted bytes and run these steps:
+        1. Append |bytes| to |record|'s [=background fetch record/response body=].
+        1. TODO: progress events
+      1. If at any point the bytes transmission for |response|'s [=response/body=]'s [=body/stream=] is done normally, then [=queue/enqueue=] the following steps to |completeFetchesEditQueue|:
+        1. Increment |completeFetches|.
+      1. If at any point the ongoing [=/fetch=] is [=fetch/terminated=], then set |abandoned| to true.
+    1. Wait for either |abandoned| to be true, or |completeFetches| to be |bgFetch|'s [=background fetch/records=]'s [=list/size=].
+    1. If |abandoned| is true:
+      1. TODO: terminate all related fetches.
+      1. TODO: failure event.
+    1. TODO: success event.
 </div>
 
 ## {{BackgroundFetchRegistration}} ## {#background-fetch-registration}
