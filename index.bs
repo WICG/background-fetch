@@ -353,17 +353,17 @@ The following is the <a>event handler</a> (and its corresponding <a>event handle
     <tr>
       <td><dfn>backgroundfetched</dfn></td>
       <td>{{ServiceWorkerGlobalScope/onbackgroundfetched}}</td>
-      <td>{{BackgroundFetchedEvent}}</td>
+      <td>{{BackgroundFetchUpdateEvent}}</td>
     </tr>
     <tr>
       <td><dfn>backgroundfetchfail</dfn></td>
       <td>{{ServiceWorkerGlobalScope/onbackgroundfetchfail}}</td>
-      <td>{{BackgroundFetchFailEvent}}</td>
+      <td>{{BackgroundFetchUpdateEvent}}</td>
     </tr>
     <tr>
       <td><dfn>backgroundfetchabort</dfn></td>
       <td>{{ServiceWorkerGlobalScope/onbackgroundfetchabort}}</td>
-      <td>{{BackgroundFetchEvent}}</td>
+      <td>{{BackgroundFetchSettledEvent}}</td>
     </tr>
     <tr>
       <td><dfn>backgroundfetchclick</dfn></td>
@@ -400,17 +400,15 @@ The following is the <a>event handler</a> (and its corresponding <a>event handle
   1. TODO
 </div>
 
-### {{BackgroundFetchedEvent}} ### {#background-fetch-end-event}
+### {{BackgroundFetchSettledEvent}} ### {#background-fetch-settled-event}
 
 <pre class="idl"><xmp>
-  [Constructor(DOMString type, BackgroundFetchedEventInit init), Exposed=ServiceWorker]
-  interface BackgroundFetchedEvent : BackgroundFetchEvent {
+  [Constructor(DOMString type, BackgroundFetchSettledEventInit init), Exposed=ServiceWorker]
+  interface BackgroundFetchSettledEvent : BackgroundFetchEvent {
     readonly attribute BackgroundFetchSettledFetches fetches;
-
-    Promise<void> updateUI(DOMString title);
   };
 
-  dictionary BackgroundFetchedEventInit : BackgroundFetchEventInit {
+  dictionary BackgroundFetchSettledEventInit : BackgroundFetchEventInit {
     required BackgroundFetchSettledFetches fetches;
   };
 
@@ -426,8 +424,31 @@ The following is the <a>event handler</a> (and its corresponding <a>event handle
   };
 </xmp></pre>
 
-<div dfn-for="BackgroundFetchedEvent">
-  The <dfn attribute>completeFetches</dfn> attribute must return TODO.
+<div dfn-for="BackgroundFetchSettledEvent">
+  The <dfn attribute>fetches</dfn> attribute must return TODO.
+</div>
+
+<div algorithm>
+  The <dfn constructor for="BackgroundFetchSettledEvent">BackgroundFetchSettledEvent(|type|, |init|)</dfn> constructor, when invoked, must run these steps:
+
+  1. TODO
+</div>
+
+### {{BackgroundFetchUpdateEvent}} ### {#background-fetch-update-event}
+
+<pre class="idl"><xmp>
+  [Constructor(DOMString type, BackgroundFetchSettledEventInit init), Exposed=ServiceWorker]
+  interface BackgroundFetchUpdateEvent : BackgroundFetchSettledEvent {
+    Promise<void> updateUI(DOMString title);
+  };
+</xmp></pre>
+
+<div dfn-for="BackgroundFetchUpdateEvent">
+  <div algorithm>
+    The <dfn constructor>BackgroundFetchUpdateEvent(|type|, |init|)</dfn> constructor, when invoked, must run these steps:
+
+    1. TODO
+  </div>
 
   <div algorithm>
     The <dfn method>updateUI(|title|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run the following steps [=in parallel=]:
@@ -436,29 +457,10 @@ The following is the <a>event handler</a> (and its corresponding <a>event handle
   </div>
 </div>
 
-<div algorithm>
-  The <dfn constructor for="BackgroundFetchedEvent">BackgroundFetchedEvent(|type|, |init|)</dfn> constructor, when invoked, must run these steps:
-
-  1. TODO
-</div>
-
-### {{BackgroundFetchFailEvent}} ### {#background-fetch-fail-event}
-
-<pre class="idl"><xmp>
-  [Constructor(DOMString type, BackgroundFetchedEventInit init), Exposed=ServiceWorker]
-  interface BackgroundFetchFailEvent : BackgroundFetchedEvent {
-    readonly attribute BackgroundFetchSettledFetches fetches;
-  };
-
-  dictionary BackgroundFetchFailEventInit : BackgroundFetchedEventInit {
-    required BackgroundFetchSettledFetches fetches;
-  };
-</xmp></pre>
-
 ### {{BackgroundFetchClickEvent}} ### {#background-fetch-click-event}
 
 <pre class="idl"><xmp>
-  [Constructor(DOMString type, BackgroundFetchedEventInit init), Exposed=ServiceWorker]
+  [Constructor(DOMString type, BackgroundFetchClickEventInit init), Exposed=ServiceWorker]
   interface BackgroundFetchClickEvent : BackgroundFetchEvent {
     readonly attribute BackgroundFetchState state;
   };
