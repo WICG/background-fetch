@@ -69,6 +69,71 @@ A <dfn>background fetch record</dfn> consists of:
   * A <dfn>response body</dfn> (a byte sequence), initially null.
 </div>
 
+# Algorithms # {#algorithms}
+
+## [=Attempt a background fetch=] ## {#attempt-a-background-fetch-algorithm}
+
+<div algorithm>
+  To <dfn>attempt a background fetch</dfn> for |bgFetch| (a [=/background fetch=]), run the following steps:
+
+  1. Let |swRegistration| be |bgFetch|'s [=background fetch/service worker registration=].
+  1. Let |completeFetches| be 0.
+  1. Let |abandoned| be false.
+  1. Let |completeFetchesEditQueue| be the result of [=starting a new parallel queue=].
+  1. For each |record| in |bgFetch|'s [=background fetch/records=], run the following steps [=in parallel=]:
+    1. Let |request| be a copy of |record|'s [=background fetch record/request=].
+    1. Set |request|'s [=request/keepalive flag=].
+    1. Set |request|'s [=request/synchronous flag=].
+    1. Let |response| be the result of [=/fetching=] |request|.
+
+      Issue: Fetch waits for the whole body before returning |response|. Let's pretend it *doesn't* do that [issue](https://github.com/whatwg/fetch/issues/536#issuecomment-330184276).
+
+    1. If one of the following is true:
+      * |response| failed due to a failed CORS check.
+
+        Issue: Fetch doesn't currently expose this [(issue)](https://github.com/whatwg/fetch/issues/605).
+      * TODO: other failure reasons?
+
+      Then set |abandoned| to true.
+    1. Otherwise, if |response| wasn't a terminal failure:
+      1. TODO: Resume download somehow.
+    1. Otherwise:
+      1. Let |storedResponse| be a copy of |response| except for its [=response/body=].
+      1. Set |record|'s [=background fetch record/response=] to |storedResponse|.
+      1. Whenever one or more bytes are transmitted from |response|'s [=response/body=]'s [=body/stream=], let |bytes| be the transmitted bytes and run these steps:
+        1. Append |bytes| to |record|'s [=background fetch record/response body=].
+        1. TODO: progress events
+      1. If at any point the bytes transmission for |response|'s [=response/body=]'s [=body/stream=] is done normally, then [=enqueue the following steps=] to |completeFetchesEditQueue|:
+        1. Increment |completeFetches|.
+      1. If at any point the ongoing [=/fetch=] is [=fetch/terminated=], then set |abandoned| to true.
+    1. Wait for either |abandoned| to be true, or |completeFetches| to be |bgFetch|'s [=background fetch/records=]'s [=list/size=].
+    1. [=Enqueue the following steps=] to |swRegistration|'s [=active background fetches edit queue=]:
+      1. Let |activeBgFetches| be |swRegistration|'s [=active background fetches=].
+      1. Let |id| be |bgFetch|'s [=background fetch/id=].
+      1. If |activeBgFetches|[|id|] does not [=map/exist=], then abort these steps.
+
+        Note: This means the background fetch was {{BackgroundFetchRegistration/abort()|aborted}}.
+      1. Remove |activeBgFetches|[|id|].
+      1. If |abandoned| is true:
+        1. TODO: terminate all related fetches.
+        1. TODO: failure event.
+      1. Otherwise:
+        1. TODO: success event.
+</div>
+
+## [=Get a BackgroundFetchRegistration instance=] ## {#get-a-backgroundfetchregistration-instance-algorithm}
+
+<div algorithm>
+  To <dfn data-lt="get a BackgroundFetchRegistration instance|getting a BackgroundFetchRegistration instance">get a BackgroundFetchRegistration instance</dfn> for an |instancesMap| (a [=BackgroundFetchRegistration instances=]) and a |bgFetch| (a [=/background fetch=]), run the following steps:
+
+  1. If |instancesMap|[|bgFetch|] [=map/exists=], then return |instancesMap|[|bgFetch|].
+  1. Let |instance| be a new {{BackgroundFetchRegistration}} whose [=BackgroundFetchRegistration/background fetch=] is set to |bgFetch|.
+  1. Set |instancesMap|[|bgFetch|] to |instance|.
+  1. Return |instance|.
+
+  Note: This is to ensure the same instance is returned for a given [=/background fetch=] throughout the life of a {{BackgroundFetchManager}}. It's okay for browsers to optimise this, as long as there's no way to tell that more than one instance has been created for a given [=/background fetch=] (e.g through equality, expandos, or weakly-associated data).
+</div>
+
 # API # {#api}
 
 ## Extensions to {{ServiceWorkerRegistration}} ## {#extensions-to-service-worker-registration}
@@ -118,9 +183,10 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
     * A <dfn>service worker registration</dfn> (a [=/service worker registration=]).
   </div>
 
+  ### {{BackgroundFetchManager/fetch()}} ### {#background-fetch-manager-fetch}
 
   <div algorithm>
-    The <dfn method>fetch(|id|, |requests|, |options|)</dfn> method, when invoked, run the following steps:
+    The <dfn method lt="fetch()">fetch(|id|, |requests|, |options|)</dfn> method, when invoked, run the following steps:
 
     1. Let |registration| be the [=context object=]'s [=BackgroundFetchManager/service worker registration=].
     1. Let |records| be a new [=list=].
@@ -165,14 +231,18 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
     1. Return |promise|.
   </div>
 
+  ### {{BackgroundFetchManager/get()}} ### {#background-fetch-manager-get}
+
   <div algorithm>
-    The <dfn method>get(|id|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run the following steps [=in parallel=]:
+    The <dfn method lt="get()">get(|id|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run the following steps [=in parallel=]:
 
     1. Let |registration| be the [=context object=]'s associated [=BackgroundFetchManager/service worker registration=].
     1. Let |bgFetch| be |registration|'s [=active background fetches=][|id|].
     1. If |bgFetch| is nothing, then [=resolve=] |promise| with undefined and abort these steps.
     1. [=Resolve=] |promise| with the result of [=getting a BackgroundFetchRegistration instance=] passing the [=context object=]'s [=BackgroundFetchRegistration instances=] and |bgFetch|.
   </div>
+
+  ### {{BackgroundFetchManager/getIds()}} ### {#background-fetch-manager-get-ids}
 
   <div algorithm>
     The <dfn method>getIds()</dfn> method, when invoked, must return [=a new promise=] |promise| and run the following steps [=in parallel=]:
@@ -181,65 +251,6 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
     1. Let |ids| be the result of [=map/getting the keys=] of |registration|'s [=active background fetches=].
     1. [=Resolve=] |promise| with |ids|.
   </div>
-</div>
-
-<div algorithm>
-  To <dfn data-lt="get a BackgroundFetchRegistration instance|getting a BackgroundFetchRegistration instance">get a BackgroundFetchRegistration instance</dfn> for an |instancesMap| (a [=BackgroundFetchRegistration instances=]) and a |bgFetch| (a [=/background fetch=]), run the following steps:
-
-  1. If |instancesMap|[|bgFetch|] [=map/exists=], then return |instancesMap|[|bgFetch|].
-  1. Let |instance| be a new {{BackgroundFetchRegistration}} whose [=BackgroundFetchRegistration/background fetch=] is set to |bgFetch|.
-  1. Set |instancesMap|[|bgFetch|] to |instance|.
-  1. Return |instance|.
-
-  Note: This is to ensure the same instance is returned for a given [=/background fetch=] throughout the life of a {{BackgroundFetchManager}}. It's okay for browsers to optimise this, as long as there's no way to tell that more than one instance has been created for a given [=/background fetch=] (e.g through equality, expandos, or weakly-associated data).
-</div>
-
-<div algorithm>
-  To <dfn>attempt a background fetch</dfn> for |bgFetch| (a [=/background fetch=]), run the following steps:
-
-  1. Let |swRegistration| be |bgFetch|'s [=background fetch/service worker registration=].
-  1. Let |completeFetches| be 0.
-  1. Let |abandoned| be false.
-  1. Let |completeFetchesEditQueue| be the result of [=starting a new parallel queue=].
-  1. For each |record| in |bgFetch|'s [=background fetch/records=], run the following steps [=in parallel=]:
-    1. Let |request| be a copy of |record|'s [=background fetch record/request=].
-    1. Set |request|'s [=request/keepalive flag=].
-    1. Set |request|'s [=request/synchronous flag=].
-    1. Let |response| be the result of [=/fetching=] |request|.
-
-      Issue: Fetch waits for the whole body before returning |response|. Let's pretend it *doesn't* do that [issue](https://github.com/whatwg/fetch/issues/536#issuecomment-330184276).
-
-    1. If one of the following is true:
-      * |response| failed due to a failed CORS check.
-
-        Issue: Fetch doesn't currently expose this [(issue)](https://github.com/whatwg/fetch/issues/605).
-      * TODO: other failure reasons?
-
-      Then set |abandoned| to true.
-    1. Otherwise, if |response| wasn't a terminal failure:
-      1. TODO: Resume download somehow.
-    1. Otherwise:
-      1. Let |storedResponse| be a copy of |response| except for its [=response/body=].
-      1. Set |record|'s [=background fetch record/response=] to |storedResponse|.
-      1. Whenever one or more bytes are transmitted from |response|'s [=response/body=]'s [=body/stream=], let |bytes| be the transmitted bytes and run these steps:
-        1. Append |bytes| to |record|'s [=background fetch record/response body=].
-        1. TODO: progress events
-      1. If at any point the bytes transmission for |response|'s [=response/body=]'s [=body/stream=] is done normally, then [=enqueue the following steps=] to |completeFetchesEditQueue|:
-        1. Increment |completeFetches|.
-      1. If at any point the ongoing [=/fetch=] is [=fetch/terminated=], then set |abandoned| to true.
-    1. Wait for either |abandoned| to be true, or |completeFetches| to be |bgFetch|'s [=background fetch/records=]'s [=list/size=].
-    1. [=Enqueue the following steps=] to |swRegistration|'s [=active background fetches edit queue=]:
-      1. Let |activeBgFetches| be |swRegistration|'s [=active background fetches=].
-      1. Let |id| be |bgFetch|'s [=background fetch/id=].
-      1. If |activeBgFetches|[|id|] does not [=map/exist=], then abort these steps.
-
-        Note: This means the background fetch was {{BackgroundFetchRegistration/abort()|aborted}}.
-      1. Remove |activeBgFetches|[|id|].
-      1. If |abandoned| is true:
-        1. TODO: terminate all related fetches.
-        1. TODO: failure event.
-      1. Otherwise:
-        1. TODO: success event.
 </div>
 
 ## {{BackgroundFetchRegistration}} ## {#background-fetch-registration}
@@ -295,6 +306,8 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
   The <dfn attribute>title</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/title=].
 
   The <dfn attribute>activeFetches</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchRegistration/background fetch=]'s TODO.
+
+  ### {{BackgroundFetchRegistration/abort()}} ### {#background-fetch-registration-abort}
 
   <div algorithm>
     The <dfn method>abort()</dfn> method, when invoked, must return [=a new promise=] |promise| and run the following steps [=in parallel=]:
