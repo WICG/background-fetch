@@ -101,7 +101,7 @@ A <dfn>background fetch record</dfn> consists of:
       Issue: Fetch waits for the whole body before returning |response|. Let's pretend it *doesn't* do that ([issue](https://github.com/whatwg/fetch/issues/536#issuecomment-330184276)).
 
     1. If |response|'s [=response/aborted flag=] is set, then set |abandoned| to true and |aborted| to true.
-    1. If one of the following is true:
+    1. Otherwise, if one of the following is true:
       * |response| failed due to a failed CORS check.
 
         Issue: Fetch doesn't currently expose this ([issue](https://github.com/whatwg/fetch/issues/605)).
@@ -114,14 +114,16 @@ A <dfn>background fetch record</dfn> consists of:
     1. Otherwise, if |response| wasn't a terminal failure:
       1. TODO: Resume download somehow.
     1. Otherwise:
-      1. Let |storedResponse| be a copy of |response| except for its [=response/body=].
-      1. Set |record|'s [=background fetch record/response=] to |storedResponse|.
-      1. Whenever one or more bytes are transmitted from |response|'s [=response/body=]'s [=body/stream=], let |bytes| be the transmitted bytes and run these steps:
+      1. Set |record|'s [=background fetch record/response=] to a copy of |response| except for its [=response/body=].
+      1. Let |stream| be |response|'s [=response/body=]'s [=body/stream=].
+      1. Whenever one or more bytes are transmitted from |stream|, let |bytes| be the transmitted bytes and run these steps:
         1. Append |bytes| to |record|'s [=background fetch record/response body=].
         1. [=Report progress for background fetch=] |bgFetch|.
-      1. If at any point the bytes transmission for |response|'s [=response/body=]'s [=body/stream=] is done normally, then [=enqueue the following steps=] to |completeFetchesEditQueue|:
+      1. If at any point the bytes transmission for |stream| is done normally, then [=enqueue the following steps=] to |completeFetchesEditQueue|:
         1. Increment |completeFetches|.
-      1. If at any point the ongoing [=/fetch=] is [=fetch/terminated=], then set |abandoned| to true.
+      1. If at any point |stream| becomes [=stream/errored=], then:
+        1. If |response|'s [=response/aborted flag=] is set, then set |aborted| to true.
+        1. Set |abandoned| to true. TODO: if |aborted| isn't true, this could be another resume point.
     1. Wait for either |abandoned| to be true, or |completeFetches| to be |bgFetch|'s [=background fetch/records=]'s [=list/size=].
     1. Let |operationAborted| be |aborted|.
     1. If |abandoned| is true:
