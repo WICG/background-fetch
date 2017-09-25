@@ -64,8 +64,10 @@ A <dfn>background fetch</dfn> consists of:
   * A <dfn>title</dfn> (a DOMString).
   * A <dfn>download total</dfn> (a number).
   * An <dfn>upload total</dfn> (a number).
+  * A <dfn>last reported download</dfn> (a number), initially 0.
   * <dfn>Icons</dfn> (a [=list=] of {{IconDefinition}}s).
   * A <dfn>service worker registration</dfn> (a [=/service worker registration=]).
+  * A <dfn>progress handling queue</dfn> (a [=parallel queue=]), initially the result of [=starting a new parallel queue=].
 </div>
 
 ## Background fetch record ## {#background-fetch-record-concept}
@@ -90,7 +92,7 @@ A <dfn>background fetch record</dfn> consists of:
   1. Let |abandoned| be false.
   1. Let |aborted| be false.
   1. Let |completeFetchesEditQueue| be the result of [=starting a new parallel queue=].
-  1. For each |record| in |bgFetch|'s [=background fetch/records=], run the following steps [=in parallel=]:
+  1. [=list/For each=] |record| in |bgFetch|'s [=background fetch/records=], run the following steps [=in parallel=]:
     1. Let |request| be a copy of |record|'s [=background fetch record/request=].
     1. Set |request|'s [=request/keepalive flag=].
     1. Set |request|'s [=request/synchronous flag=].
@@ -116,7 +118,7 @@ A <dfn>background fetch record</dfn> consists of:
       1. Set |record|'s [=background fetch record/response=] to |storedResponse|.
       1. Whenever one or more bytes are transmitted from |response|'s [=response/body=]'s [=body/stream=], let |bytes| be the transmitted bytes and run these steps:
         1. Append |bytes| to |record|'s [=background fetch record/response body=].
-        1. TODO: progress events
+        1. [=Report progress for background fetch=] |bgFetch|.
       1. If at any point the bytes transmission for |response|'s [=response/body=]'s [=body/stream=] is done normally, then [=enqueue the following steps=] to |completeFetchesEditQueue|:
         1. Increment |completeFetches|.
       1. If at any point the ongoing [=/fetch=] is [=fetch/terminated=], then set |abandoned| to true.
@@ -142,6 +144,24 @@ A <dfn>background fetch record</dfn> consists of:
       1. Otherwise, [=fire a functional event=] named "`backgroundfetched`" using {{BackgroundFetchUpdateEvent}} on |swRegistration| with the following properties:
         : {{BackgroundFetchSettledEvent/fetches}}
         :: A new {{BackgroundFetchSettledFetches}}. TODO: associate this with |bgFetch|'s [=background fetch/records=].
+</div>
+
+## [=Report progress for background fetch=] ## {#report-progress-for-background-fetch-algorithm}
+
+<div algorithm>
+  To <dfn>report progress for background fetch</dfn> |bgFetch| (a [=/background fetch=]), [=enqueue the following steps=] to |bgFetch|'s [=background fetch/progress handling queue=]:
+
+  1. Let |downloaded| be 0.
+  1. [=list/For each=] |record| in |bgFetch|'s [=background fetch/records=], increment |downloaded| by the number of bytes in [=background fetch record/response body=].
+  1. If |downloaded| is equal to |bgFetch|'s [=background fetch/last reported download=], then abort these steps.
+  1. Set |bgFetch|'s [=background fetch/last reported download=] to |downloaded|.
+  1. For each [=environment settings object=] |env| whose [=environment settings object/origin=] is equal to |bgFetch|'s [=background fetch/service worker registration=]'s [=service worker registration/scope URL=]'s [=url/origin=], [=queue a task=] on |env|'s [=environment settings object/responsible event loop=] using the [=networking task source=] to run the following steps:
+    1. Let |bgFetchRegistration| be the instance of {{BackgroundFetchRegistration}} within this environment whose [=BackgroundFetchRegistration/background fetch=] is equal to |bgFetch|, or null if none exists.
+
+      Note: There will be at most one per environment, because of the [=get a BackgroundFetchRegistration instance=] algorithm.
+    1. If |bgFetchRegistration| is not null, then:
+      1. Set [=BackgroundFetchRegistration/downloaded=] to |downloaded|.
+      1. [=fire an event=] named "`progress`" at |bgFetchRegistration|.
 </div>
 
 ## [=Get a BackgroundFetchRegistration instance=] ## {#get-a-backgroundfetchregistration-instance-algorithm}
@@ -310,7 +330,12 @@ dictionary IconDefinition {
     1. Let |registration| be the [=context object=]'s associated [=BackgroundFetchManager/service worker registration=].
     1. Let |bgFetch| be |registration|'s [=active background fetches=][|id|].
     1. If |bgFetch| is nothing, then [=resolve=] |promise| with undefined and abort these steps.
-    1. [=Resolve=] |promise| with the result of [=getting a BackgroundFetchRegistration instance=] passing the [=context object=]'s [=BackgroundFetchRegistration instances=] and |bgFetch|.
+    1. [=Enqueue the following steps=] to |bgFetch|'s [=background fetch/progress handling queue=]:
+      1. [=Queue a task=] |task| to run the following steps:
+        1. [=Resolve=] |promise| with the result of [=getting a BackgroundFetchRegistration instance=] passing the [=context object=]'s [=BackgroundFetchRegistration instances=] and |bgFetch|.
+      1. Wait for |task| to complete.
+
+        Note: This ensures the potential new instance of {{BackgroundFetchRegistration}} doesn't miss any {{BackgroundFetchRegistration/progress!!event}} events.
   </div>
 
   ### {{BackgroundFetchManager/getIds()}} ### {#background-fetch-manager-get-ids}
@@ -330,13 +355,13 @@ dictionary IconDefinition {
 [Exposed=(Window,Worker)]
 interface BackgroundFetchRegistration : EventTarget {
   readonly attribute DOMString id;
-  readonly attribute FrozenArray<IconDefinition> icons;
   readonly attribute unsigned long long uploadTotal;
   readonly attribute unsigned long long uploaded;
   readonly attribute unsigned long long downloadTotal;
   readonly attribute unsigned long long downloaded;
-  readonly attribute DOMString title;
   readonly attribute BackgroundFetchActiveFetches activeFetches;
+
+  attribute EventHandler onprogress;
 
   Promise<boolean> abort();
 };
@@ -360,23 +385,29 @@ interface BackgroundFetchActiveFetch : BackgroundFetchFetch {
 </script>
 
 <div dfn-for="BackgroundFetchRegistration">
-  A {{BackgroundFetchRegistration}} instance has an associated <dfn>background fetch</dfn>, a [=/background fetch=].
+  A {{BackgroundFetchRegistration}} instance has an associated <dfn>background fetch</dfn> (a [=/background fetch=]).
 
-  The <dfn attribute>id</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/id=].
+  A {{BackgroundFetchRegistration}} instance has an associated <dfn>downloaded</dfn> (a number), initially 0.
 
-  The <dfn attribute>icons</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/icons=].
+  A {{BackgroundFetchRegistration}} instance has an associated <dfn>id</dfn>, <dfn>uploadTotal</dfn>, and <dfn>downloadTotal</dfn>, which are copied from the [=BackgroundFetchRegistration/background fetch=] upon instantiation.
 
-  The <dfn attribute>uploadTotal</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/upload total=].
+  The <dfn attribute>id</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchRegistration/id=].
 
-  The <dfn attribute>uploaded</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchRegistration/background fetch=]'s TODO.
+  The <dfn attribute>uploadTotal</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchRegistration/uploadTotal=].
 
-  The <dfn attribute>downloadTotal</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/download total=].
+  The <dfn attribute>downloadTotal</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchRegistration/downloadTotal=].
 
-  The <dfn attribute>downloaded</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchRegistration/background fetch=]'s TODO.
+  The <dfn attribute>uploaded</dfn> attribute's getter must return TODO.
 
-  The <dfn attribute>title</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/title=].
+  The <dfn attribute>downloaded</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchRegistration/download=].
 
   The <dfn attribute>activeFetches</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchRegistration/background fetch=]'s TODO.
+
+  ### Events ### {#background-fetch-registration-events}
+
+  The <dfn attribute>onprogress</dfn> [=event handler=] has the [=event handler event type=] of {{progress!!event}}.
+
+  The <dfn event>progress</dfn> event uses the {{Event}} interface.
 
   ### {{BackgroundFetchRegistration/abort()}} ### {#background-fetch-registration-abort}
 
