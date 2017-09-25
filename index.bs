@@ -88,6 +88,7 @@ A <dfn>background fetch record</dfn> consists of:
   1. Let |swRegistration| be |bgFetch|'s [=background fetch/service worker registration=].
   1. Let |completeFetches| be 0.
   1. Let |abandoned| be false.
+  1. Let |aborted| be false.
   1. Let |completeFetchesEditQueue| be the result of [=starting a new parallel queue=].
   1. For each |record| in |bgFetch|'s [=background fetch/records=], run the following steps [=in parallel=]:
     1. Let |request| be a copy of |record|'s [=background fetch record/request=].
@@ -95,12 +96,16 @@ A <dfn>background fetch record</dfn> consists of:
     1. Set |request|'s [=request/synchronous flag=].
     1. Let |response| be the result of [=/fetching=] |request|.
 
-      Issue: Fetch waits for the whole body before returning |response|. Let's pretend it *doesn't* do that [issue](https://github.com/whatwg/fetch/issues/536#issuecomment-330184276).
+      Issue: Fetch waits for the whole body before returning |response|. Let's pretend it *doesn't* do that ([issue](https://github.com/whatwg/fetch/issues/536#issuecomment-330184276)).
 
+    1. If |response|'s [=response/aborted flag=] is set, then set |abandoned| to true and |aborted| to true.
     1. If one of the following is true:
       * |response| failed due to a failed CORS check.
 
-        Issue: Fetch doesn't currently expose this [(issue)](https://github.com/whatwg/fetch/issues/605).
+        Issue: Fetch doesn't currently expose this ([issue](https://github.com/whatwg/fetch/issues/605)).
+      * |response| is a [=network error=] and |request|'s [=request/method=] is not \``GET`\`.
+
+        Issue: Do we want to enable retrying of uploads? ([issue](https://github.com/WICG/background-fetch/issues/58))
       * TODO: other failure reasons?
 
       Then set |abandoned| to true.
@@ -116,18 +121,27 @@ A <dfn>background fetch record</dfn> consists of:
         1. Increment |completeFetches|.
       1. If at any point the ongoing [=/fetch=] is [=fetch/terminated=], then set |abandoned| to true.
     1. Wait for either |abandoned| to be true, or |completeFetches| to be |bgFetch|'s [=background fetch/records=]'s [=list/size=].
+    1. Let |operationAborted| be |aborted|.
+    1. If |abandoned| is true:
+        1. TODO: terminate all related fetches.
     1. [=Enqueue the following steps=] to |swRegistration|'s [=active background fetches edit queue=]:
       1. Let |activeBgFetches| be |swRegistration|'s [=active background fetches=].
       1. Let |id| be |bgFetch|'s [=background fetch/id=].
-      1. If |activeBgFetches| does not [=active background fetches/contain=] |bgFetch|, then [=resolve=] |promise| with false and abort these steps.
+      1. If |activeBgFetches| [=active background fetches/contains=] |bgFetch|, then remove |activeBgFetches|[|id|].
+      1. Otherwise, set |operationAborted| to true.
 
-        Note: This means the background fetch was {{BackgroundFetchRegistration/abort()|aborted}}.
-      1. Remove |activeBgFetches|[|id|].
-      1. If |abandoned| is true:
-        1. TODO: terminate all related fetches.
-        1. TODO: failure event.
-      1. Otherwise:
-        1. TODO: success event.
+        Note: This handles a race condition where {{BackgroundFetchRegistration/abort()}} was successfully called but one of the fetches failed at the same time. If we've returned true from {{BackgroundFetchRegistration/abort()}}, this ensures we fire the related abort event.
+      1. If |operationAborted| is true, then [=fire a functional event=] named "`backgroundfetchabort`" using {{BackgroundFetchSettledEvent}} on |swRegistration| with the following properties:
+        : {{BackgroundFetchSettledEvent/fetches}}
+        :: A new {{BackgroundFetchSettledFetches}}. TODO: associate this with |bgFetch|'s [=background fetch/records=].
+
+        Issue: The above prose is based on [ServiceWorker/#1199](https://github.com/w3c/ServiceWorker/pull/1199).
+      1. Otherwise if |abandoned| is true, then [=fire a functional event=] named "`backgroundfetchfail`" using {{BackgroundFetchUpdateEvent}} on |swRegistration| with the following properties:
+        : {{BackgroundFetchSettledEvent/fetches}}
+        :: A new {{BackgroundFetchSettledFetches}}. TODO: associate this with |bgFetch|'s [=background fetch/records=].
+      1. Otherwise, [=fire a functional event=] named "`backgroundfetched`" using {{BackgroundFetchUpdateEvent}} on |swRegistration| with the following properties:
+        : {{BackgroundFetchSettledEvent/fetches}}
+        :: A new {{BackgroundFetchSettledFetches}}. TODO: associate this with |bgFetch|'s [=background fetch/records=].
 </div>
 
 ## [=Get a BackgroundFetchRegistration instance=] ## {#get-a-backgroundfetchregistration-instance-algorithm}
@@ -155,6 +169,8 @@ partial interface ServiceWorkerGlobalScope {
   attribute EventHandler onbackgroundfetchclick;
 };
 </script>
+
+### Events ### {#service-worker-global-events}
 
 The following is the <a>event handler</a> (and its corresponding <a>event handler event type</a>) that must be supported, as <a>event handler IDL attributes</a>, by all objects implementing {{ServiceWorker}} interface:
 
@@ -375,13 +391,6 @@ interface BackgroundFetchActiveFetch : BackgroundFetchFetch {
       1. If |activeBgFetches| does not [=active background fetches/contain=] |bgFetch|, then [=resolve=] |promise| with false and abort these steps.
       1. Remove |activeBgFetches|[|id|].
       1. [=Resolve=] |promise| with true.
-      1. TODO: terminate the fetches.
-      1. [=Fire a functional event=] named "`backgroundfetchabort`" using {{BackgroundFetchSettledEvent}} on |swRegistration| with the following properties:
-
-        : {{BackgroundFetchSettledEvent/fetches}}
-        :: A new {{BackgroundFetchSettledFetches}}. TODO: associate this with |bgFetch|'s [=background fetch/records=].
-
-        Issue: The above prose is based on [ServiceWorker/#1199](https://github.com/w3c/ServiceWorker/pull/1199).
   </div>
 </div>
 
