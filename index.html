@@ -1178,7 +1178,7 @@ Possible extra rowspan handling
 </style>
   <meta content="Bikeshed version eeaa009c31ac13852bf86c1553d994e53f48f852" name="generator">
   <link href="https://jakearchibald.github.io/background-fetch" rel="canonical">
-  <meta content="b6481068f7044677e4fd5c34d0506423b76af44f" name="document-revision">
+  <meta content="3ef4dea6e8a4b1882f194b6b0a4855e129f87917" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1634,7 +1634,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
        <li data-md="">
         <p>If <var>response</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-aborted" id="ref-for-concept-response-aborted">aborted flag</a> is set, then set <var>abandoned</var> to true and <var>aborted</var> to true.</p>
        <li data-md="">
-        <p>If one of the following is true:</p>
+        <p>Otherwise, if one of the following is true:</p>
         <ul>
          <li data-md="">
           <p><var>response</var> failed due to a failed CORS check.</p>
@@ -1656,11 +1656,11 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
         <p>Otherwise:</p>
         <ol>
          <li data-md="">
-          <p>Let <var>storedResponse</var> be a copy of <var>response</var> except for its <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-body" id="ref-for-concept-response-body">body</a>.</p>
+          <p>Set <var>record</var>’s <a data-link-type="dfn" href="#background-fetch-record-response" id="ref-for-background-fetch-record-response">response</a> to a copy of <var>response</var> except for its <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-body" id="ref-for-concept-response-body">body</a>.</p>
          <li data-md="">
-          <p>Set <var>record</var>’s <a data-link-type="dfn" href="#background-fetch-record-response" id="ref-for-background-fetch-record-response">response</a> to <var>storedResponse</var>.</p>
+          <p>Let <var>stream</var> be <var>response</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-body" id="ref-for-concept-response-body①">body</a>'s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-body-stream" id="ref-for-concept-body-stream">stream</a>.</p>
          <li data-md="">
-          <p>Whenever one or more bytes are transmitted from <var>response</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-body" id="ref-for-concept-response-body①">body</a>'s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-body-stream" id="ref-for-concept-body-stream">stream</a>, let <var>bytes</var> be the transmitted bytes and run these steps:</p>
+          <p>Whenever one or more bytes are transmitted from <var>stream</var>, let <var>bytes</var> be the transmitted bytes and run these steps:</p>
           <ol>
            <li data-md="">
             <p>Append <var>bytes</var> to <var>record</var>’s <a data-link-type="dfn" href="#background-fetch-record-response-body" id="ref-for-background-fetch-record-response-body">response body</a>.</p>
@@ -1668,13 +1668,19 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
             <p><a data-link-type="dfn" href="#report-progress-for-background-fetch" id="ref-for-report-progress-for-background-fetch">Report progress for background fetch</a> <var>bgFetch</var>.</p>
           </ol>
          <li data-md="">
-          <p>If at any point the bytes transmission for <var>response</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-body" id="ref-for-concept-response-body②">body</a>'s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-body-stream" id="ref-for-concept-body-stream①">stream</a> is done normally, then <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#enqueue-the-following-steps" id="ref-for-enqueue-the-following-steps">enqueue the following steps</a> to <var>completeFetchesEditQueue</var>:</p>
+          <p>If at any point the bytes transmission for <var>stream</var> is done normally, then <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#enqueue-the-following-steps" id="ref-for-enqueue-the-following-steps">enqueue the following steps</a> to <var>completeFetchesEditQueue</var>:</p>
           <ol>
            <li data-md="">
             <p>Increment <var>completeFetches</var>.</p>
           </ol>
          <li data-md="">
-          <p>If at any point the ongoing <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-fetch" id="ref-for-concept-fetch⑤">fetch</a> is <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-fetch-terminate" id="ref-for-concept-fetch-terminate">terminated</a>, then set <var>abandoned</var> to true.</p>
+          <p>If at any point <var>stream</var> becomes <a data-link-type="dfn">errored</a>, then:</p>
+          <ol>
+           <li data-md="">
+            <p>If <var>response</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-aborted" id="ref-for-concept-response-aborted①">aborted flag</a> is set, then set <var>aborted</var> to true.</p>
+           <li data-md="">
+            <p>Set <var>abandoned</var> to true. TODO: if <var>aborted</var> isn’t true, this could be another resume point.</p>
+          </ol>
         </ol>
        <li data-md="">
         <p>Wait for either <var>abandoned</var> to be true, or <var>completeFetches</var> to be <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-records" id="ref-for-background-fetch-records①">records</a>'s <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-size" id="ref-for-list-size">size</a>.</p>
@@ -2468,7 +2474,6 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
      <li><a href="https://fetch.spec.whatwg.org/#concept-body-source">source</a>
      <li><a href="https://fetch.spec.whatwg.org/#concept-body-stream">stream</a>
      <li><a href="https://fetch.spec.whatwg.org/#synchronous-flag">synchronous flag</a>
-     <li><a href="https://fetch.spec.whatwg.org/#concept-fetch-terminate">terminated</a>
      <li><a href="https://fetch.spec.whatwg.org/#concept-body-total-bytes">total bytes</a>
     </ul>
    <li>
