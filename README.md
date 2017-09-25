@@ -57,13 +57,11 @@ const bgFetchJob = await registration.backgroundFetch.get(id);
 `bgFetchJob` has the following members:
 
 * `id` - identifier string.
-* `icons` - as provided.
 * `downloadTotal` - as provided.
 * `uploadTotal` - total bytes to send.
 * `uploadProgress` - bytes sent so far.
 * `downloadTotal` - as provided.
 * `downloadProgress` - bytes received so far.
-* `title` - as provided.
 * `activeFetches` - provides access to the in-progress fetches.
 * `abort()` - abort the whole background fetch job. This returns a promise that resolves with a boolean, which is true if the operation successfully aborted.
 * `onprogress` - Event when `downloadProgress` or `uploadProgress` update.
