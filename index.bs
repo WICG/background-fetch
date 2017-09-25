@@ -243,6 +243,7 @@ dictionary IconDefinition {
     The <dfn method>fetch(|id|, |requests|, |options|)</dfn> method, when invoked, run the following steps:
 
     1. Let |registration| be the [=context object=]'s [=BackgroundFetchManager/service worker registration=].
+    1. Let |bgFetchInstances| be [=context object=]'s [=BackgroundFetchRegistration instances=].
     1. Let |records| be a new [=list=].
     1. Let |uploadTotal| be 0.
     1. If |requests| is a {{RequestInfo}}, set |requests| to « |requests| ».
@@ -281,7 +282,7 @@ dictionary IconDefinition {
         :: |registration|.
       1. Set |bgFetchMap|[|id|] to |bgFetch|.
       1. If storing |bgFetch| fails due to exceeding a quota limit, [=reject=] |promise| with a {{QuotaExceededError}} {{DOMException}} and abort these steps.
-      1. [=Resolve=] |promise| with the result of [=getting a BackgroundFetchRegistration instance=] passing the [=context object=]'s [=BackgroundFetchRegistration instances=] and |bgFetch|.
+      1. [=Resolve=] |promise| with the result of [=getting a BackgroundFetchRegistration instance=] passing |bgFetchInstances| and |bgFetch|.
     1. Return |promise|.
   </div>
 
