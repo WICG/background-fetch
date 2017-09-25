@@ -423,7 +423,7 @@ dictionary BackgroundFetchSettledEventInit : BackgroundFetchEventInit {
   required BackgroundFetchSettledFetches fetches;
 };
 
-[Exposed=(Window,Worker)]
+[Exposed=ServiceWorker]
 interface BackgroundFetchSettledFetches {
   Promise<BackgroundFetchSettledFetch> match(RequestInfo request);
   Promise<FrozenArray<BackgroundFetchSettledFetch>> values();

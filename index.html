@@ -1178,7 +1178,7 @@ Possible extra rowspan handling
 </style>
   <meta content="Bikeshed version eeaa009c31ac13852bf86c1553d994e53f48f852" name="generator">
   <link href="https://jakearchibald.github.io/background-fetch" rel="canonical">
-  <meta content="acd69548b1741978b724017016a8e0d48ff91e08" name="document-revision">
+  <meta content="c19d375f168f776b79808c5480a15c4fe288b250" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -2002,7 +2002,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
   <span class="kt">required</span> <a class="n" data-link-type="idl-name" href="#backgroundfetchsettledfetches" id="ref-for-backgroundfetchsettledfetches②">BackgroundFetchSettledFetches</a> <dfn class="nv idl-code" data-dfn-for="BackgroundFetchSettledEventInit" data-dfn-type="dict-member" data-export="" data-type="BackgroundFetchSettledFetches " id="dom-backgroundfetchsettledeventinit-fetches"><code>fetches</code><a class="self-link" href="#dom-backgroundfetchsettledeventinit-fetches"></a></dfn>;
 };
 
-[<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed⑦">Exposed</a>=(<span class="n">Window</span>,<span class="n">Worker</span>)]
+[<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed⑦">Exposed</a>=<span class="n">ServiceWorker</span>]
 <span class="kt">interface</span> <dfn class="nv dfn-paneled idl-code" data-dfn-type="interface" data-export="" id="backgroundfetchsettledfetches"><code>BackgroundFetchSettledFetches</code></dfn> {
   <span class="kt">Promise</span>&lt;<a class="n" data-link-type="idl-name" href="#backgroundfetchsettledfetch" id="ref-for-backgroundfetchsettledfetch">BackgroundFetchSettledFetch</a>> <dfn class="nv idl-code" data-dfn-for="BackgroundFetchSettledFetches" data-dfn-type="method" data-export="" data-lt="match(request)" id="dom-backgroundfetchsettledfetches-match"><code>match</code><a class="self-link" href="#dom-backgroundfetchsettledfetches-match"></a></dfn>(<a class="n" data-link-type="idl-name" href="https://fetch.spec.whatwg.org/#requestinfo" id="ref-for-requestinfo④">RequestInfo</a> <dfn class="nv idl-code" data-dfn-for="BackgroundFetchSettledFetches/match(request)" data-dfn-type="argument" data-export="" id="dom-backgroundfetchsettledfetches-match-request-request"><code>request</code><a class="self-link" href="#dom-backgroundfetchsettledfetches-match-request-request"></a></dfn>);
   <span class="kt">Promise</span>&lt;<span class="kt">FrozenArray</span>&lt;<a class="n" data-link-type="idl-name" href="#backgroundfetchsettledfetch" id="ref-for-backgroundfetchsettledfetch①">BackgroundFetchSettledFetch</a>>> <dfn class="nv idl-code" data-dfn-for="BackgroundFetchSettledFetches" data-dfn-type="method" data-export="" data-lt="values()" id="dom-backgroundfetchsettledfetches-values"><code>values</code><a class="self-link" href="#dom-backgroundfetchsettledfetches-values"></a></dfn>();
@@ -2551,7 +2551,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
   <span class="kt">required</span> <a class="n" data-link-type="idl-name" href="#backgroundfetchsettledfetches" id="ref-for-backgroundfetchsettledfetches②①">BackgroundFetchSettledFetches</a> <a class="nv" data-type="BackgroundFetchSettledFetches " href="#dom-backgroundfetchsettledeventinit-fetches"><code>fetches</code></a>;
 };
 
-[<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed⑦①">Exposed</a>=(<span class="n">Window</span>,<span class="n">Worker</span>)]
+[<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed⑦①">Exposed</a>=<span class="n">ServiceWorker</span>]
 <span class="kt">interface</span> <a class="nv" href="#backgroundfetchsettledfetches"><code>BackgroundFetchSettledFetches</code></a> {
   <span class="kt">Promise</span>&lt;<a class="n" data-link-type="idl-name" href="#backgroundfetchsettledfetch" id="ref-for-backgroundfetchsettledfetch②">BackgroundFetchSettledFetch</a>> <a class="nv" href="#dom-backgroundfetchsettledfetches-match"><code>match</code></a>(<a class="n" data-link-type="idl-name" href="https://fetch.spec.whatwg.org/#requestinfo" id="ref-for-requestinfo④①">RequestInfo</a> <a class="nv" href="#dom-backgroundfetchsettledfetches-match-request-request"><code>request</code></a>);
   <span class="kt">Promise</span>&lt;<span class="kt">FrozenArray</span>&lt;<a class="n" data-link-type="idl-name" href="#backgroundfetchsettledfetch" id="ref-for-backgroundfetchsettledfetch①①">BackgroundFetchSettledFetch</a>>> <a class="nv" href="#dom-backgroundfetchsettledfetches-values"><code>values</code></a>();
