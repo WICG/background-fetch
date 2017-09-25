@@ -329,19 +329,13 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
       1. If |activeBgFetches| does not [=active background fetches/contain=] |bgFetch|, then [=resolve=] |promise| with false and abort these steps.
       1. Remove |activeBgFetches|[|id|].
       1. [=Resolve=] |promise| with true.
-      1. TODO: terminate the fetches
-      1. Let |eventType| be `"backgroundfetchabort"`.
-      1. [=Handle functional event=] for |swRegistration| and |eventType| using the following steps:
+      1. TODO: terminate the fetches.
+      1. [=Fire a functional event=] named "`backgroundfetchabort`" using {{BackgroundFetchSettledEvent}} on |swRegistration| with the following properties:
 
-        Issue: This isn't quite how [=handle functional event=] works, but its current definition doesn't really make sense ([issue](https://github.com/w3c/ServiceWorker/issues/1196)).
+        : {{BackgroundFetchSettledEvent/fetches}}
+        :: A new {{BackgroundFetchSettledFetches}}. TODO: associate this with |bgFetch|'s [=background fetch/records=].
 
-        1. Let |event| be the result of [=creating an event=] with {{BackgroundFetchSettledEvent}}.
-        1. Let |settledFetches| be a new {{BackgroundFetchSettledFetches}}. TODO: associate this with |bgFetch|'s [=background fetch/records=].
-        1. Initialise |event|'s {{Event/type}} to |eventType|.
-        1. Initialise |event|'s {{BackgroundFetchSettledEvent/fetches}} to |settledFetches|.
-        1. Dispatch a service worker event |event|.
-
-          Issue: Also part of the previous [issue](https://github.com/w3c/ServiceWorker/issues/1196).
+        Issue: The above prose is based on [ServiceWorker/#1199](https://github.com/w3c/ServiceWorker/pull/1199).
   </div>
 </div>
 

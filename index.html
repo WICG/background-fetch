@@ -1178,7 +1178,7 @@ Possible extra rowspan handling
 </style>
   <meta content="Bikeshed version 459c2a65222f1973d4f1846a767ec88e8a5dae3e" name="generator">
   <link href="https://jakearchibald.github.io/background-fetch" rel="canonical">
-  <meta content="a3bb2d0f0739c391f7fc951b36b1e58927a00634" name="document-revision">
+  <meta content="fc6206509a5fa3c5e9071356bb0c42d3c2450b4d" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1425,7 +1425,7 @@ pre.highlight, pre > code.highlight { display: block; padding: 1em; margin: .5em
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">Background Fetch</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Editor’s Draft, <time class="dt-updated" datetime="2017-09-21">21 September 2017</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Editor’s Draft, <time class="dt-updated" datetime="2017-09-25">25 September 2017</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1927,25 +1927,15 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
         <li data-md="">
          <p><a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#resolve-promise" id="ref-for-resolve-promise⑥">Resolve</a> <var>promise</var> with true.</p>
         <li data-md="">
-         <p>TODO: terminate the fetches</p>
+         <p>TODO: terminate the fetches.</p>
         <li data-md="">
-         <p>Let <var>eventType</var> be <code>"backgroundfetchabort"</code>.</p>
-        <li data-md="">
-         <p><a data-link-type="dfn" href="https://w3c.github.io/ServiceWorker/#handle-functional-event" id="ref-for-handle-functional-event">Handle functional event</a> for <var>swRegistration</var> and <var>eventType</var> using the following steps:</p>
-         <p class="issue" id="issue-ea032efd"><a class="self-link" href="#issue-ea032efd"></a> This isn’t quite how <a data-link-type="dfn" href="https://w3c.github.io/ServiceWorker/#handle-functional-event" id="ref-for-handle-functional-event①">handle functional event</a> works, but its current definition doesn’t really make sense (<a href="https://github.com/w3c/ServiceWorker/issues/1196">issue</a>).</p>
-         <ol>
-          <li data-md="">
-           <p>Let <var>event</var> be the result of <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event-create" id="ref-for-concept-event-create">creating an event</a> with <code class="idl"><a data-link-type="idl" href="#backgroundfetchsettledevent" id="ref-for-backgroundfetchsettledevent">BackgroundFetchSettledEvent</a></code>.</p>
-          <li data-md="">
-           <p>Let <var>settledFetches</var> be a new <code class="idl"><a data-link-type="idl" href="#backgroundfetchsettledfetches" id="ref-for-backgroundfetchsettledfetches">BackgroundFetchSettledFetches</a></code>. TODO: associate this with <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-records" id="ref-for-background-fetch-records③">records</a>.</p>
-          <li data-md="">
-           <p>Initialise <var>event</var>’s <code class="idl"><a data-link-type="idl" href="https://dom.spec.whatwg.org/#dom-event-type" id="ref-for-dom-event-type">type</a></code> to <var>eventType</var>.</p>
-          <li data-md="">
-           <p>Initialise <var>event</var>’s <code class="idl"><a data-link-type="idl" href="#dom-backgroundfetchsettledevent-fetches" id="ref-for-dom-backgroundfetchsettledevent-fetches">fetches</a></code> to <var>settledFetches</var>.</p>
-          <li data-md="">
-           <p>Dispatch a service worker event <var>event</var>.</p>
-           <p class="issue" id="issue-f46bb3b7"><a class="self-link" href="#issue-f46bb3b7"></a> Also part of the previous <a href="https://github.com/w3c/ServiceWorker/issues/1196">issue</a>.</p>
-         </ol>
+         <p><a data-link-type="dfn">Fire a functional event</a> named "<code>backgroundfetchabort</code>" using <code class="idl"><a data-link-type="idl" href="#backgroundfetchsettledevent" id="ref-for-backgroundfetchsettledevent">BackgroundFetchSettledEvent</a></code> on <var>swRegistration</var> with the following properties:</p>
+         <dl>
+          <dt data-md=""><code class="idl"><a data-link-type="idl" href="#dom-backgroundfetchsettledevent-fetches" id="ref-for-dom-backgroundfetchsettledevent-fetches">fetches</a></code>
+          <dd data-md="">
+           <p>A new <code class="idl"><a data-link-type="idl" href="#backgroundfetchsettledfetches" id="ref-for-backgroundfetchsettledfetches">BackgroundFetchSettledFetches</a></code>. TODO: associate this with <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-records" id="ref-for-background-fetch-records③">records</a>.</p>
+         </dl>
+         <p class="issue" id="issue-75d0102a"><a class="self-link" href="#issue-75d0102a"></a> The above prose is based on <a href="https://github.com/w3c/ServiceWorker/pull/1199">ServiceWorker/#1199</a>.</p>
        </ol>
      </ol>
     </div>
@@ -2370,8 +2360,6 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
     <ul>
      <li><a href="https://dom.spec.whatwg.org/#eventtarget">EventTarget</a>
      <li><a href="https://dom.spec.whatwg.org/#context-object">context object</a>
-     <li><a href="https://dom.spec.whatwg.org/#concept-event-create">creating an event</a>
-     <li><a href="https://dom.spec.whatwg.org/#dom-event-type">type</a>
     </ul>
    <li>
     <a data-link-type="biblio">[FETCH]</a> defines the following terms:
@@ -2447,7 +2435,6 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
      <li><a href="https://w3c.github.io/ServiceWorker/#serviceworkerglobalscope">ServiceWorkerGlobalScope</a>
      <li><a href="https://w3c.github.io/ServiceWorker/#serviceworkerregistration">ServiceWorkerRegistration</a>
      <li><a href="https://w3c.github.io/ServiceWorker/#dfn-active-worker">active worker</a>
-     <li><a href="https://w3c.github.io/ServiceWorker/#handle-functional-event">handle functional event</a>
      <li><a href="https://w3c.github.io/ServiceWorker/#dfn-service-worker">service worker</a>
      <li><a href="https://w3c.github.io/ServiceWorker/#dfn-service-worker-registration">service worker registration</a>
      <li><a href="https://w3c.github.io/ServiceWorker/#dom-extendableevent-waituntil">waitUntil(f)</a>
@@ -2600,8 +2587,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
    <div class="issue"> Fetch waits for the whole body before returning <var>response</var>. Let’s pretend it <em>doesn’t</em> do that <a href="https://github.com/whatwg/fetch/issues/536#issuecomment-330184276">issue</a>.<a href="#issue-ba3b5fd8"> ↵ </a></div>
    <div class="issue"> Fetch doesn’t currently expose this <a href="https://github.com/whatwg/fetch/issues/605">(issue)</a>.<a href="#issue-8840f7f0"> ↵ </a></div>
    <div class="issue"> This isn’t correctly set in fetch (<a href="https://github.com/whatwg/fetch/issues/604">issue</a>).<a href="#issue-9b0afb74"> ↵ </a></div>
-   <div class="issue"> This isn’t quite how <a data-link-type="dfn" href="https://w3c.github.io/ServiceWorker/#handle-functional-event">handle functional event</a> works, but its current definition doesn’t really make sense (<a href="https://github.com/w3c/ServiceWorker/issues/1196">issue</a>).<a href="#issue-ea032efd"> ↵ </a></div>
-   <div class="issue"> Also part of the previous <a href="https://github.com/w3c/ServiceWorker/issues/1196">issue</a>.<a href="#issue-f46bb3b7"> ↵ </a></div>
+   <div class="issue"> The above prose is based on <a href="https://github.com/w3c/ServiceWorker/pull/1199">ServiceWorker/#1199</a>.<a href="#issue-75d0102a"> ↵ </a></div>
   </div>
   <aside class="dfn-panel" data-for="service-worker-registration-active-background-fetches">
    <b><a href="#service-worker-registration-active-background-fetches">#service-worker-registration-active-background-fetches</a></b><b>Referenced in:</b>
