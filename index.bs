@@ -145,12 +145,57 @@ A <dfn>background fetch record</dfn> consists of:
 
 # API # {#api}
 
+## Extensions to {{ServiceWorkerGlobalScope}} ## {#extensions-to-service-worker-global}
+
+<script type="idl">
+partial interface ServiceWorkerGlobalScope {
+  attribute EventHandler onbackgroundfetched;
+  attribute EventHandler onbackgroundfetchfail;
+  attribute EventHandler onbackgroundfetchabort;
+  attribute EventHandler onbackgroundfetchclick;
+};
+</script>
+
+The following is the <a>event handler</a> (and its corresponding <a>event handler event type</a>) that must be supported, as <a>event handler IDL attributes</a>, by all objects implementing {{ServiceWorker}} interface:
+
+<table class="data">
+  <thead>
+    <tr>
+      <th>[=event handler event type=]</th>
+      <th>[=event handler=]</th>
+      <th>Interface</th>
+    </tr>
+  </thead>
+  <tbody dfn-for="ServiceWorkerGlobalScope" dfn-type="event">
+    <tr>
+      <td><dfn>backgroundfetched</dfn></td>
+      <td>{{ServiceWorkerGlobalScope/onbackgroundfetched}}</td>
+      <td>{{BackgroundFetchUpdateEvent}}</td>
+    </tr>
+    <tr>
+      <td><dfn>backgroundfetchfail</dfn></td>
+      <td>{{ServiceWorkerGlobalScope/onbackgroundfetchfail}}</td>
+      <td>{{BackgroundFetchUpdateEvent}}</td>
+    </tr>
+    <tr>
+      <td><dfn>backgroundfetchabort</dfn></td>
+      <td>{{ServiceWorkerGlobalScope/onbackgroundfetchabort}}</td>
+      <td>{{BackgroundFetchSettledEvent}}</td>
+    </tr>
+    <tr>
+      <td><dfn>backgroundfetchclick</dfn></td>
+      <td>{{ServiceWorkerGlobalScope/onbackgroundfetchclick}}</td>
+      <td>{{BackgroundFetchClickEvent}}</td>
+    </tr>
+  </tbody>
+</table>
+
 ## Extensions to {{ServiceWorkerRegistration}} ## {#extensions-to-service-worker-registration}
 
 <script type="idl">
-  partial interface ServiceWorkerRegistration {
-    readonly attribute BackgroundFetchManager backgroundFetch;
-  };
+partial interface ServiceWorkerRegistration {
+  readonly attribute BackgroundFetchManager backgroundFetch;
+};
 </script>
 
 Each {{ServiceWorkerRegistration}} instance has a unique instance of {{BackgroundFetchManager}}, allocated when the {{ServiceWorkerRegistration}} object is created. It's [=BackgroundFetchManager/service worker registration=] is set to {{ServiceWorkerRegistration}}'s [=/service worker registration=].
@@ -160,27 +205,27 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
 ## {{BackgroundFetchManager}} ## {#background-fetch-manager}
 
 <script type="idl">
-  [Exposed=(Window,Worker)]
-  interface BackgroundFetchManager {
-    Promise<BackgroundFetchRegistration> fetch(DOMString id, (RequestInfo or sequence<RequestInfo>) requests, optional BackgroundFetchOptions options);
-    Promise<BackgroundFetchRegistration?> get(DOMString id);
-    Promise<FrozenArray<DOMString>> getIds();
-    // TODO: in future this should become an async iterator for BackgroundFetchRegistration objects
-  };
+[Exposed=(Window,Worker)]
+interface BackgroundFetchManager {
+  Promise<BackgroundFetchRegistration> fetch(DOMString id, (RequestInfo or sequence<RequestInfo>) requests, optional BackgroundFetchOptions options);
+  Promise<BackgroundFetchRegistration?> get(DOMString id);
+  Promise<FrozenArray<DOMString>> getIds();
+  // TODO: in future this should become an async iterator for BackgroundFetchRegistration objects
+};
 
-  dictionary BackgroundFetchOptions {
-    sequence<IconDefinition> icons = [];
-    DOMString title = "";
-    unsigned long long downloadTotal = 0;
-  };
+dictionary BackgroundFetchOptions {
+  sequence<IconDefinition> icons = [];
+  DOMString title = "";
+  unsigned long long downloadTotal = 0;
+};
 
-  // This is taken from https://w3c.github.io/manifest/#icons-member.
-  // This definition should probably be moved somewhere more general.
-  dictionary IconDefinition {
-    DOMString src;
-    DOMString sizes = "";
-    DOMString type = "";
-  };
+// This is taken from https://w3c.github.io/manifest/#icons-member.
+// This definition should probably be moved somewhere more general.
+dictionary IconDefinition {
+  DOMString src;
+  DOMString sizes = "";
+  DOMString type = "";
+};
 </script>
 
 <div dfn-for="BackgroundFetchManager">
@@ -265,36 +310,36 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
 ## {{BackgroundFetchRegistration}} ## {#background-fetch-registration}
 
 <script type="idl">
-  [Exposed=(Window,Worker)]
-  interface BackgroundFetchRegistration : EventTarget {
-    readonly attribute DOMString id;
-    readonly attribute FrozenArray<IconDefinition> icons;
-    readonly attribute unsigned long long uploadTotal;
-    readonly attribute unsigned long long uploaded;
-    readonly attribute unsigned long long downloadTotal;
-    readonly attribute unsigned long long downloaded;
-    readonly attribute DOMString title;
-    readonly attribute BackgroundFetchActiveFetches activeFetches;
+[Exposed=(Window,Worker)]
+interface BackgroundFetchRegistration : EventTarget {
+  readonly attribute DOMString id;
+  readonly attribute FrozenArray<IconDefinition> icons;
+  readonly attribute unsigned long long uploadTotal;
+  readonly attribute unsigned long long uploaded;
+  readonly attribute unsigned long long downloadTotal;
+  readonly attribute unsigned long long downloaded;
+  readonly attribute DOMString title;
+  readonly attribute BackgroundFetchActiveFetches activeFetches;
 
-    Promise<boolean> abort();
-  };
+  Promise<boolean> abort();
+};
 
-  [Exposed=(Window,Worker)]
-  interface BackgroundFetchFetch {
-    readonly attribute Request request;
-  };
+[Exposed=(Window,Worker)]
+interface BackgroundFetchFetch {
+  readonly attribute Request request;
+};
 
-  [Exposed=(Window,Worker)]
-  interface BackgroundFetchActiveFetches {
-    Promise<BackgroundFetchActiveFetch> match(RequestInfo request);
-    Promise<FrozenArray<BackgroundFetchActiveFetch>> values();
-  };
+[Exposed=(Window,Worker)]
+interface BackgroundFetchActiveFetches {
+  Promise<BackgroundFetchActiveFetch> match(RequestInfo request);
+  Promise<FrozenArray<BackgroundFetchActiveFetch>> values();
+};
 
-  [Exposed=(Window,Worker)]
-  interface BackgroundFetchActiveFetch : BackgroundFetchFetch {
-    readonly attribute Promise<Response> responseReady;
-    // In future this will include a fetch observer
-  };
+[Exposed=(Window,Worker)]
+interface BackgroundFetchActiveFetch : BackgroundFetchFetch {
+  readonly attribute Promise<Response> responseReady;
+  // In future this will include a fetch observer
+};
 </script>
 
 <div dfn-for="BackgroundFetchRegistration">
@@ -339,62 +384,17 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
   </div>
 </div>
 
-## Events ## {#events}
-
-<script type="idl">
-  partial interface ServiceWorkerGlobalScope {
-    attribute EventHandler onbackgroundfetched;
-    attribute EventHandler onbackgroundfetchfail;
-    attribute EventHandler onbackgroundfetchabort;
-    attribute EventHandler onbackgroundfetchclick;
-  };
-</script>
-
-The following is the <a>event handler</a> (and its corresponding <a>event handler event type</a>) that must be supported, as <a>event handler IDL attributes</a>, by all objects implementing {{ServiceWorker}} interface:
-
-<table class="data">
-  <thead>
-    <tr>
-      <th>[=event handler event type=]</th>
-      <th>[=event handler=]</th>
-      <th>Interface</th>
-    </tr>
-  </thead>
-  <tbody dfn-for="ServiceWorkerGlobalScope" dfn-type="event">
-    <tr>
-      <td><dfn>backgroundfetched</dfn></td>
-      <td>{{ServiceWorkerGlobalScope/onbackgroundfetched}}</td>
-      <td>{{BackgroundFetchUpdateEvent}}</td>
-    </tr>
-    <tr>
-      <td><dfn>backgroundfetchfail</dfn></td>
-      <td>{{ServiceWorkerGlobalScope/onbackgroundfetchfail}}</td>
-      <td>{{BackgroundFetchUpdateEvent}}</td>
-    </tr>
-    <tr>
-      <td><dfn>backgroundfetchabort</dfn></td>
-      <td>{{ServiceWorkerGlobalScope/onbackgroundfetchabort}}</td>
-      <td>{{BackgroundFetchSettledEvent}}</td>
-    </tr>
-    <tr>
-      <td><dfn>backgroundfetchclick</dfn></td>
-      <td>{{ServiceWorkerGlobalScope/onbackgroundfetchclick}}</td>
-      <td>{{BackgroundFetchClickEvent}}</td>
-    </tr>
-  </tbody>
-</table>
-
 ### {{BackgroundFetchEvent}} ### {#background-fetch-event}
 
 <script type="idl">
-  [Constructor(DOMString type, BackgroundFetchEventInit init), Exposed=ServiceWorker]
-  interface BackgroundFetchEvent : ExtendableEvent {
-    readonly attribute DOMString id;
-  };
+[Constructor(DOMString type, BackgroundFetchEventInit init), Exposed=ServiceWorker]
+interface BackgroundFetchEvent : ExtendableEvent {
+  readonly attribute DOMString id;
+};
 
-  dictionary BackgroundFetchEventInit : ExtendableEventInit {
-    required DOMString id;
-  };
+dictionary BackgroundFetchEventInit : ExtendableEventInit {
+  required DOMString id;
+};
 </script>
 
 <div dfn-for="BackgroundFetchEvent">
@@ -414,25 +414,25 @@ The following is the <a>event handler</a> (and its corresponding <a>event handle
 ### {{BackgroundFetchSettledEvent}} ### {#background-fetch-settled-event}
 
 <script type="idl">
-  [Constructor(DOMString type, BackgroundFetchSettledEventInit init), Exposed=ServiceWorker]
-  interface BackgroundFetchSettledEvent : BackgroundFetchEvent {
-    readonly attribute BackgroundFetchSettledFetches fetches;
-  };
+[Constructor(DOMString type, BackgroundFetchSettledEventInit init), Exposed=ServiceWorker]
+interface BackgroundFetchSettledEvent : BackgroundFetchEvent {
+  readonly attribute BackgroundFetchSettledFetches fetches;
+};
 
-  dictionary BackgroundFetchSettledEventInit : BackgroundFetchEventInit {
-    required BackgroundFetchSettledFetches fetches;
-  };
+dictionary BackgroundFetchSettledEventInit : BackgroundFetchEventInit {
+  required BackgroundFetchSettledFetches fetches;
+};
 
-  [Exposed=(Window,Worker)]
-  interface BackgroundFetchSettledFetches {
-    Promise<BackgroundFetchSettledFetch> match(RequestInfo request);
-    Promise<FrozenArray<BackgroundFetchSettledFetch>> values();
-  };
+[Exposed=(Window,Worker)]
+interface BackgroundFetchSettledFetches {
+  Promise<BackgroundFetchSettledFetch> match(RequestInfo request);
+  Promise<FrozenArray<BackgroundFetchSettledFetch>> values();
+};
 
-  [Exposed=ServiceWorker]
-  interface BackgroundFetchSettledFetch : BackgroundFetchFetch {
-    readonly attribute Response? response;
-  };
+[Exposed=ServiceWorker]
+interface BackgroundFetchSettledFetch : BackgroundFetchFetch {
+  readonly attribute Response? response;
+};
 </script>
 
 <div dfn-for="BackgroundFetchSettledEvent">
@@ -448,10 +448,10 @@ The following is the <a>event handler</a> (and its corresponding <a>event handle
 ### {{BackgroundFetchUpdateEvent}} ### {#background-fetch-update-event}
 
 <script type="idl">
-  [Constructor(DOMString type, BackgroundFetchSettledEventInit init), Exposed=ServiceWorker]
-  interface BackgroundFetchUpdateEvent : BackgroundFetchSettledEvent {
-    Promise<void> updateUI(DOMString title);
-  };
+[Constructor(DOMString type, BackgroundFetchSettledEventInit init), Exposed=ServiceWorker]
+interface BackgroundFetchUpdateEvent : BackgroundFetchSettledEvent {
+  Promise<void> updateUI(DOMString title);
+};
 </script>
 
 <div dfn-for="BackgroundFetchUpdateEvent">
@@ -471,16 +471,16 @@ The following is the <a>event handler</a> (and its corresponding <a>event handle
 ### {{BackgroundFetchClickEvent}} ### {#background-fetch-click-event}
 
 <script type="idl">
-  [Constructor(DOMString type, BackgroundFetchClickEventInit init), Exposed=ServiceWorker]
-  interface BackgroundFetchClickEvent : BackgroundFetchEvent {
-    readonly attribute BackgroundFetchState state;
-  };
+[Constructor(DOMString type, BackgroundFetchClickEventInit init), Exposed=ServiceWorker]
+interface BackgroundFetchClickEvent : BackgroundFetchEvent {
+  readonly attribute BackgroundFetchState state;
+};
 
-  dictionary BackgroundFetchClickEventInit : BackgroundFetchEventInit {
-    required BackgroundFetchState state;
-  };
+dictionary BackgroundFetchClickEventInit : BackgroundFetchEventInit {
+  required BackgroundFetchState state;
+};
 
-  enum BackgroundFetchState { "pending", "succeeded", "failed" };
+enum BackgroundFetchState { "pending", "succeeded", "failed" };
 </script>
 
 # Privacy and bandwidth usage # {#privacy-and-bandwidth-use}
