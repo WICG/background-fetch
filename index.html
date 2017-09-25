@@ -1178,7 +1178,7 @@ Possible extra rowspan handling
 </style>
   <meta content="Bikeshed version eeaa009c31ac13852bf86c1553d994e53f48f852" name="generator">
   <link href="https://jakearchibald.github.io/background-fetch" rel="canonical">
-  <meta content="bff4fcc859ad999272c21cfada17a5eb9fb12a16" name="document-revision">
+  <meta content="b6481068f7044677e4fd5c34d0506423b76af44f" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1942,13 +1942,19 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
       <li data-md="">
        <p>If <var>bgFetch</var> is nothing, then <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#resolve-promise" id="ref-for-resolve-promise①">resolve</a> <var>promise</var> with undefined and abort these steps.</p>
       <li data-md="">
+       <p>Let <var>downloaded</var> be <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-last-reported-download" id="ref-for-background-fetch-last-reported-download②">last reported downloaded</a>.</p>
+      <li data-md="">
        <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#enqueue-the-following-steps" id="ref-for-enqueue-the-following-steps④">Enqueue the following steps</a> to <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-progress-handling-queue" id="ref-for-background-fetch-progress-handling-queue①">progress handling queue</a>:</p>
        <ol>
         <li data-md="">
          <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task①">Queue a task</a> <var>task</var> to run the following steps:</p>
          <ol>
           <li data-md="">
-           <p><a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#resolve-promise" id="ref-for-resolve-promise②">Resolve</a> <var>promise</var> with the result of <a data-link-type="dfn" href="#get-a-backgroundfetchregistration-instance" id="ref-for-get-a-backgroundfetchregistration-instance③">getting a BackgroundFetchRegistration instance</a> passing the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object④">context object</a>'s <a data-link-type="dfn" href="#backgroundfetchmanager-backgroundfetchregistration-instances" id="ref-for-backgroundfetchmanager-backgroundfetchregistration-instances②">BackgroundFetchRegistration instances</a> and <var>bgFetch</var>.</p>
+           <p>Let <var>bgFetchRegistration</var> be the result of <a data-link-type="dfn" href="#get-a-backgroundfetchregistration-instance" id="ref-for-get-a-backgroundfetchregistration-instance③">getting a BackgroundFetchRegistration instance</a> passing the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object④">context object</a>'s <a data-link-type="dfn" href="#backgroundfetchmanager-backgroundfetchregistration-instances" id="ref-for-backgroundfetchmanager-backgroundfetchregistration-instances②">BackgroundFetchRegistration instances</a> and <var>bgFetch</var>.</p>
+          <li data-md="">
+           <p>Set <var>bgFetchRegistration</var>’s <a data-link-type="dfn" href="#backgroundfetchregistration-downloaded" id="ref-for-backgroundfetchregistration-downloaded①">downloaded</a> to <var>downloaded</var>.</p>
+          <li data-md="">
+           <p><a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#resolve-promise" id="ref-for-resolve-promise②">Resolve</a> <var>promise</var> with <var>bgFetchRegistration</var>.</p>
          </ol>
         <li data-md="">
          <p>Wait for <var>task</var> to complete.</p>
@@ -2009,7 +2015,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
     <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="attribute" data-export="" id="dom-backgroundfetchregistration-uploadtotal"><code>uploadTotal</code></dfn> attribute’s getter must return the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object⑦">context object</a>'s <a data-link-type="dfn" href="#backgroundfetchregistration-uploadtotal" id="ref-for-backgroundfetchregistration-uploadtotal">uploadTotal</a>.</p>
     <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="attribute" data-export="" id="dom-backgroundfetchregistration-downloadtotal"><code>downloadTotal</code></dfn> attribute’s getter must return the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object⑧">context object</a>'s <a data-link-type="dfn" href="#backgroundfetchregistration-downloadtotal" id="ref-for-backgroundfetchregistration-downloadtotal">downloadTotal</a>.</p>
     <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="attribute" data-export="" id="dom-backgroundfetchregistration-uploaded"><code>uploaded</code></dfn> attribute’s getter must return TODO.</p>
-    <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="attribute" data-export="" id="dom-backgroundfetchregistration-downloaded"><code>downloaded</code></dfn> attribute’s getter must return the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object⑨">context object</a>'s <a data-link-type="dfn" href="#backgroundfetchregistration-downloaded" id="ref-for-backgroundfetchregistration-downloaded①">downloaded</a>.</p>
+    <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="attribute" data-export="" id="dom-backgroundfetchregistration-downloaded"><code>downloaded</code></dfn> attribute’s getter must return the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object⑨">context object</a>'s <a data-link-type="dfn" href="#backgroundfetchregistration-downloaded" id="ref-for-backgroundfetchregistration-downloaded②">downloaded</a>.</p>
     <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="attribute" data-export="" id="dom-backgroundfetchregistration-activefetches"><code>activeFetches</code></dfn> attribute’s getter must return the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object①⓪">context object</a>'s <a data-link-type="dfn" href="#backgroundfetchregistration-background-fetch" id="ref-for-backgroundfetchregistration-background-fetch③">background fetch</a>'s TODO.</p>
     <h4 class="heading settled" data-level="4.4.1" id="background-fetch-registration-events"><span class="secno">4.4.1. </span><span class="content">Events</span><a class="self-link" href="#background-fetch-registration-events"></a></h4>
     <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="attribute" data-export="" id="dom-backgroundfetchregistration-onprogress"><code>onprogress</code></dfn> <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#event-handlers" id="ref-for-event-handlers②">event handler</a> has the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#event-handler-event-type" id="ref-for-event-handler-event-type②">event handler event type</a> of <code class="idl"><a class="idl-code" data-link-type="event" href="#eventdef-backgroundfetchregistration-progress" id="ref-for-eventdef-backgroundfetchregistration-progress①">progress</a></code>.</p>
@@ -2763,6 +2769,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
    <b><a href="#background-fetch-last-reported-download">#background-fetch-last-reported-download</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-background-fetch-last-reported-download">3.2. Report progress for background fetch</a> <a href="#ref-for-background-fetch-last-reported-download①">(2)</a>
+    <li><a href="#ref-for-background-fetch-last-reported-download②">4.3.2. get()</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="background-fetch-icons">
@@ -2968,7 +2975,8 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
    <b><a href="#backgroundfetchregistration-downloaded">#backgroundfetchregistration-downloaded</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-backgroundfetchregistration-downloaded">3.2. Report progress for background fetch</a>
-    <li><a href="#ref-for-backgroundfetchregistration-downloaded①">4.4. BackgroundFetchRegistration</a>
+    <li><a href="#ref-for-backgroundfetchregistration-downloaded①">4.3.2. get()</a>
+    <li><a href="#ref-for-backgroundfetchregistration-downloaded②">4.4. BackgroundFetchRegistration</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="backgroundfetchregistration-id">
