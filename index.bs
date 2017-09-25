@@ -399,7 +399,7 @@ interface BackgroundFetchActiveFetch : BackgroundFetchFetch {
 
   The <dfn attribute>uploaded</dfn> attribute's getter must return TODO.
 
-  The <dfn attribute>downloaded</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchRegistration/download=].
+  The <dfn attribute>downloaded</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchRegistration/downloaded=].
 
   The <dfn attribute>activeFetches</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchRegistration/background fetch=]'s TODO.
 
