@@ -4,7 +4,7 @@ Shortname: background-fetch
 Level: 1
 Status: ED
 Group: wicg
-URL: https://jakearchibald.github.io/background-fetch
+URL: https://wicg.github.io/background-fetch/
 Editor: Jake Archibald, Google, jakearchibald@google.com
 Editor: Peter Beverloo, Google, beverloo@google.com
 Abstract: An API to handle large uploads/downloads in the background with user visibility.
