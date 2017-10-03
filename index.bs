@@ -538,4 +538,6 @@ The [=/origin=] of a background fetch should have equal or great visibility to t
 
 A user agent may pause background downloads depending on network conditions or battery state. For example, a user agent may download automatically when connected to WiFi, but require user confirmation to download using mobile data. If an implementation has this restriction, the user should be able to persist granting mobile data use for the [=/origin=].
 
+If the user agent provides a way for a user to abort a background fetch operation, it should [=fetch/terminate=] all fetches associated with the [=/background fetch=]'s [=background fetch/records=], with the *abort* flag set.
+
 A background fetch exposes the user's external IPs to the server throughout the duration of the background fetch. An attacker could use an extremely slow background fetch as a way to persistently track the user once they've left the site. Good visibility into the progress of the background fetch will help the user identify unwanted use.

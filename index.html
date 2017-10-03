@@ -1178,7 +1178,7 @@ Possible extra rowspan handling
 </style>
   <meta content="Bikeshed version eeaa009c31ac13852bf86c1553d994e53f48f852" name="generator">
   <link href="https://jakearchibald.github.io/background-fetch" rel="canonical">
-  <meta content="9187f179a5a2049eca78df3b7624dd10d43e18a4" name="document-revision">
+  <meta content="12bf83a3b6f0cbe23a82733ba9aaa9b1dbf0b997" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -2142,6 +2142,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
    <p>It’s the recommendation of this standard that user agents make background fetch operations highly visible and easily abortable rather than asking permission up front. However, given that background fetches can be paused and retried, a user agent that immediately paused a background fetch and user interaction to resume would be compliant.</p>
    <p>The <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/origin.html#concept-origin" id="ref-for-concept-origin">origin</a> of a background fetch should have equal or great visibility to the developer-provided information, such as a the <a data-link-type="dfn" href="#background-fetch-icons" id="ref-for-background-fetch-icons①">icons</a> and <a data-link-type="dfn" href="#background-fetch-title" id="ref-for-background-fetch-title①">title</a>.</p>
    <p>A user agent may pause background downloads depending on network conditions or battery state. For example, a user agent may download automatically when connected to WiFi, but require user confirmation to download using mobile data. If an implementation has this restriction, the user should be able to persist granting mobile data use for the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/origin.html#concept-origin" id="ref-for-concept-origin①">origin</a>.</p>
+   <p>If the user agent provides a way for a user to abort a background fetch operation, it should <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-fetch-terminate" id="ref-for-concept-fetch-terminate①">terminate</a> all fetches associated with the <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch①⓪">background fetch</a>'s <a data-link-type="dfn" href="#background-fetch-records" id="ref-for-background-fetch-records⑦">records</a>, with the <em>abort</em> flag set.</p>
    <p>A background fetch exposes the user’s external IPs to the server throughout the duration of the background fetch. An attacker could use an extremely slow background fetch as a way to persistently track the user once they’ve left the site. Good visibility into the progress of the background fetch will help the user identify unwanted use.</p>
   </main>
   <div data-fill-with="conformance">
@@ -2735,6 +2736,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
     <li><a href="#ref-for-background-fetch⑦">4.3. BackgroundFetchManager</a>
     <li><a href="#ref-for-background-fetch⑧">4.3.1. fetch()</a>
     <li><a href="#ref-for-background-fetch⑨">4.4. BackgroundFetchRegistration</a>
+    <li><a href="#ref-for-background-fetch①⓪">5. Privacy and bandwidth usage</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="background-fetch-id">
@@ -2752,6 +2754,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
     <li><a href="#ref-for-background-fetch-records">3.1. Attempt a background fetch</a> <a href="#ref-for-background-fetch-records①">(2)</a> <a href="#ref-for-background-fetch-records②">(3)</a> <a href="#ref-for-background-fetch-records③">(4)</a> <a href="#ref-for-background-fetch-records④">(5)</a>
     <li><a href="#ref-for-background-fetch-records⑤">3.2. Report progress for background fetch</a>
     <li><a href="#ref-for-background-fetch-records⑥">4.3.1. fetch()</a>
+    <li><a href="#ref-for-background-fetch-records⑦">5. Privacy and bandwidth usage</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="background-fetch-title">
