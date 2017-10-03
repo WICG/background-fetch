@@ -427,6 +427,7 @@ interface BackgroundFetchActiveFetch : BackgroundFetchFetch {
       1. If |activeBgFetches| does not [=active background fetches/contain=] |bgFetch|, then [=resolve=] |promise| with false and abort these steps.
       1. Remove |activeBgFetches|[|id|].
       1. [=Resolve=] |promise| with true.
+      1. TODO: [=fetch/Terminate=] related fetches with the *aborted* flag set.
   </div>
 </div>
 

@@ -1178,7 +1178,7 @@ Possible extra rowspan handling
 </style>
   <meta content="Bikeshed version eeaa009c31ac13852bf86c1553d994e53f48f852" name="generator">
   <link href="https://jakearchibald.github.io/background-fetch" rel="canonical">
-  <meta content="3ef4dea6e8a4b1882f194b6b0a4855e129f87917" name="document-revision">
+  <meta content="9187f179a5a2049eca78df3b7624dd10d43e18a4" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1425,7 +1425,7 @@ pre.highlight, pre > code.highlight { display: block; padding: 1em; margin: .5em
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">Background Fetch</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Editor’s Draft, <time class="dt-updated" datetime="2017-09-25">25 September 2017</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Editor’s Draft, <time class="dt-updated" datetime="2017-10-03">3 October 2017</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -2047,6 +2047,8 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
          <p>Remove <var>activeBgFetches</var>[<var>id</var>].</p>
         <li data-md="">
          <p><a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#resolve-promise" id="ref-for-resolve-promise⑤">Resolve</a> <var>promise</var> with true.</p>
+        <li data-md="">
+         <p>TODO: <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-fetch-terminate" id="ref-for-concept-fetch-terminate">Terminate</a> related fetches with the <em>aborted</em> flag set.</p>
        </ol>
      </ol>
     </div>
@@ -2474,6 +2476,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
      <li><a href="https://fetch.spec.whatwg.org/#concept-body-source">source</a>
      <li><a href="https://fetch.spec.whatwg.org/#concept-body-stream">stream</a>
      <li><a href="https://fetch.spec.whatwg.org/#synchronous-flag">synchronous flag</a>
+     <li><a href="https://fetch.spec.whatwg.org/#concept-fetch-terminate">terminated</a>
      <li><a href="https://fetch.spec.whatwg.org/#concept-body-total-bytes">total bytes</a>
     </ul>
    <li>
