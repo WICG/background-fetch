@@ -1176,9 +1176,9 @@ Possible extra rowspan handling
 		}
 	}
 </style>
-  <meta content="Bikeshed version eeaa009c31ac13852bf86c1553d994e53f48f852" name="generator">
+  <meta content="Bikeshed version 3ee78e75729309d4dfc4793df74c38e4ae785832" name="generator">
   <link href="https://wicg.github.io/background-fetch/" rel="canonical">
-  <meta content="4a007bbf00d6b90d4bccf5ac5d6e2ab3bda8841e" name="document-revision">
+  <meta content="1bb8484de9a56ef0bfdc5174e178fc0261f2b5a6" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1425,7 +1425,7 @@ pre.highlight, pre > code.highlight { display: block; padding: 1em; margin: .5em
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">Background Fetch</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Editor’s Draft, <time class="dt-updated" datetime="2017-10-03">3 October 2017</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Editor’s Draft, <time class="dt-updated" datetime="2017-10-12">12 October 2017</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1682,51 +1682,51 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
             <p>Set <var>abandoned</var> to true. TODO: if <var>aborted</var> isn’t true, this could be another resume point.</p>
           </ol>
         </ol>
+      </ol>
+     <li data-md="">
+      <p>Wait for either <var>abandoned</var> to be true, or <var>completeFetches</var> to be <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-records" id="ref-for-background-fetch-records①">records</a>'s <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-size" id="ref-for-list-size">size</a>.</p>
+     <li data-md="">
+      <p>Let <var>operationAborted</var> be <var>aborted</var>.</p>
+     <li data-md="">
+      <p>If <var>abandoned</var> is true:</p>
+      <ol>
        <li data-md="">
-        <p>Wait for either <var>abandoned</var> to be true, or <var>completeFetches</var> to be <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-records" id="ref-for-background-fetch-records①">records</a>'s <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-size" id="ref-for-list-size">size</a>.</p>
+        <p>TODO: terminate all related fetches.</p>
+      </ol>
+     <li data-md="">
+      <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#enqueue-the-following-steps" id="ref-for-enqueue-the-following-steps①">Enqueue the following steps</a> to <var>swRegistration</var>’s <a data-link-type="dfn" href="#service-worker-registration-active-background-fetches-edit-queue" id="ref-for-service-worker-registration-active-background-fetches-edit-queue">active background fetches edit queue</a>:</p>
+      <ol>
        <li data-md="">
-        <p>Let <var>operationAborted</var> be <var>aborted</var>.</p>
+        <p>Let <var>activeBgFetches</var> be <var>swRegistration</var>’s <a data-link-type="dfn" href="#service-worker-registration-active-background-fetches" id="ref-for-service-worker-registration-active-background-fetches①">active background fetches</a>.</p>
        <li data-md="">
-        <p>If <var>abandoned</var> is true:</p>
-        <ol>
-         <li data-md="">
-          <p>TODO: terminate all related fetches.</p>
-        </ol>
+        <p>Let <var>id</var> be <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-id" id="ref-for-background-fetch-id①">id</a>.</p>
        <li data-md="">
-        <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#enqueue-the-following-steps" id="ref-for-enqueue-the-following-steps①">Enqueue the following steps</a> to <var>swRegistration</var>’s <a data-link-type="dfn" href="#service-worker-registration-active-background-fetches-edit-queue" id="ref-for-service-worker-registration-active-background-fetches-edit-queue">active background fetches edit queue</a>:</p>
-        <ol>
-         <li data-md="">
-          <p>Let <var>activeBgFetches</var> be <var>swRegistration</var>’s <a data-link-type="dfn" href="#service-worker-registration-active-background-fetches" id="ref-for-service-worker-registration-active-background-fetches①">active background fetches</a>.</p>
-         <li data-md="">
-          <p>Let <var>id</var> be <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-id" id="ref-for-background-fetch-id①">id</a>.</p>
-         <li data-md="">
-          <p>If <var>activeBgFetches</var> <a data-link-type="dfn" href="#active-background-fetches-contains" id="ref-for-active-background-fetches-contains">contains</a> <var>bgFetch</var>, then remove <var>activeBgFetches</var>[<var>id</var>].</p>
-         <li data-md="">
-          <p>Otherwise, set <var>operationAborted</var> to true.</p>
-          <p class="note" role="note"><span>Note:</span> This handles a race condition where <code class="idl"><a data-link-type="idl" href="#dom-backgroundfetchregistration-abort" id="ref-for-dom-backgroundfetchregistration-abort">abort()</a></code> was successfully called but one of the fetches failed at the same time. If we’ve returned true from <code class="idl"><a data-link-type="idl" href="#dom-backgroundfetchregistration-abort" id="ref-for-dom-backgroundfetchregistration-abort①">abort()</a></code>, this ensures we fire the related abort event.</p>
-         <li data-md="">
-          <p>If <var>operationAborted</var> is true, then <a data-link-type="dfn">fire a functional event</a> named "<code>backgroundfetchabort</code>" using <code class="idl"><a data-link-type="idl" href="#backgroundfetchsettledevent" id="ref-for-backgroundfetchsettledevent">BackgroundFetchSettledEvent</a></code> on <var>swRegistration</var> with the following properties:</p>
-          <dl>
-           <dt data-md=""><code class="idl"><a data-link-type="idl" href="#dom-backgroundfetchsettledevent-fetches" id="ref-for-dom-backgroundfetchsettledevent-fetches">fetches</a></code>
-           <dd data-md="">
-            <p>A new <code class="idl"><a data-link-type="idl" href="#backgroundfetchsettledfetches" id="ref-for-backgroundfetchsettledfetches">BackgroundFetchSettledFetches</a></code>. TODO: associate this with <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-records" id="ref-for-background-fetch-records②">records</a>.</p>
-          </dl>
-          <p class="issue" id="issue-75d0102a"><a class="self-link" href="#issue-75d0102a"></a> The above prose is based on <a href="https://github.com/w3c/ServiceWorker/pull/1199">ServiceWorker/#1199</a>.</p>
-         <li data-md="">
-          <p>Otherwise, if <var>abandoned</var> is true, then <a data-link-type="dfn">fire a functional event</a> named "<code>backgroundfetchfail</code>" using <code class="idl"><a data-link-type="idl" href="#backgroundfetchupdateevent" id="ref-for-backgroundfetchupdateevent">BackgroundFetchUpdateEvent</a></code> on <var>swRegistration</var> with the following properties:</p>
-          <dl>
-           <dt data-md=""><code class="idl"><a data-link-type="idl" href="#dom-backgroundfetchsettledevent-fetches" id="ref-for-dom-backgroundfetchsettledevent-fetches①">fetches</a></code>
-           <dd data-md="">
-            <p>A new <code class="idl"><a data-link-type="idl" href="#backgroundfetchsettledfetches" id="ref-for-backgroundfetchsettledfetches①">BackgroundFetchSettledFetches</a></code>. TODO: associate this with <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-records" id="ref-for-background-fetch-records③">records</a>.</p>
-          </dl>
-         <li data-md="">
-          <p>Otherwise, <a data-link-type="dfn">fire a functional event</a> named "<code>backgroundfetched</code>" using <code class="idl"><a data-link-type="idl" href="#backgroundfetchupdateevent" id="ref-for-backgroundfetchupdateevent①">BackgroundFetchUpdateEvent</a></code> on <var>swRegistration</var> with the following properties:</p>
-          <dl>
-           <dt data-md=""><code class="idl"><a data-link-type="idl" href="#dom-backgroundfetchsettledevent-fetches" id="ref-for-dom-backgroundfetchsettledevent-fetches②">fetches</a></code>
-           <dd data-md="">
-            <p>A new <code class="idl"><a data-link-type="idl" href="#backgroundfetchsettledfetches" id="ref-for-backgroundfetchsettledfetches②">BackgroundFetchSettledFetches</a></code>. TODO: associate this with <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-records" id="ref-for-background-fetch-records④">records</a>.</p>
-          </dl>
-        </ol>
+        <p>If <var>activeBgFetches</var> <a data-link-type="dfn" href="#active-background-fetches-contains" id="ref-for-active-background-fetches-contains">contains</a> <var>bgFetch</var>, then remove <var>activeBgFetches</var>[<var>id</var>].</p>
+       <li data-md="">
+        <p>Otherwise, set <var>operationAborted</var> to true.</p>
+        <p class="note" role="note"><span>Note:</span> This handles a race condition where <code class="idl"><a data-link-type="idl" href="#dom-backgroundfetchregistration-abort" id="ref-for-dom-backgroundfetchregistration-abort">abort()</a></code> was successfully called but one of the fetches failed at the same time. If we’ve returned true from <code class="idl"><a data-link-type="idl" href="#dom-backgroundfetchregistration-abort" id="ref-for-dom-backgroundfetchregistration-abort①">abort()</a></code>, this ensures we fire the related abort event.</p>
+       <li data-md="">
+        <p>If <var>operationAborted</var> is true, then <a data-link-type="dfn">fire a functional event</a> named "<code>backgroundfetchabort</code>" using <code class="idl"><a data-link-type="idl" href="#backgroundfetchsettledevent" id="ref-for-backgroundfetchsettledevent">BackgroundFetchSettledEvent</a></code> on <var>swRegistration</var> with the following properties:</p>
+        <dl>
+         <dt data-md=""><code class="idl"><a data-link-type="idl" href="#dom-backgroundfetchsettledevent-fetches" id="ref-for-dom-backgroundfetchsettledevent-fetches">fetches</a></code>
+         <dd data-md="">
+          <p>A new <code class="idl"><a data-link-type="idl" href="#backgroundfetchsettledfetches" id="ref-for-backgroundfetchsettledfetches">BackgroundFetchSettledFetches</a></code>. TODO: associate this with <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-records" id="ref-for-background-fetch-records②">records</a>.</p>
+        </dl>
+        <p class="issue" id="issue-75d0102a"><a class="self-link" href="#issue-75d0102a"></a> The above prose is based on <a href="https://github.com/w3c/ServiceWorker/pull/1199">ServiceWorker/#1199</a>.</p>
+       <li data-md="">
+        <p>Otherwise, if <var>abandoned</var> is true, then <a data-link-type="dfn">fire a functional event</a> named "<code>backgroundfetchfail</code>" using <code class="idl"><a data-link-type="idl" href="#backgroundfetchupdateevent" id="ref-for-backgroundfetchupdateevent">BackgroundFetchUpdateEvent</a></code> on <var>swRegistration</var> with the following properties:</p>
+        <dl>
+         <dt data-md=""><code class="idl"><a data-link-type="idl" href="#dom-backgroundfetchsettledevent-fetches" id="ref-for-dom-backgroundfetchsettledevent-fetches①">fetches</a></code>
+         <dd data-md="">
+          <p>A new <code class="idl"><a data-link-type="idl" href="#backgroundfetchsettledfetches" id="ref-for-backgroundfetchsettledfetches①">BackgroundFetchSettledFetches</a></code>. TODO: associate this with <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-records" id="ref-for-background-fetch-records③">records</a>.</p>
+        </dl>
+       <li data-md="">
+        <p>Otherwise, <a data-link-type="dfn">fire a functional event</a> named "<code>backgroundfetched</code>" using <code class="idl"><a data-link-type="idl" href="#backgroundfetchupdateevent" id="ref-for-backgroundfetchupdateevent①">BackgroundFetchUpdateEvent</a></code> on <var>swRegistration</var> with the following properties:</p>
+        <dl>
+         <dt data-md=""><code class="idl"><a data-link-type="idl" href="#dom-backgroundfetchsettledevent-fetches" id="ref-for-dom-backgroundfetchsettledevent-fetches②">fetches</a></code>
+         <dd data-md="">
+          <p>A new <code class="idl"><a data-link-type="idl" href="#backgroundfetchsettledfetches" id="ref-for-backgroundfetchsettledfetches②">BackgroundFetchSettledFetches</a></code>. TODO: associate this with <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-records" id="ref-for-background-fetch-records④">records</a>.</p>
+        </dl>
       </ol>
     </ol>
    </div>
@@ -1932,6 +1932,8 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
          <p>If storing <var>bgFetch</var> fails due to exceeding a quota limit, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise" id="ref-for-reject-promise">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#quotaexceedederror" id="ref-for-quotaexceedederror">QuotaExceededError</a></code> <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#idl-DOMException" id="ref-for-idl-DOMException">DOMException</a></code> and abort these steps.</p>
         <li data-md="">
          <p><a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#resolve-promise" id="ref-for-resolve-promise">Resolve</a> <var>promise</var> with the result of <a data-link-type="dfn" href="#get-a-backgroundfetchregistration-instance" id="ref-for-get-a-backgroundfetchregistration-instance②">getting a BackgroundFetchRegistration instance</a> passing <var>bgFetchInstances</var> and <var>bgFetch</var>.</p>
+        <li data-md="">
+         <p><a data-link-type="dfn" href="#attempt-a-background-fetch" id="ref-for-attempt-a-background-fetch①">Attempt a background fetch</a> with <var>bgFetch</var>.</p>
        </ol>
       <li data-md="">
        <p>Return <var>promise</var>.</p>
@@ -2837,6 +2839,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
    <b><a href="#attempt-a-background-fetch">#attempt-a-background-fetch</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-attempt-a-background-fetch">3.1. Attempt a background fetch</a>
+    <li><a href="#ref-for-attempt-a-background-fetch①">4.3.1. fetch()</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="report-progress-for-background-fetch">

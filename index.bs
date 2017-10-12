@@ -124,28 +124,28 @@ A <dfn>background fetch record</dfn> consists of:
       1. If at any point |stream| becomes [=stream/errored=], then:
         1. If |response|'s [=response/aborted flag=] is set, then set |aborted| to true.
         1. Set |abandoned| to true. TODO: if |aborted| isn't true, this could be another resume point.
-    1. Wait for either |abandoned| to be true, or |completeFetches| to be |bgFetch|'s [=background fetch/records=]'s [=list/size=].
-    1. Let |operationAborted| be |aborted|.
-    1. If |abandoned| is true:
-        1. TODO: terminate all related fetches.
-    1. [=Enqueue the following steps=] to |swRegistration|'s [=active background fetches edit queue=]:
-      1. Let |activeBgFetches| be |swRegistration|'s [=active background fetches=].
-      1. Let |id| be |bgFetch|'s [=background fetch/id=].
-      1. If |activeBgFetches| [=active background fetches/contains=] |bgFetch|, then remove |activeBgFetches|[|id|].
-      1. Otherwise, set |operationAborted| to true.
+  1. Wait for either |abandoned| to be true, or |completeFetches| to be |bgFetch|'s [=background fetch/records=]'s [=list/size=].
+  1. Let |operationAborted| be |aborted|.
+  1. If |abandoned| is true:
+      1. TODO: terminate all related fetches.
+  1. [=Enqueue the following steps=] to |swRegistration|'s [=active background fetches edit queue=]:
+    1. Let |activeBgFetches| be |swRegistration|'s [=active background fetches=].
+    1. Let |id| be |bgFetch|'s [=background fetch/id=].
+    1. If |activeBgFetches| [=active background fetches/contains=] |bgFetch|, then remove |activeBgFetches|[|id|].
+    1. Otherwise, set |operationAborted| to true.
 
-        Note: This handles a race condition where {{BackgroundFetchRegistration/abort()}} was successfully called but one of the fetches failed at the same time. If we've returned true from {{BackgroundFetchRegistration/abort()}}, this ensures we fire the related abort event.
-      1. If |operationAborted| is true, then [=fire a functional event=] named "`backgroundfetchabort`" using {{BackgroundFetchSettledEvent}} on |swRegistration| with the following properties:
-        : {{BackgroundFetchSettledEvent/fetches}}
-        :: A new {{BackgroundFetchSettledFetches}}. TODO: associate this with |bgFetch|'s [=background fetch/records=].
+      Note: This handles a race condition where {{BackgroundFetchRegistration/abort()}} was successfully called but one of the fetches failed at the same time. If we've returned true from {{BackgroundFetchRegistration/abort()}}, this ensures we fire the related abort event.
+    1. If |operationAborted| is true, then [=fire a functional event=] named "`backgroundfetchabort`" using {{BackgroundFetchSettledEvent}} on |swRegistration| with the following properties:
+      : {{BackgroundFetchSettledEvent/fetches}}
+      :: A new {{BackgroundFetchSettledFetches}}. TODO: associate this with |bgFetch|'s [=background fetch/records=].
 
-        Issue: The above prose is based on [ServiceWorker/#1199](https://github.com/w3c/ServiceWorker/pull/1199).
-      1. Otherwise, if |abandoned| is true, then [=fire a functional event=] named "`backgroundfetchfail`" using {{BackgroundFetchUpdateEvent}} on |swRegistration| with the following properties:
-        : {{BackgroundFetchSettledEvent/fetches}}
-        :: A new {{BackgroundFetchSettledFetches}}. TODO: associate this with |bgFetch|'s [=background fetch/records=].
-      1. Otherwise, [=fire a functional event=] named "`backgroundfetched`" using {{BackgroundFetchUpdateEvent}} on |swRegistration| with the following properties:
-        : {{BackgroundFetchSettledEvent/fetches}}
-        :: A new {{BackgroundFetchSettledFetches}}. TODO: associate this with |bgFetch|'s [=background fetch/records=].
+      Issue: The above prose is based on [ServiceWorker/#1199](https://github.com/w3c/ServiceWorker/pull/1199).
+    1. Otherwise, if |abandoned| is true, then [=fire a functional event=] named "`backgroundfetchfail`" using {{BackgroundFetchUpdateEvent}} on |swRegistration| with the following properties:
+      : {{BackgroundFetchSettledEvent/fetches}}
+      :: A new {{BackgroundFetchSettledFetches}}. TODO: associate this with |bgFetch|'s [=background fetch/records=].
+    1. Otherwise, [=fire a functional event=] named "`backgroundfetched`" using {{BackgroundFetchUpdateEvent}} on |swRegistration| with the following properties:
+      : {{BackgroundFetchSettledEvent/fetches}}
+      :: A new {{BackgroundFetchSettledFetches}}. TODO: associate this with |bgFetch|'s [=background fetch/records=].
 </div>
 
 ## [=Report progress for background fetch=] ## {#report-progress-for-background-fetch-algorithm}
@@ -321,6 +321,7 @@ dictionary IconDefinition {
       1. Set |bgFetchMap|[|id|] to |bgFetch|.
       1. If storing |bgFetch| fails due to exceeding a quota limit, [=reject=] |promise| with a {{QuotaExceededError}} {{DOMException}} and abort these steps.
       1. [=Resolve=] |promise| with the result of [=getting a BackgroundFetchRegistration instance=] passing |bgFetchInstances| and |bgFetch|.
+      1. [=Attempt a background fetch=] with |bgFetch|.
     1. Return |promise|.
   </div>
 
