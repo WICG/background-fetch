@@ -175,7 +175,7 @@ A <dfn>background fetch record</dfn> consists of:
   To <dfn data-lt="get a BackgroundFetchRegistration instance|getting a BackgroundFetchRegistration instance">get a BackgroundFetchRegistration instance</dfn> for an |instancesMap| (a [=BackgroundFetchRegistration instances=]) and a |bgFetch| (a [=/background fetch=]), run these steps:
 
   1. If |instancesMap|[|bgFetch|] [=map/exists=], then return |instancesMap|[|bgFetch|].
-  1. Let |instance| be a new {{BackgroundFetchRegistration}} whose [=BackgroundFetchRegistration/background fetch=] is set to |bgFetch|.
+  1. Let |instance| be a new {{BackgroundFetchRegistration}} in the parent {{BackgroundFetchManager}}'s [=relevant Realm=], and set it's [=BackgroundFetchRegistration/background fetch=] to |bgFetch|.
   1. Set |instancesMap|[|bgFetch|] to |instance|.
   1. Return |instance|.
 
@@ -321,10 +321,11 @@ dictionary IconDefinition {
         :: |options|' `title` member.
         : [=background fetch/service worker registration=]
         :: |registration|.
-      1. Set |bgFetchMap|[|id|] to |bgFetch|.
       1. If storing |bgFetch| fails due to exceeding a quota limit, [=reject=] |promise| with a {{QuotaExceededError}} {{DOMException}} and abort these steps.
-      1. [=Resolve=] |promise| with the result of [=getting a BackgroundFetchRegistration instance=] passing |bgFetchInstances| and |bgFetch|.
-      1. [=Attempt a background fetch=] with |bgFetch|.
+      1. Set |bgFetchMap|[|id|] to |bgFetch|.
+      1. [=Queue a task=] to run these steps:
+        1. [=Resolve=] |promise| with the result of [=getting a BackgroundFetchRegistration instance=] passing |bgFetchInstances| and |bgFetch|.
+      1. [=In parallel=], [=attempt a background fetch=] with |bgFetch|.
     1. Return |promise|.
   </div>
 
