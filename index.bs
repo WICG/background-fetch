@@ -292,11 +292,6 @@ dictionary IconDefinition {
     1. [=list/For each=] |request| of |requests|:
       1. Let |internalRequest| be the [=Request/request=] of the result of invoking the {{Request}} constructor with |request|.
       1. If |internalRequest|'s [=request/mode=] is "`no-cors`", then return [=a promise rejected with=] a {{TypeError}}.
-      1. If |internalRequest|'s [=request/body=] is not null, then:
-        1. If |internalRequest|'s [=request/body=]'s [=body/source=] is a {{ReadableStream}}, then return [=a promise rejected with=] a {{TypeError}}.
-        1. Increment |uploadTotal| by |internalRequest|'s [=request/body=]'s [=body/total bytes=].
-
-          Issue: This isn't correctly set in fetch ([issue](https://github.com/whatwg/fetch/issues/604)).
       1. Set |internalRequest|'s [=request/client=] to null.
       1. Let |record| be a new [=background fetch record=].
       1. Set |record|'s [=background fetch record/request=] to |internalReqeust|.
@@ -305,7 +300,23 @@ dictionary IconDefinition {
     1. [=Enqueue the following steps=] to |registration|'s [=active background fetches edit queue=]:
       1. Let |bgFetchMap| be |registration|'s [=active background fetches=].
       1. If |registration|'s [=service worker registration/active worker=] is null, then reject |promise| with a {{TypeError}} and abort these steps.
-      1. If |bgFetchMap|[|id|] [=map/exists=], reject |promise| with a {{TypeError}} and abort these steps.
+      1. If |bgFetchMap|[|id|] [=map/exists=], [=reject=] |promise| with a {{TypeError}} and abort these steps.
+      1. Let |requestBodiesRemaining| be the [=list/size=] of |requests|.
+      1. Let |requestReadAborted| be false.
+      1. [=list/For each=] |request| of |requests|:
+        1. If |request|'s [=request/body=] is null, then [=continue=].
+        1. Let |stream| be |request|'s [=request/body=]'s [=body/stream=].
+        1. Run these steps [=in parallel=]:
+          1. Run these steps but [=abort when=] |requestReadAborted| is true:
+            1. [=body/Wait=] for |request|'s [=request/body=].
+            1. If |stream| has [=stream/errored=], then set |requestReadAborted| to true.
+
+            Note: This ensures we have a copy of the request bytes before resolving.
+          1. [=If aborted=] and |stream| is [=stream/readable=], then [=stream/error=] |stream| with an {{AbortError}} {{DOMException}} and abort these steps.
+          1. Increment |uploadTotal| by |request|'s [=request/body=]'s [=body/total bytes=].
+          1. Decrement |requestBodiesRemaining| by 1.
+      1. Wait for |requestBodiesRemaining| to be 0, or |requestReadAborted| to be true.
+      1. If |requestReadAborted| is true, then [=reject=] |promise| with a {{TypeError}} and abort these steps.
       1. Let |bgFetch| be a new [=/background fetch=] with:
         : [=background fetch/id=]
         :: |id|.
