@@ -37,6 +37,8 @@ This specification aims to:
 
 # Infrastructure # {#infrastructure}
 
+The <dfn>background fetch task source</dfn> is a [=task source=]. All queued tasks in this specification use the [=background fetch task source=] unless otherwise noted.
+
 ## Extensions to service worker registration ## {#service-worker-registration-concept-extensions}
 
 A [=/service worker registration=] additionally has:
@@ -158,7 +160,7 @@ A <dfn>background fetch record</dfn> consists of:
   1. [=list/For each=] |record| in |bgFetch|'s [=background fetch/records=], increment |downloaded| by the number of bytes in [=background fetch record/response body=].
   1. If |downloaded| is equal to |bgFetch|'s [=background fetch/last reported download=], then abort these steps.
   1. Set |bgFetch|'s [=background fetch/last reported download=] to |downloaded|.
-  1. For each [=environment settings object=] |env| whose [=environment settings object/origin=] is equal to |bgFetch|'s [=background fetch/service worker registration=]'s [=service worker registration/scope URL=]'s [=url/origin=], [=queue a task=] on |env|'s [=environment settings object/responsible event loop=] using the [=networking task source=] to run the following steps:
+  1. For each [=environment settings object=] |env| whose [=environment settings object/origin=] is equal to |bgFetch|'s [=background fetch/service worker registration=]'s [=service worker registration/scope URL=]'s [=url/origin=], [=queue a task=] on |env|'s [=environment settings object/responsible event loop=] to run these steps:
     1. Let |bgFetchRegistration| be the instance of {{BackgroundFetchRegistration}} within this environment whose [=BackgroundFetchRegistration/background fetch=] is equal to |bgFetch|, or null if none exists.
 
       Note: There will be at most one per environment, because of the [=get a BackgroundFetchRegistration instance=] algorithm.
