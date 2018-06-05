@@ -1,3 +1,4 @@
+
 <pre class="metadata">
 Title: Background Fetch
 Shortname: background-fetch
@@ -122,7 +123,11 @@ A <dfn>background fetch record</dfn> consists of:
       1. Let |request| be a copy of |record|'s [=background fetch record/request=].
       1. Set |request|'s [=request/keepalive flag=].
       1. Set |request|'s [=request/synchronous flag=].
-      1. [=request/Add a range header=] to |request| with the [=byte sequence/length=] of |record|'s [=background fetch record/response body=].
+      1. Let |currentBodyLength| be the [=byte sequence/length=] of |record|'s [=background fetch record/response body=].
+      1. If |currentBodyLength| is not 0, then [=request/add a range header=] to |request| with |currentLength|.
+
+        Note: This allows the initially request to make use of content encoding, since `Accept-Encoding: identity` is added to requests with a range header.
+
       1. Let |response| be the result of [=/fetching=] |request|.
 
         Issue: Fetch waits for the body before returning |response|. Let's pretend it *doesn't* do that ([issue](https://github.com/whatwg/fetch/issues/536#issuecomment-330184276)).

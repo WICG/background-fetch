@@ -1211,9 +1211,9 @@ Possible extra rowspan handling
 		}
 	}
 </style>
-  <meta content="Bikeshed version 1a927b7d2ff9a70dcdc5dc9f892fd154b7b64097" name="generator">
+  <meta content="Bikeshed version 6bebf68aed1298eb5349b6cdea3fab1e79551a6f" name="generator">
   <link href="https://wicg.github.io/background-fetch/" rel="canonical">
-  <meta content="ab2b692e121c586f33d1b6de2b393ff98cedec3f" name="document-revision">
+  <meta content="4a2cc52443094d8f6dd5b38ccebd4bbe8a0e7246" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1471,7 +1471,7 @@ pre.highlight, pre > code.highlight { display: block; padding: 1em; margin: .5em
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">Background Fetch</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Editor’s Draft, <time class="dt-updated" datetime="2018-05-23">23 May 2018</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Editor’s Draft, <time class="dt-updated" datetime="2018-06-04">4 June 2018</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1664,7 +1664,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
       <li data-md="">
        <p>The UI may remain once the operation is complete, in which case it can still be activated.</p>
      </ul>
-     <p>Additionally, the user agent may initially set <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-paused-flag" id="ref-for-background-fetch-paused-flag②">paused flag</a> and allow the user to either accept the background fetch (unsetting <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-paused-flag" id="ref-for-background-fetch-paused-flag③">paused flag</a>), or refuse the background fetch (aborting TODO hook this up).</p>
+     <p>The user agent may initially set <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-paused-flag" id="ref-for-background-fetch-paused-flag②">paused flag</a>, and allow the user to either accept the background fetch (unsetting <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-paused-flag" id="ref-for-background-fetch-paused-flag③">paused flag</a>), or refuse the background fetch (aborting TODO hook this up).</p>
      <p class="note" role="note"><span>Note:</span> The user agent may consider this if the user is on a metered connection, or the background fetch was started in the background.</p>
     </div>
    </div>
@@ -1714,7 +1714,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
          <li data-md="">
           <p>Set <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#synchronous-flag" id="ref-for-synchronous-flag">synchronous flag</a>.</p>
          <li data-md="">
-          <p><a data-link-type="dfn">Add a range header</a> to <var>request</var> with the <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#byte-sequence-length" id="ref-for-byte-sequence-length">length</a> of <var>record</var>’s <a data-link-type="dfn" href="#background-fetch-record-response-body" id="ref-for-background-fetch-record-response-body">response body</a>.</p>
+          <p><a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-add-range-header" id="ref-for-concept-request-add-range-header">Add a range header</a> to <var>request</var> with the <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#byte-sequence-length" id="ref-for-byte-sequence-length">length</a> of <var>record</var>’s <a data-link-type="dfn" href="#background-fetch-record-response-body" id="ref-for-background-fetch-record-response-body">response body</a>.</p>
          <li data-md="">
           <p>Let <var>response</var> be the result of <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-fetch" id="ref-for-concept-fetch④">fetching</a> <var>request</var>.</p>
           <p class="issue" id="issue-f513fa3a"><a class="self-link" href="#issue-f513fa3a"></a> Fetch waits for the body before returning <var>response</var>. Let’s pretend it <em>doesn’t</em> do that (<a href="https://github.com/whatwg/fetch/issues/536#issuecomment-330184276">issue</a>).</p>
@@ -1873,14 +1873,11 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
      <li data-md="">
       <p class="assertion">Assert: <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-header-list" id="ref-for-concept-request-header-list">header list</a> <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#header-list-contains" id="ref-for-header-list-contains">contains</a> `<code>Range</code>`.</p>
      <li data-md="">
-      <p>If <var>partialResponse</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-status" id="ref-for-concept-response-status②">status</a> is not <code>206</code>, then return invalid.</p>
+      <p class="assertion">Assert: <var>partialResponse</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-status" id="ref-for-concept-response-status②">status</a> is <code>206</code>.</p>
      <li data-md="">
       <p>Let <var>rangeValue</var> be the <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-value" id="ref-for-concept-header-value">value</a> of the first <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header" id="ref-for-concept-header">header</a> whose <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-name" id="ref-for-concept-header-name">name</a> is a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#byte-case-insensitive" id="ref-for-byte-case-insensitive">byte-case-insensitive</a> match for `<code>Range</code>` in <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-header-list" id="ref-for-concept-request-header-list①">header list</a>.</p>
      <li data-md="">
       <p>If parsing <var>rangeValue</var> per <a data-link-type="dfn" href="#single-byte-range" id="ref-for-single-byte-range">single byte range</a> fails, then return invalid.</p>
-     <li data-md="">
-      <p>Let <var>requestFirstBytePos</var> be the portion of <var>rangeValue</var> named <code>first-byte-pos</code> when parsed as a <a data-link-type="dfn" href="#single-byte-range" id="ref-for-single-byte-range①">single byte range</a>, parsed as an integer.</p>
-      <p class="issue" id="issue-cddfe468"><a class="self-link" href="#issue-cddfe468"></a> Parsing as an integer <a href="https://github.com/whatwg/infra/issues/189">infra/189</a>.</p>
      <li data-md="">
       <p>Let <var>responseFirstBytePos</var>, <var>responseLastBytePos</var>, and <var>responseCompleteLength</var> be the result of <a data-link-type="dfn" href="#extract-content-range-values" id="ref-for-extract-content-range-values">extracting content-range values</a> from <var>partialResponse</var>. If this fails, then return invalid.</p>
      <li data-md="">
@@ -1892,20 +1889,19 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
         <p>If <var>previousPartialResponse</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-header-list" id="ref-for-concept-response-header-list">header list</a> <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#header-list-contains" id="ref-for-header-list-contains①">contains</a> `<code>ETag</code>`, and <a data-link-type="dfn" href="#header-equality" id="ref-for-header-equality">header equality</a> for `<code>ETag</code>`, <var>previousPartialResponse</var>, and <var>partialResponse</var> is false, then return invalid.</p>
        <li data-md="">
         <p>If <var>previousPartialResponse</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-header-list" id="ref-for-concept-response-header-list①">header list</a> <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#header-list-contains" id="ref-for-header-list-contains②">contains</a> `<code>Last-Modified</code>`, and <a data-link-type="dfn" href="#header-equality" id="ref-for-header-equality①">header equality</a> for `<code>Last-Modified</code>`, <var>previousPartialResponse</var>, and <var>partialResponse</var> is false, then return invalid.</p>
+       <li data-md="">
+        <p>If <var>responseCompleteLength</var> is not null, then:</p>
+        <ol>
+         <li data-md="">
+          <p>Let <var>previousResponseFirstBytePos</var>, <var>previousResponseLastBytePos</var>, and <var>previousResponseCompleteLength</var> be the result of <a data-link-type="dfn" href="#extract-content-range-values" id="ref-for-extract-content-range-values①">extracting content-range values</a> from <var>previousPartialResponse</var>. If this fails, then return invalid.</p>
+         <li data-md="">
+          <p>If <var>responseCompleteLength</var> does not equal <var>previousResponseCompleteLength</var>, then return invalid.</p>
+        </ol>
       </ol>
+     <li data-md="">
+      <p>Return valid.</p>
     </ol>
    </div>
-   <p></p>
-   <li data-md="">
-    <p>If <var>responseCompleteLength</var> is not null, then:</p>
-    <ol>
-     <li data-md="">
-      <p>Let <var>previousResponseFirstBytePos</var>, <var>previousResponseLastBytePos</var>, and <var>previousResponseCompleteLength</var> be the result of <a data-link-type="dfn" href="#extract-content-range-values" id="ref-for-extract-content-range-values①">extracting content-range values</a> from <var>previousPartialResponse</var>. If this fails, then return invalid.</p>
-     <li data-md="">
-      <p>If <var>responseCompleteLength</var> does not equal <var>previousResponseCompleteLength</var>, then return invalid.</p>
-    </ol>
-   <li data-md="">
-    <p>Return valid.</p>
    <h3 class="heading settled" data-level="3.5" id="extract-content-range-values-algorithm"><span class="secno">3.5. </span><span class="content"><a data-link-type="dfn" href="#extract-content-range-values" id="ref-for-extract-content-range-values②">Extract content-range values</a></span><a class="self-link" href="#extract-content-range-values-algorithm"></a></h3>
    <div class="algorithm" data-algorithm="extract content-range values">
      To <dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="extract content-range values|extracting content-range values" data-noexport="" id="extract-content-range-values">extract content-range values</dfn> from a <var>response</var> (a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response" id="ref-for-concept-response③">response</a>), run these steps: 
@@ -1927,7 +1923,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
      <li data-md="">
       <p>Return <var>firstBytePos</var>, <var>lastBytePos</var>, and <var>completeLength</var>.</p>
     </ol>
-    <p class="issue" id="issue-cddfe468①"><a class="self-link" href="#issue-cddfe468①"></a> Parsing as an integer <a href="https://github.com/whatwg/infra/issues/189">infra/189</a>.</p>
+    <p class="issue" id="issue-cddfe468"><a class="self-link" href="#issue-cddfe468"></a> Parsing as an integer <a href="https://github.com/whatwg/infra/issues/189">infra/189</a>.</p>
    </div>
    <h3 class="heading settled" data-level="3.6" id="header-equality-algorithm"><span class="secno">3.6. </span><span class="content"><a data-link-type="dfn" href="#header-equality" id="ref-for-header-equality②">Header equality</a></span><a class="self-link" href="#header-equality-algorithm"></a></h3>
    <div class="algorithm" data-algorithm="header equality">
@@ -2730,6 +2726,12 @@ complete-length = ( 1*DIGIT / "*" )</pre>
     <li><a href="#ref-for-concept-aborted-network-error">3.1. Attempt a background fetch</a>
    </ul>
   </aside>
+  <aside class="dfn-panel" data-for="term-for-concept-request-add-range-header">
+   <a href="https://fetch.spec.whatwg.org/#concept-request-add-range-header">https://fetch.spec.whatwg.org/#concept-request-add-range-header</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-concept-request-add-range-header">3.1. Attempt a background fetch</a>
+   </ul>
+  </aside>
   <aside class="dfn-panel" data-for="term-for-concept-response-body">
    <a href="https://fetch.spec.whatwg.org/#concept-response-body">https://fetch.spec.whatwg.org/#concept-response-body</a><b>Referenced in:</b>
    <ul>
@@ -3248,6 +3250,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
      <li><span class="dfn-paneled" id="term-for-response" style="color:initial">Response</span>
      <li><span class="dfn-paneled" id="term-for-concept-response-aborted" style="color:initial">aborted flag</span>
      <li><span class="dfn-paneled" id="term-for-concept-aborted-network-error" style="color:initial">aborted network error</span>
+     <li><span class="dfn-paneled" id="term-for-concept-request-add-range-header" style="color:initial">add a range header</span>
      <li><span class="dfn-paneled" id="term-for-concept-response-body" style="color:initial">body <small>(for response)</small></span>
      <li><span class="dfn-paneled" id="term-for-concept-request-client" style="color:initial">client</span>
      <li><span class="dfn-paneled" id="term-for-header-list-contains" style="color:initial">contains</span>
@@ -3485,7 +3488,6 @@ complete-length = ( 1*DIGIT / "*" )</pre>
    <div class="issue"> Is "user agent is offline" hand-waving too much? Also discussed in <a href="https://github.com/whatwg/fetch/issues/526#issuecomment-380686368">fetch/526</a>.<a href="#issue-6a6d7250"> ↵ </a></div>
    <div class="issue"> The above prose is based on <a href="https://github.com/w3c/ServiceWorker/pull/1199">ServiceWorker/#1199</a>.<a href="#issue-b11043f2"> ↵ </a></div>
    <div class="issue"> Parsing as an integer <a href="https://github.com/whatwg/infra/issues/189">infra/189</a>.<a href="#issue-cddfe468"> ↵ </a></div>
-   <div class="issue"> Parsing as an integer <a href="https://github.com/whatwg/infra/issues/189">infra/189</a>.<a href="#issue-cddfe468①"> ↵ </a></div>
   </div>
   <aside class="dfn-panel" data-for="background-fetch-task-source">
    <b><a href="#background-fetch-task-source">#background-fetch-task-source</a></b><b>Referenced in:</b>
@@ -3694,7 +3696,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
   <aside class="dfn-panel" data-for="single-byte-range">
    <b><a href="#single-byte-range">#single-byte-range</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-single-byte-range">3.4. Validate a partial response</a> <a href="#ref-for-single-byte-range①">(2)</a>
+    <li><a href="#ref-for-single-byte-range">3.4. Validate a partial response</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="single-byte-content-range">
