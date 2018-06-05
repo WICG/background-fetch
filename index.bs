@@ -86,7 +86,7 @@ A <dfn>background fetch</dfn> consists of:
     * The UI may be activated (for example, by clicking), in which case it must TODO hook this up to the event.
     * The UI may remain once the operation is complete, in which case it can still be activated.
 
-    Additionally, the user agent may initially set |bgFetch|'s [=background fetch/paused flag=] and allow the user to either accept the background fetch (unsetting |bgFetch|'s [=background fetch/paused flag=]), or refuse the background fetch (aborting TODO hook this up).
+    The user agent may initially set |bgFetch|'s [=background fetch/paused flag=], and allow the user to either accept the background fetch (unsetting |bgFetch|'s [=background fetch/paused flag=]), or refuse the background fetch (aborting TODO hook this up).
 
     Note: The user agent may consider this if the user is on a metered connection, or the background fetch was started in the background.
   </div>
@@ -217,22 +217,19 @@ A <dfn>background fetch record</dfn> consists of:
   To <dfn>validate a partial response</dfn> for a |request| (a [=/request=]), a |partialResponse| (a [=/response=]), and an optional |previousPartialResponse| (a [=/response=] or null, null unless otherwise specified), run these steps:
 
   1. Assert: |request|'s [=request/header list=] [=header list/contains=] \``Range`\`.
-  1. If |partialResponse|'s [=response/status=] is not `206`, then return invalid.
+  1. Assert: |partialResponse|'s [=response/status=] is `206`.
   1. Let |rangeValue| be the [=header/value=] of the first [=header=] whose [=header/name=] is a [=byte-case-insensitive=] match for \``Range`\` in |request|'s [=request/header list=].
   1. If parsing |rangeValue| per [=single byte range=] fails, then return invalid.
-  1. Let |requestFirstBytePos| be the portion of |rangeValue| named `first-byte-pos` when parsed as a [=single byte range=], parsed as an integer.
-
-    Issue: Parsing as an integer [infra/189](https://github.com/whatwg/infra/issues/189).
-
   1. Let |responseFirstBytePos|, |responseLastBytePos|, and |responseCompleteLength| be the result of [=extracting content-range values=] from |partialResponse|. If this fails, then return invalid.
   1. If |requestFirstBytePos| does not equal |responseFirstBytePos|, then return invalid.
   1. If |previousPartialResponse| is given, then:
     1. If |previousPartialResponse|'s [=response/header list=] [=header list/contains=] \``ETag`\`, and [=header equality=] for \``ETag`\`, |previousPartialResponse|, and |partialResponse| is false, then return invalid.
-    1. If |previousPartialResponse|'s [=response/header list=] [=header list/contains=] \``Last-Modified`\`, and [=header equality=] for \``Last-Modified`\`, |previousPartialResponse|, and |partialResponse| is false, then return invalid.</div>
+    1. If |previousPartialResponse|'s [=response/header list=] [=header list/contains=] \``Last-Modified`\`, and [=header equality=] for \``Last-Modified`\`, |previousPartialResponse|, and |partialResponse| is false, then return invalid.
     1. If |responseCompleteLength| is not null, then:
       1. Let |previousResponseFirstBytePos|, |previousResponseLastBytePos|, and |previousResponseCompleteLength| be the result of [=extracting content-range values=] from |previousPartialResponse|. If this fails, then return invalid.
       1. If |responseCompleteLength| does not equal |previousResponseCompleteLength|, then return invalid.
   1. Return valid.
+</div>
 
 ## [=Extract content-range values=] ## {#extract-content-range-values-algorithm}
 
