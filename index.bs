@@ -607,6 +607,18 @@ interface BackgroundFetchSettledFetch : BackgroundFetchFetch {
 
 <div dfn-for="BackgroundFetchSettledFetches">
   A {{BackgroundFetchSettledFetches}} object has <dfn>records</dfn> (a [=list=] of [=background fetch records=]).
+
+  <div algorithm>
+    The <dfn method>match(|request|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run these steps [=in parallel=]:
+
+    1. TODO
+  </div>
+
+  <div algorithm>
+    The <dfn method>values()</dfn> method, when invoked, must return [=a new promise=] |promise| and run these steps [=in parallel=]:
+
+    1. TODO
+  </div>
 </div>
 
 ### {{BackgroundFetchUpdateEvent}} ### {#background-fetch-update-event}
