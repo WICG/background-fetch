@@ -57,7 +57,6 @@ const bgFetchJob = await registration.backgroundFetch.get(id);
 `bgFetchJob` has the following members:
 
 * `id` - identifier string.
-* `downloadTotal` - as provided.
 * `uploadTotal` - total bytes to send.
 * `uploadProgress` - bytes sent so far.
 * `downloadTotal` - as provided.
