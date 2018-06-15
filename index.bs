@@ -80,7 +80,7 @@ A <dfn>background fetch</dfn> consists of:
 
     * The |bgFetch|'s [=background fetch/service worker registration=]'s [=service worker registration/scope url=]'s [=url/origin=] must be displayed.
     * The UI may display |bgFetch|'s [=background fetch/title=].
-    * The UI may display one of |bgFetch|'s [=background fetch/icons=].
+    * The UI may display one of |bgFetch|'s [=background fetch/icons=]. TODO: when to fetch this?
     * The UI may use |bgFetch|'s [=background fetch/download total=], [=background fetch/upload total=], [=background fetch/last reported download=], and [=background fetch/paused flag=] to present the progress of the fetch. TODO what about bytes uploaded? TODO how can I tell when the operation is complete?
     * The UI must provide a way for the user to abort |bgFetch|. TODO link up to algo.
     * The UI may provide a way to toggle |bgFetch|'s [=background fetch/paused flag=].
@@ -89,7 +89,7 @@ A <dfn>background fetch</dfn> consists of:
 
     The user agent may initially set |bgFetch|'s [=background fetch/paused flag=], and allow the user to either accept the background fetch (unsetting |bgFetch|'s [=background fetch/paused flag=]), or refuse the background fetch (aborting TODO hook this up).
 
-    Note: The user agent may consider this if the user is on a metered connection, or the background fetch was started in the background.
+    Note: The user agent may consider initially setting |bgFetch|'s [=background fetch/paused flag=] if the user is on a metered connection, or the background fetch was started in the background.
   </div>
 </div>
 
@@ -123,8 +123,8 @@ A <dfn>background fetch record</dfn> consists of:
       1. Let |request| be a copy of |record|'s [=background fetch record/request=].
       1. Set |request|'s [=request/keepalive flag=].
       1. Set |request|'s [=request/synchronous flag=].
-      1. Let |currentBodyLength| be the [=byte sequence/length=] of |record|'s [=background fetch record/response body=].
-      1. If |currentBodyLength| is not 0, then [=request/add a range header=] to |request| with |currentLength|.
+      1. Let |rangeStart| be the [=byte sequence/length=] of |record|'s [=background fetch record/response body=].
+      1. If |rangeStart| is not 0, then [=request/add a range header=] to |request| with |currentLength|.
 
         Note: This allows the initially request to make use of content encoding, since `Accept-Encoding: identity` is added to requests with a range header.
 
@@ -137,13 +137,13 @@ A <dfn>background fetch record</dfn> consists of:
 
           Issue: Is "user agent is offline" hand-waving too much? Also discussed in [fetch/526](https://github.com/whatwg/fetch/issues/526#issuecomment-380686368).
 
-          Note: If |request|'s [=request/method=] is not \``GET`\`, reissuing the request may have unwanted side effects. If a standard method to resume requests becomes available, we'll adopt it here.
+          Note: If |request|'s [=request/method=] is not \``GET`\`, reissuing the request may have unwanted side effects. If a standard method to resume requests becomes available, it'll be adopted here.
 
         1. If |response| is an [=aborted network error=], then set |aborted| to true.
         1. Set |abandoned| to true and abort these steps.
       1. If |response|'s [=response/status=] is not an [=ok status=], then set |abandoned| to true and abort these steps.
       1. If |response|'s [=response/status=] is `206`, then:
-        1. If [=validate a partial response=] for |request|, |response|, and |record|'s [=background fetch record/response=] returns invalid, then set |abandoned| to true and abort these steps.
+        1. If [=validate a partial response=] for |rangeStart|, |response|, and |record|'s [=background fetch record/response=] returns invalid, then set |abandoned| to true and abort these steps.
       1. Otherwise:
         1. Decrement |storedBytes| by the [=byte sequence/length=] of |record|'s [=background fetch record/response body=].
         1. Set |record|'s [=background fetch record/response body=] to an empty [=byte sequence=].
@@ -152,15 +152,23 @@ A <dfn>background fetch record</dfn> consists of:
         Note: This may be replacing an existing value. It's acceptable for earlier responses to be missing things like \``ETag`\` headers, and complete lengths from \``Content-Range`\` headers, but once a later response has them, we want to compare them against subsequent responses.
 
       1. Let |stream| be |response|'s [=response/body=]'s [=body/stream=].
+      1. Let |readEnded| be false.
+      1. Let |readComplete| be false.
       1. Whenever one or more bytes are transmitted from |stream|, let |bytes| be the transmitted bytes and run these steps:
+        1. Increment |storedBytes| by |bytes|' size.
+        1. If |storedBytes| is greater than |downloadTotal|, then set |abandoned| and |readEnded| to true and abort these steps.
         1. Append |bytes| to |record|'s [=background fetch record/response body=].
-        1. Increment |downloadTotal| by |bytes| size.
-        1. TODO check downloadTotal limit
         1. [=Report progress for background fetch=] |bgFetch|.
-      1. If at any point the bytes transmission for |stream| is done normally, then increment |completeFetches|.
+      1. If at any point the bytes transmission for |stream| is done normally, then:
+        1. Increment |completeFetches|.
+        1. Set |readComplete| to true.
+        1. Set |readEnded| to true.
       1. If at any point |stream| becomes [=stream/errored=], then:
-        1. If |response|'s [=response/aborted flag=] is set, then set |aborted| to true.
-        1. Set |abandoned| to true. TODO: if |aborted| isn't true, this could be another resume point.
+        1. If |response|'s [=response/aborted flag=] is set, then set |aborted| to true, and |abandoned| to true.
+        1. Set |readComplete| to true.
+      1. Wait for |readEnded| to be true.
+      1. If either of |readComplete| or |abandoned| is true, [=break=].
+      1. TODO handle "paused" being set after the first step in this block.
   1. Wait for either |abandoned| to be true, or |completeFetches| to be |bgFetch|'s [=background fetch/records=]'s [=list/size=].
   1. Let |operationAborted| be |aborted|.
   1. If |abandoned| is true:
@@ -173,6 +181,8 @@ A <dfn>background fetch record</dfn> consists of:
 
       Note: This handles a race condition where {{BackgroundFetchRegistration/abort()}} was successfully called but one of the fetches failed at the same time. If we've returned true from {{BackgroundFetchRegistration/abort()}}, this ensures we fire the related abort event.
     1. If |operationAborted| is true, then [=fire a functional event=] named "`backgroundfetchabort`" using {{BackgroundFetchSettledEvent}} on |swRegistration| with the following properties:
+      : {{BackgroundFetchEvent/id}}
+      :: |id|
       : {{BackgroundFetchSettledEvent/fetches}}
       :: A new {{BackgroundFetchSettledFetches}}. TODO: associate this with |bgFetch|'s [=background fetch/records=].
 
@@ -219,20 +229,17 @@ A <dfn>background fetch record</dfn> consists of:
 ## [=Validate a partial response=] ## {#validate-partial-response-algorithm}
 
 <div algorithm>
-  To <dfn>validate a partial response</dfn> for a |request| (a [=/request=]), a |partialResponse| (a [=/response=]), and an optional |previousPartialResponse| (a [=/response=] or null, null unless otherwise specified), run these steps:
+  To <dfn>validate a partial response</dfn> for an |expectedRangeStart| (a number), a |partialResponse| (a [=/response=]), and an optional |previousResponse| (a [=/response=] or null, null unless otherwise specified), run these steps:
 
-  1. Assert: |request|'s [=request/header list=] [=header list/contains=] \``Range`\`.
   1. Assert: |partialResponse|'s [=response/status=] is `206`.
-  1. Let |rangeValue| be the [=header/value=] of the first [=header=] whose [=header/name=] is a [=byte-case-insensitive=] match for \``Range`\` in |request|'s [=request/header list=].
-  1. If parsing |rangeValue| per [=single byte range=] fails, then return invalid.
   1. Let |responseFirstBytePos|, |responseLastBytePos|, and |responseCompleteLength| be the result of [=extracting content-range values=] from |partialResponse|. If this fails, then return invalid.
-  1. If |requestFirstBytePos| does not equal |responseFirstBytePos|, then return invalid.
-  1. If |previousPartialResponse| is given, then:
-    1. If |previousPartialResponse|'s [=response/header list=] [=header list/contains=] \``ETag`\`, and [=header equality=] for \``ETag`\`, |previousPartialResponse|, and |partialResponse| is false, then return invalid.
-    1. If |previousPartialResponse|'s [=response/header list=] [=header list/contains=] \``Last-Modified`\`, and [=header equality=] for \``Last-Modified`\`, |previousPartialResponse|, and |partialResponse| is false, then return invalid.
-    1. If |responseCompleteLength| is not null, then:
-      1. Let |previousResponseFirstBytePos|, |previousResponseLastBytePos|, and |previousResponseCompleteLength| be the result of [=extracting content-range values=] from |previousPartialResponse|. If this fails, then return invalid.
-      1. If |responseCompleteLength| does not equal |previousResponseCompleteLength|, then return invalid.
+  1. If |requestFirstBytePos| does not equal |expectedRangeStart|, then return invalid.
+  1. If |previousResponse| is not null, then:
+    1. If |previousResponse|'s [=response/header list=] [=header list/contains=] \``ETag`\`, and [=header equality=] for \``ETag`\`, |previousResponse|'s [=response/header list=], and |partialResponse|'s [=response/header list=] is false, then return invalid.
+    1. If |previousResponse|'s [=response/header list=] [=header list/contains=] \``Last-Modified`\`, and [=header equality=] for \``Last-Modified`\`, |previousResponse|'s [=response/header list=], and |partialResponse|'s [=response/header list=] is false, then return invalid.
+    1. If |previousResponse|'s [=response/status=] is `206`, then:
+      1. Let |previousResponseFirstBytePos|, |previousResponseLastBytePos|, and |previousResponseCompleteLength| be the result of [=extracting content-range values=] from |previousResponse|. If this fails, then return invalid.
+      1. If |previousResponseCompleteLength| is not null, and |responseCompleteLength| does not equal |previousResponseCompleteLength|, then return invalid.
   1. Return valid.
 </div>
 
@@ -256,29 +263,24 @@ A <dfn>background fetch record</dfn> consists of:
 ## [=Header equality=] ## {#header-equality-algorithm}
 
 <div algorithm>
-  To determine <dfn>header equality</dfn> for a |headerName| (a [=byte sequence=]), in |response1| (a [=/response=]), and |response2| (a [=/response=]), run these steps:
+  To determine <dfn>header equality</dfn> for a |headerName| (a [=byte sequence=]), in |headerList1| (a [=/header list=]), and |headerList2| (a [=/header list=]), run these steps:
 
-  1. If |response1|'s [=response/header list=] does not [=header list/contain=] |headerName|, and |response2|'s [=response/header list=] does not [=header list/contain=] |headerName|, then return true.
-  1. If |response1|'s [=response/header list=] [=header list/contains=] |headerName|, and |response2|'s [=response/header list=] [=header list/contains=] |headerName|, then:
-    1. Let |response1Value| be the [=header/value=] of the first [=header=] whose [=header/name=] is a [=byte-case-insensitive=] match for |headerName| in |response1|'s [=response/header list=].
-    1. Let |response2Value| be the [=header/value=] of the first [=header=] whose [=header/name=] is a [=byte-case-insensitive=] match for |headerName| in |response2|'s [=response/header list=].
-    1. If |response1Value| is identical to |response2Value|, then return true, otherwise return false.
+  1. If |headerList1| does not [=header list/contain=] |headerName|, and |headerList2| does not [=header list/contain=] |headerName|, then return true.
+  1. If |headerList1| [=header list/contains=] |headerName|, and |headerList2| [=header list/contains=] |headerName|, then:
+    1. Let |header1Value| be the [=header/value=] of the first [=header=] whose [=header/name=] is a [=byte-case-insensitive=] match for |headerName| in |headerList1|.
+    1. Let |header2Value| be the [=header/value=] of the first [=header=] whose [=header/name=] is a [=byte-case-insensitive=] match for |headerName| in |headerList2|.
+    1. If |header1Value| is identical to |header2Value|, then return true, otherwise return false.
   1. Return false.
 </div>
 
-# Range header syntax # {#range-header-syntax}
-
-The following is [=ABNF=] for a <dfn>single byte range</dfn>:
-
-<pre>
-"bytes=" first-byte-pos "-" [ last-byte-pos ]
-first-byte-pos = 1*DIGIT
-last-byte-pos  = 1*DIGIT</pre>
+# Header syntax # {#header-syntax}
 
 The following is [=ABNF=] for a <dfn>single byte content-range</dfn>:
 
 <pre>
 "bytes=" first-byte-pos "-" last-byte-pos "/" complete-length
+first-byte-pos = 1*DIGIT
+last-byte-pos  = 1*DIGIT
 complete-length = ( 1*DIGIT / "*" )</pre>
 
 # API # {#api}
@@ -584,7 +586,13 @@ interface BackgroundFetchSettledEvent : BackgroundFetchEvent {
 dictionary BackgroundFetchSettledEventInit : BackgroundFetchEventInit {
   required BackgroundFetchSettledFetches fetches;
 };
+</script>
 
+<div dfn-for="BackgroundFetchSettledEvent">
+  The <dfn attribute>fetches</dfn> attribute must return the value it was initialized to.
+</div>
+
+<script type="idl">
 [Exposed=ServiceWorker]
 interface BackgroundFetchSettledFetches {
   Promise<BackgroundFetchSettledFetch> match(RequestInfo request);
@@ -597,14 +605,8 @@ interface BackgroundFetchSettledFetch : BackgroundFetchFetch {
 };
 </script>
 
-<div dfn-for="BackgroundFetchSettledEvent">
-  The <dfn attribute>fetches</dfn> attribute must return TODO.
-</div>
-
-<div algorithm>
-  The <dfn constructor for="BackgroundFetchSettledEvent">BackgroundFetchSettledEvent(|type|, |init|)</dfn> constructor, when invoked, must run these steps:
-
-  1. TODO
+<div dfn-for="BackgroundFetchSettledFetches">
+  A {{BackgroundFetchSettledFetches}} object has <dfn>records</dfn> (a [=list=] of [=background fetch records=]).
 </div>
 
 ### {{BackgroundFetchUpdateEvent}} ### {#background-fetch-update-event}
