@@ -74,7 +74,6 @@ A <dfn>background fetch</dfn> consists of:
   * A <dfn>progress handling queue</dfn> (a [=parallel queue=]), initially the result of [=starting a new parallel queue=].
   * A <dfn>paused flag</dfn>, initially unset.
 
-
   <div algorithm>
     To <dfn>display</dfn> a [=/background fetch=] (|bgFetch|), the user agent must present a user interface that follows these rules:
 
@@ -101,6 +100,7 @@ A <dfn>background fetch record</dfn> consists of:
   * A <dfn>request</dfn> (a [=/request=]).
   * A <dfn>response</dfn> (a [=/response=]), initially null.
   * A <dfn>response body</dfn> (a [=byte sequence=]), initially empty.
+  * A <dfn>body complete flag</dfn>, initially unset.
 </div>
 
 # Algorithms # {#algorithms}
@@ -112,7 +112,7 @@ A <dfn>background fetch record</dfn> consists of:
 
   1. [=background fetch/Display=] |bgFetch|.
   1. Let |swRegistration| be |bgFetch|'s [=background fetch/service worker registration=].
-  1. Let |completeFetches| be 0.
+  1. Let |successfulFetches| be 0.
   1. Let |storedBytes| be 0. TODO: track and react to this, to prevent too much being downloaded.
   1. Let |downloadTotal| be |bgFetch|'s [=background fetch/download total=] if it is not 0, otherwise infinity.
   1. Let |abandoned| be false.
@@ -141,7 +141,6 @@ A <dfn>background fetch record</dfn> consists of:
 
         1. If |response| is an [=aborted network error=], then set |aborted| to true.
         1. Set |abandoned| to true and abort these steps.
-      1. If |response|'s [=response/status=] is not an [=ok status=], then set |abandoned| to true and abort these steps.
       1. If |response|'s [=response/status=] is `206`, then:
         1. If [=validate a partial response=] for |rangeStart|, |response|, and |record|'s [=background fetch record/response=] returns invalid, then set |abandoned| to true and abort these steps.
       1. Otherwise:
@@ -160,16 +159,19 @@ A <dfn>background fetch record</dfn> consists of:
         1. Append |bytes| to |record|'s [=background fetch record/response body=].
         1. [=Report progress for background fetch=] |bgFetch|.
       1. If at any point the bytes transmission for |stream| is done normally, then:
-        1. Increment |completeFetches|.
+        1. Set |record|'s [=record/body complete flag=].
         1. Set |readComplete| to true.
+        1. If |response|'s [=response/status=] is not an [=ok status=], then set |abandoned| to true.
+        1. Otherwise, increment |successfulFetches|.
         1. Set |readEnded| to true.
       1. If at any point |stream| becomes [=stream/errored=], then:
         1. If |response|'s [=response/aborted flag=] is set, then set |aborted| to true, and |abandoned| to true.
+        1. If |response|'s [=response/status=] is not an [=ok status=], then set |abandoned| to true.
         1. Set |readComplete| to true.
       1. Wait for |readEnded| to be true.
       1. If either of |readComplete| or |abandoned| is true, [=break=].
       1. TODO handle "paused" being set after the first step in this block.
-  1. Wait for either |abandoned| to be true, or |completeFetches| to be |bgFetch|'s [=background fetch/records=]'s [=list/size=].
+  1. Wait for either |abandoned| to be true, or |successfulFetches| to be |bgFetch|'s [=background fetch/records=]'s [=list/size=].
   1. Let |operationAborted| be |aborted|.
   1. If |abandoned| is true:
       1. TODO: terminate all related fetches.
@@ -589,24 +591,19 @@ dictionary BackgroundFetchSettledEventInit : BackgroundFetchEventInit {
 </script>
 
 <div dfn-for="BackgroundFetchSettledEvent">
-  The <dfn attribute>fetches</dfn> attribute must return the value it was initialized to.
+  <p>The <dfn attribute>fetches</dfn> attribute must return the value it was initialized to.</p>
 </div>
 
 <script type="idl">
 [Exposed=ServiceWorker]
 interface BackgroundFetchSettledFetches {
   Promise<BackgroundFetchSettledFetch> match(RequestInfo request);
-  Promise<FrozenArray<BackgroundFetchSettledFetch>> values();
-};
-
-[Exposed=ServiceWorker]
-interface BackgroundFetchSettledFetch : BackgroundFetchFetch {
-  readonly attribute Response? response;
+  Promise<sequence<BackgroundFetchSettledFetch>> values();
 };
 </script>
 
 <div dfn-for="BackgroundFetchSettledFetches">
-  A {{BackgroundFetchSettledFetches}} object has <dfn>records</dfn> (a [=list=] of [=background fetch records=]).
+  <p>A {{BackgroundFetchSettledFetches}} object has <dfn>records</dfn> (a [=list=] of [=background fetch records=]).</p>
 
   <div algorithm>
     The <dfn method>match(|request|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run these steps [=in parallel=]:
@@ -620,6 +617,13 @@ interface BackgroundFetchSettledFetch : BackgroundFetchFetch {
     1. TODO
   </div>
 </div>
+
+<script type="idl">
+[Exposed=ServiceWorker]
+interface BackgroundFetchSettledFetch : BackgroundFetchFetch {
+  readonly attribute Response? response;
+};
+</script>
 
 ### {{BackgroundFetchUpdateEvent}} ### {#background-fetch-update-event}
 
