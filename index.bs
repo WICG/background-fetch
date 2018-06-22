@@ -311,12 +311,10 @@ A <dfn>background fetch record</dfn> consists of:
   1. [=list/For each=] |record| of |records|:
     1. Let |settledFetch| be a new {{BackgroundFetchSettledFetch}}.
     1. Let |requestObject| be a new {{Request}} object with the following set:
-
       : [=Request/Request=]
       :: A copy of |record|'s [=background fetch record/request=].
       : [=Request/Headers=]
       :: A new {{Headers}} object associated with this {{Request}}'s [=Request/request=]'s [=request/header list=].
-
     1. Set |settledFetch|'s [=BackgroundFetchSettledFetch/request=] to |requestObject|.
     1. If |record|'s [=background fetch record/body complete flag=] is set, then:
       1. Let |response| be copy of |record|'s [=background fetch record/response=].
@@ -326,22 +324,18 @@ A <dfn>background fetch record</dfn> consists of:
         1. Increment |transmittedBytes| by |bytes|' [=byte sequence/length=].
         1. [=Resolve=] |bytePromise| with a new {{Uint8Array}} wrapping a new {{ArrayBuffer}} of |bytes|.
       1. Let |body| be a new [=/body=] with the following set:
-
         : [=body/Stream=]
         :: |stream|.
         : [=body/Source=]
         :: |record|'s [=background fetch record/response body source=].
         : [=body/Total bytes=]
         :: The [=byte sequence/length=] of |record|'s [=background fetch record/response body source=].
-
       1. Set |response|'s [=response/body=] to |body|.
       1. Let |responseObject| be a new {{Response}} object with the following set:
-
         : [=Response/Response=]
         :: A copy of |record|'s [=background fetch record/response=].
         : [=Response/Headers=]
         :: A new {{Headers}} object associated with this {{Response}}'s [=Response/response=]'s [=response/header list=].
-
       1. [=Resolve=] |responseObject|'s [=Response/trailer promise=] with a new {{Headers}} object associated with |responseObject|'s [=Response/response=]'s [=response/trailer=].
 
         Issue: [=Response/Trailer promise=] isn't exported. [fetch/771](https://github.com/whatwg/fetch/issues/771).
@@ -429,7 +423,7 @@ The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribu
 interface BackgroundFetchManager {
   Promise<BackgroundFetchRegistration> fetch(DOMString id, (RequestInfo or sequence<RequestInfo>) requests, optional BackgroundFetchOptions options);
   Promise<BackgroundFetchRegistration?> get(DOMString id);
-  Promise<FrozenArray<DOMString>> getIds();
+  Promise<sequence<DOMString>> getIds();
   // TODO: in future this should become an async iterator for BackgroundFetchRegistration objects
 };
 
@@ -544,8 +538,7 @@ dictionary IconDefinition {
     The <dfn method>getIds()</dfn> method, when invoked, must return [=a new promise=] |promise| and run these steps [=in parallel=]:
 
     1. Let |registration| be the [=context object=]'s associated [=BackgroundFetchManager/service worker registration=].
-    1. Let |ids| be the result of [=map/getting the keys=] of |registration|'s [=active background fetches=].
-    1. [=Resolve=] |promise| with |ids|.
+    1. [=Resolve=] |promise| with the result of [=map/getting the keys=] of |registration|'s [=active background fetches=].
   </div>
 </div>
 
