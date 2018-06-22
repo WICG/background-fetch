@@ -343,6 +343,8 @@ A <dfn>background fetch record</dfn> consists of:
       1. Set |settledFetch|'s [=BackgroundFetchSettledFetch/response=] to |responseObject|.
     1. [=list/Append=] |settledFetch| to |settledFetches|.
   1. Return |settledFetches|.
+
+  Issue: I need to make sure the response objects have the correct content-length and no content-range. Although, maybe I don't need to, since compression is already an issue here. Check with Ben.
 </div>
 
 # Header syntax # {#header-syntax}
