@@ -19,6 +19,25 @@ spec:fetch; type:interface; text:ReadableStream
 spec:promises-guide-1; type:dfn; text:resolve
 </pre>
 
+<style>
+  .algorithm dl {
+    overflow: hidden;
+  }
+  .algorithm dt {
+    font-weight: normal;
+    float: left;
+    clear: left;
+    line-height: 1.5;
+    margin-right: 0.3em;
+  }
+  .algorithm dt::after {
+    content: '- ';
+  }
+  .algorithm dd {
+    margin-left: 0em;
+  }
+</style>
+
 # Introduction # {#intro}
 
 A [=service worker=] is capable of fetching and caching assets, the size of which is restricted only by [origin storage](https://storage.spec.whatwg.org/#usage-and-quota). However, if the user navigates away from the site or closes the browser, the service worker is [[service-workers#service-worker-lifetime|likely to be killed]]. This can happen even if there's a pending promise passed to {{ExtendableEvent/waitUntil()}}; if it hasn't resolved within a few minutes the browser may consider it an abuse of [=service worker=] and kill the process.
@@ -36,9 +55,17 @@ This specification aims to:
 * Allow the app to display progress information about a background fetch.
 * Allow the app to suggest which connection types the [=/fetch=] should be restricted to.
 
+# Realms # {#realms}
+
+All platform objects are created in the [=context object=]'s [=relevant Realm=] unless otherwise noted.
+
 # Infrastructure # {#infrastructure}
 
-The <dfn>background fetch task source</dfn> is a [=task source=]. All queued tasks in this specification use the [=background fetch task source=] unless otherwise noted.
+The <dfn>background fetch task source</dfn> is a [=task source=].
+
+<div algorithm>
+  To <dfn>queue a bgfetch task</dfn> on an optional |eventLoop| (an [=event loop=], defaulting to the [=context object=]'s [=relevant settings object=]'s [=responsible event loop=]) with |steps| (steps), [=queue a task=] on |eventLoop| using the [=background fetch task source=] to run |steps|.
+</div>
 
 ## Extensions to service worker registration ## {#service-worker-registration-concept-extensions}
 
@@ -99,7 +126,7 @@ A <dfn>background fetch record</dfn> consists of:
 <div dfn-for="background fetch record">
   * A <dfn>request</dfn> (a [=/request=]).
   * A <dfn>response</dfn> (a [=/response=]), initially null.
-  * A <dfn>response body</dfn> (a [=byte sequence=]), initially empty.
+  * A <dfn>response body source</dfn> (a [=byte sequence=]), initially empty.
   * A <dfn>body complete flag</dfn>, initially unset.
 </div>
 
@@ -123,7 +150,7 @@ A <dfn>background fetch record</dfn> consists of:
       1. Let |request| be a copy of |record|'s [=background fetch record/request=].
       1. Set |request|'s [=request/keepalive flag=].
       1. Set |request|'s [=request/synchronous flag=].
-      1. Let |rangeStart| be the [=byte sequence/length=] of |record|'s [=background fetch record/response body=].
+      1. Let |rangeStart| be the [=byte sequence/length=] of |record|'s [=background fetch record/response body source=].
       1. If |rangeStart| is not 0, then [=request/add a range header=] to |request| with |currentLength|.
 
         Note: This allows the initially request to make use of content encoding, since `Accept-Encoding: identity` is added to requests with a range header.
@@ -144,8 +171,8 @@ A <dfn>background fetch record</dfn> consists of:
       1. If |response|'s [=response/status=] is `206`, then:
         1. If [=validate a partial response=] for |rangeStart|, |response|, and |record|'s [=background fetch record/response=] returns invalid, then set |abandoned| to true and abort these steps.
       1. Otherwise:
-        1. Decrement |storedBytes| by the [=byte sequence/length=] of |record|'s [=background fetch record/response body=].
-        1. Set |record|'s [=background fetch record/response body=] to an empty [=byte sequence=].
+        1. Decrement |storedBytes| by the [=byte sequence/length=] of |record|'s [=background fetch record/response body source=].
+        1. Set |record|'s [=background fetch record/response body source=] to an empty [=byte sequence=].
       1. Set |record|'s [=background fetch record/response=] to a copy of |response| except for its [=response/body=].
 
         Note: This may be replacing an existing value. It's acceptable for earlier responses to be missing things like \``ETag`\` headers, and complete lengths from \``Content-Range`\` headers, but once a later response has them, we want to compare them against subsequent responses.
@@ -156,7 +183,7 @@ A <dfn>background fetch record</dfn> consists of:
       1. Whenever one or more bytes are transmitted from |stream|, let |bytes| be the transmitted bytes and run these steps:
         1. Increment |storedBytes| by |bytes|' size.
         1. If |storedBytes| is greater than |downloadTotal|, then set |abandoned| and |readEnded| to true and abort these steps.
-        1. Append |bytes| to |record|'s [=background fetch record/response body=].
+        1. Append |bytes| to |record|'s [=background fetch record/response body source=].
         1. [=Report progress for background fetch=] |bgFetch|.
       1. If at any point the bytes transmission for |stream| is done normally, then:
         1. Set |record|'s [=record/body complete flag=].
@@ -203,10 +230,10 @@ A <dfn>background fetch record</dfn> consists of:
   To <dfn>report progress for background fetch</dfn> |bgFetch| (a [=/background fetch=]), [=enqueue the following steps=] to |bgFetch|'s [=background fetch/progress handling queue=]:
 
   1. Let |downloaded| be 0.
-  1. [=list/For each=] |record| in |bgFetch|'s [=background fetch/records=], increment |downloaded| by the number of bytes in [=background fetch record/response body=].
+  1. [=list/For each=] |record| in |bgFetch|'s [=background fetch/records=], increment |downloaded| by the number of bytes in [=background fetch record/response body source=].
   1. If |downloaded| is equal to |bgFetch|'s [=background fetch/last reported download=], then abort these steps.
   1. Set |bgFetch|'s [=background fetch/last reported download=] to |downloaded|.
-  1. For each [=environment settings object=] |env| whose [=environment settings object/origin=] is equal to |bgFetch|'s [=background fetch/service worker registration=]'s [=service worker registration/scope URL=]'s [=url/origin=], [=queue a task=] on |env|'s [=environment settings object/responsible event loop=] to run these steps:
+  1. For each [=environment settings object=] |env| whose [=environment settings object/origin=] is equal to |bgFetch|'s [=background fetch/service worker registration=]'s [=service worker registration/scope URL=]'s [=url/origin=], [=queue a bgfetch task=] on |env|'s [=environment settings object/responsible event loop=] to run these steps:
     1. Let |bgFetchRegistration| be the instance of {{BackgroundFetchRegistration}} within this environment whose [=BackgroundFetchRegistration/background fetch=] is equal to |bgFetch|, or null if none exists.
 
       Note: There will be at most one per environment, because of the [=get a BackgroundFetchRegistration instance=] algorithm.
@@ -221,7 +248,7 @@ A <dfn>background fetch record</dfn> consists of:
   To <dfn data-lt="get a BackgroundFetchRegistration instance|getting a BackgroundFetchRegistration instance">get a BackgroundFetchRegistration instance</dfn> for an |instancesMap| (a [=BackgroundFetchRegistration instances=]) and a |bgFetch| (a [=/background fetch=]), run these steps:
 
   1. If |instancesMap|[|bgFetch|] [=map/exists=], then return |instancesMap|[|bgFetch|].
-  1. Let |instance| be a new {{BackgroundFetchRegistration}} in the parent {{BackgroundFetchManager}}'s [=relevant Realm=], and set it's [=BackgroundFetchRegistration/background fetch=] to |bgFetch|.
+  1. Let |instance| be a new {{BackgroundFetchRegistration}} in the parent {{BackgroundFetchManager}}'s [=relevant Realm=], and set its [=BackgroundFetchRegistration/background fetch=] to |bgFetch|.
   1. Set |instancesMap|[|bgFetch|] to |instance|.
   1. Return |instance|.
 
@@ -437,7 +464,7 @@ dictionary IconDefinition {
         : [=background fetch/service worker registration=]
         :: |registration|.
       1. Set |bgFetchMap|[|id|] to |bgFetch|.
-      1. [=Queue a task=] to run these steps:
+      1. [=Queue a bgfetch task=] to run these steps:
         1. [=Resolve=] |promise| with the result of [=getting a BackgroundFetchRegistration instance=] passing |bgFetchInstances| and |bgFetch|.
       1. [=In parallel=], [=attempt a background fetch=] with |bgFetch|.
     1. Return |promise|.
@@ -453,7 +480,7 @@ dictionary IconDefinition {
     1. If |bgFetch| is nothing, then [=resolve=] |promise| with undefined and abort these steps.
     1. Let |downloaded| be |bgFetch|'s [=background fetch/last reported downloaded=].
     1. [=Enqueue the following steps=] to |bgFetch|'s [=background fetch/progress handling queue=]:
-      1. [=Queue a task=] |task| to run these steps:
+      1. [=Queue a bgfetch task=] |task| to run these steps:
         1. Let |bgFetchRegistration| be the result of [=getting a BackgroundFetchRegistration instance=] passing the [=context object=]'s [=BackgroundFetchRegistration instances=] and |bgFetch|.
         1. Set |bgFetchRegistration|'s [=BackgroundFetchRegistration/downloaded=] to |downloaded|.
         1. [=Resolve=] |promise| with |bgFetchRegistration|.
@@ -614,7 +641,50 @@ interface BackgroundFetchSettledFetches {
   <div algorithm>
     The <dfn method>values()</dfn> method, when invoked, must return [=a new promise=] |promise| and run these steps [=in parallel=]:
 
-    1. TODO
+    1. Let |records| be the [=context object=]'s [=BackgroundFetchSettledFetches/records=].
+    1. [=Queue a bgfetch task=] to run these steps:
+      1. Let |settledFetches| be a new [=/list=].
+      1. [=list/For each=] |record| of |records|:
+        1. Let |settledFetch| be a new {{BackgroundFetchSettledFetch}}.
+        1. Let |requestObject| be a new {{Request}} object with the following set:
+
+          : [=Request/Request=]
+          :: A copy of |record|'s [=background fetch record/request=].
+          : [=Request/Headers=]
+          :: A new {{Headers}} object associated with this {{Request}}'s [=Request/request=]'s [=request/header list=].
+
+        1. Set |settledFetch|'s [=BackgroundFetchSettledFetch/request=] to |requestObject|.
+        1. If |record|'s [=background fetch record/body complete flag=] is set, then:
+          1. Let |response| be copy of |record|'s [=background fetch record/response=].
+          1. Let |transmittedBytes| be 0.
+          1. Let |stream| be a new {{ReadableStream}} object with a pull action that returns [=a new promise=] |bytePromise| and runs these steps [=in parallel=]:
+            1. Let |bytes| be a user agent determined slice of |record|'s [=background fetch record/response body source=], starting from an offset of |transmittedBytes|.
+            1. Increment |transmittedBytes| by |bytes|' [=byte sequence/length=].
+            1. [=Resolve=] |bytePromise| with a new {{Uint8Array}} wrapping a new {{ArrayBuffer}} of |bytes|.
+          1. Let |body| be a new [=/body=] with the following set:
+
+            : [=body/Stream=]
+            :: |stream|.
+            : [=body/Source=]
+            :: |record|'s [=background fetch record/response body source=].
+            : [=body/Total bytes=]
+            :: The [=byte sequence/length=] of |record|'s [=background fetch record/response body source=].
+
+          1. Set |response|'s [=response/body=] to |body|.
+          1. Let |responseObject| be a new {{Response}} object with the following set:
+
+            : [=Response/Response=]
+            :: A copy of |record|'s [=background fetch record/response=].
+            : [=Response/Headers=]
+            :: A new {{Headers}} object associated with this {{Response}}'s [=Response/response=]'s [=response/header list=].
+
+          1. [=Resolve=] |responseObject|'s [=Response/trailer promise=] with a new {{Headers}} object associated with |responseObject|'s [=Response/response=]'s [=response/trailer=].
+
+            Issue: [=Response/Trailer promise=] isn't exported. [fetch/771](https://github.com/whatwg/fetch/issues/771).
+
+          1. Set |settledFetch|'s [=BackgroundFetchSettledFetch/response=] to |responseObject|.
+        1. [=list/Append=] |settledFetch| to |settledFetches|.
+      1. [=Resolve=] |promise| with |settledFetches|.
   </div>
 </div>
 
