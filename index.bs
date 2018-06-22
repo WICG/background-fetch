@@ -516,23 +516,6 @@ interface BackgroundFetchRegistration : EventTarget {
 
   Promise<boolean> abort();
 };
-
-[Exposed=(Window,Worker)]
-interface BackgroundFetchFetch {
-  readonly attribute Request request;
-};
-
-[Exposed=(Window,Worker)]
-interface BackgroundFetchActiveFetches {
-  Promise<BackgroundFetchActiveFetch> match(RequestInfo request);
-  Promise<FrozenArray<BackgroundFetchActiveFetch>> values();
-};
-
-[Exposed=(Window,Worker)]
-interface BackgroundFetchActiveFetch : BackgroundFetchFetch {
-  readonly attribute Promise<Response> responseReady;
-  // In future this will include a fetch observer
-};
 </script>
 
 <div dfn-for="BackgroundFetchRegistration">
@@ -577,7 +560,32 @@ interface BackgroundFetchActiveFetch : BackgroundFetchFetch {
   </div>
 </div>
 
-### {{BackgroundFetchEvent}} ### {#background-fetch-event}
+<script type="idl">
+[Exposed=(Window,Worker)]
+interface BackgroundFetchActiveFetches {
+  Promise<BackgroundFetchActiveFetch> match(RequestInfo request, optional CacheQueryOptions options);
+  Promise<sequence<BackgroundFetchActiveFetch>> matchAll(RequestInfo request, optional CacheQueryOptions options);
+  Promise<sequence<BackgroundFetchActiveFetch>> values();
+};
+</script>
+
+<div dfn-for="BackgroundFetchActiveFetches">
+</div>
+
+<script type="idl">
+[Exposed=(Window,Worker)]
+interface BackgroundFetchActiveFetch : BackgroundFetchFetch {
+  readonly attribute Promise<Response> responseReady;
+  // In future this will include a fetch observer
+};
+
+[Exposed=(Window,Worker)]
+interface BackgroundFetchFetch {
+  readonly attribute Request request;
+};
+</script>
+
+## {{BackgroundFetchEvent}} ## {#background-fetch-event}
 
 <script type="idl">
 [Constructor(DOMString type, BackgroundFetchEventInit init), Exposed=ServiceWorker]
@@ -604,7 +612,7 @@ dictionary BackgroundFetchEventInit : ExtendableEventInit {
   1. TODO
 </div>
 
-### {{BackgroundFetchSettledEvent}} ### {#background-fetch-settled-event}
+## {{BackgroundFetchSettledEvent}} ## {#background-fetch-settled-event}
 
 <script type="idl">
 [Constructor(DOMString type, BackgroundFetchSettledEventInit init), Exposed=ServiceWorker]
@@ -625,7 +633,7 @@ dictionary BackgroundFetchSettledEventInit : BackgroundFetchEventInit {
 [Exposed=ServiceWorker]
 interface BackgroundFetchSettledFetches {
   Promise<BackgroundFetchSettledFetch> match(RequestInfo request, optional CacheQueryOptions options);
-  Promise<BackgroundFetchSettledFetch> matchAll(RequestInfo request, optional CacheQueryOptions options);
+  Promise<sequence<BackgroundFetchSettledFetch>> matchAll(RequestInfo request, optional CacheQueryOptions options);
   Promise<sequence<BackgroundFetchSettledFetch>> values();
 };
 </script>
@@ -635,6 +643,8 @@ Issue: {{CacheQueryOptions}} includes {{CacheQueryOptions/cacheName}} which does
 <div dfn-for="BackgroundFetchSettledFetches">
   <p>A {{BackgroundFetchSettledFetches}} object has <dfn>records</dfn> (a [=list=] of [=background fetch records=]).</p>
 
+  ### {{BackgroundFetchSettledFetches/match()}} ### {#background-fetch-settled-fetches-match}
+
   <div algorithm>
     The <dfn method>match(|request|, |options|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run these steps [=in parallel=]:
 
@@ -643,6 +653,8 @@ Issue: {{CacheQueryOptions}} includes {{CacheQueryOptions/cacheName}} which does
 
     Note: User agents are encouraged to optimise the above so it's faster than calling {{BackgroundFetchSettledFetches/matchAll()}}.
   </div>
+
+  ### {{BackgroundFetchSettledFetches/matchAll()}} ### {#background-fetch-settled-fetches-match-all}
 
   <div algorithm>
     The <dfn method>matchAll(|request|, |options|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run these steps [=in parallel=]:
@@ -716,7 +728,7 @@ interface BackgroundFetchSettledFetch : BackgroundFetchFetch {
 };
 </script>
 
-### {{BackgroundFetchUpdateEvent}} ### {#background-fetch-update-event}
+## {{BackgroundFetchUpdateEvent}} ## {#background-fetch-update-event}
 
 <script type="idl">
 [Constructor(DOMString type, BackgroundFetchSettledEventInit init), Exposed=ServiceWorker]
@@ -727,19 +739,13 @@ interface BackgroundFetchUpdateEvent : BackgroundFetchSettledEvent {
 
 <div dfn-for="BackgroundFetchUpdateEvent">
   <div algorithm>
-    The <dfn constructor>BackgroundFetchUpdateEvent(|type|, |init|)</dfn> constructor, when invoked, must run these steps:
-
-    1. TODO
-  </div>
-
-  <div algorithm>
     The <dfn method>updateUI(|title|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run these steps [=in parallel=]:
 
     1. TODO
   </div>
 </div>
 
-### {{BackgroundFetchClickEvent}} ### {#background-fetch-click-event}
+## {{BackgroundFetchClickEvent}} ## {#background-fetch-click-event}
 
 <script type="idl">
 [Constructor(DOMString type, BackgroundFetchClickEventInit init), Exposed=ServiceWorker]
@@ -753,6 +759,10 @@ dictionary BackgroundFetchClickEventInit : BackgroundFetchEventInit {
 
 enum BackgroundFetchState { "pending", "succeeded", "failed" };
 </script>
+
+<div dfn-for="BackgroundFetchClickEvent">
+  <p>The <dfn attribute>state</dfn> attribute must return the value it was initialized to.</p>
+</div>
 
 # Privacy and bandwidth usage # {#privacy-and-bandwidth-use}
 
