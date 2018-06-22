@@ -624,68 +624,89 @@ dictionary BackgroundFetchSettledEventInit : BackgroundFetchEventInit {
 <script type="idl">
 [Exposed=ServiceWorker]
 interface BackgroundFetchSettledFetches {
-  Promise<BackgroundFetchSettledFetch> match(RequestInfo request);
+  Promise<BackgroundFetchSettledFetch> match(RequestInfo request, optional CacheQueryOptions options);
+  Promise<BackgroundFetchSettledFetch> matchAll(RequestInfo request, optional CacheQueryOptions options);
   Promise<sequence<BackgroundFetchSettledFetch>> values();
 };
 </script>
+
+Issue: {{CacheQueryOptions}} includes {{CacheQueryOptions/cacheName}} which doesn't make sense here. I need to abstract it out.
 
 <div dfn-for="BackgroundFetchSettledFetches">
   <p>A {{BackgroundFetchSettledFetches}} object has <dfn>records</dfn> (a [=list=] of [=background fetch records=]).</p>
 
   <div algorithm>
-    The <dfn method>match(|request|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run these steps [=in parallel=]:
+    The <dfn method>match(|request|, |options|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run these steps [=in parallel=]:
 
-    1. TODO
+    1. Let |promise| be the result of calling the algorithm {{BackgroundFetchSettledFetches/matchAll()}} passing |request| and |options|.
+    1. Return the result of [=transforming=] |promise| with a fulfillment handler that, when called with argument |matches|, returns |matches|[0].
+
+    Note: User agents are encouraged to optimise the above so it's faster than calling {{BackgroundFetchSettledFetches/matchAll()}}.
+  </div>
+
+  <div algorithm>
+    The <dfn method>matchAll(|request|, |options|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run these steps [=in parallel=]:
+
+    1. Let |records| be the result of filtering the [=context object=]'s [=BackgroundFetchSettledFetches/records=] according to the rules of {{Cache/matchAll()}}.
+
+      Issue: The above needs to be abstracted.
+
+    1. [=Queue a bgfetch task=] to [=resolve=] |promise| with the result of [=creating settled fetches=] from |records| in [=context object=]'s [=relevant Realm=].
   </div>
 
   <div algorithm>
     The <dfn method>values()</dfn> method, when invoked, must return [=a new promise=] |promise| and run these steps [=in parallel=]:
 
     1. Let |records| be the [=context object=]'s [=BackgroundFetchSettledFetches/records=].
-    1. [=Queue a bgfetch task=] to run these steps:
-      1. Let |settledFetches| be a new [=/list=].
-      1. [=list/For each=] |record| of |records|:
-        1. Let |settledFetch| be a new {{BackgroundFetchSettledFetch}}.
-        1. Let |requestObject| be a new {{Request}} object with the following set:
-
-          : [=Request/Request=]
-          :: A copy of |record|'s [=background fetch record/request=].
-          : [=Request/Headers=]
-          :: A new {{Headers}} object associated with this {{Request}}'s [=Request/request=]'s [=request/header list=].
-
-        1. Set |settledFetch|'s [=BackgroundFetchSettledFetch/request=] to |requestObject|.
-        1. If |record|'s [=background fetch record/body complete flag=] is set, then:
-          1. Let |response| be copy of |record|'s [=background fetch record/response=].
-          1. Let |transmittedBytes| be 0.
-          1. Let |stream| be a new {{ReadableStream}} object with a pull action that returns [=a new promise=] |bytePromise| and runs these steps [=in parallel=]:
-            1. Let |bytes| be a user agent determined slice of |record|'s [=background fetch record/response body source=], starting from an offset of |transmittedBytes|.
-            1. Increment |transmittedBytes| by |bytes|' [=byte sequence/length=].
-            1. [=Resolve=] |bytePromise| with a new {{Uint8Array}} wrapping a new {{ArrayBuffer}} of |bytes|.
-          1. Let |body| be a new [=/body=] with the following set:
-
-            : [=body/Stream=]
-            :: |stream|.
-            : [=body/Source=]
-            :: |record|'s [=background fetch record/response body source=].
-            : [=body/Total bytes=]
-            :: The [=byte sequence/length=] of |record|'s [=background fetch record/response body source=].
-
-          1. Set |response|'s [=response/body=] to |body|.
-          1. Let |responseObject| be a new {{Response}} object with the following set:
-
-            : [=Response/Response=]
-            :: A copy of |record|'s [=background fetch record/response=].
-            : [=Response/Headers=]
-            :: A new {{Headers}} object associated with this {{Response}}'s [=Response/response=]'s [=response/header list=].
-
-          1. [=Resolve=] |responseObject|'s [=Response/trailer promise=] with a new {{Headers}} object associated with |responseObject|'s [=Response/response=]'s [=response/trailer=].
-
-            Issue: [=Response/Trailer promise=] isn't exported. [fetch/771](https://github.com/whatwg/fetch/issues/771).
-
-          1. Set |settledFetch|'s [=BackgroundFetchSettledFetch/response=] to |responseObject|.
-        1. [=list/Append=] |settledFetch| to |settledFetches|.
-      1. [=Resolve=] |promise| with |settledFetches|.
+    1. [=Queue a bgfetch task=] to [=resolve=] |promise| with the result of [=creating settled fetches=] from |records| in [=context object=]'s [=relevant Realm=].
   </div>
+</div>
+
+<div algorithm>
+  To <dfn lt="create settled fetches|creating settled fetches">create settled fetches</dfn> from |records| (a [=/list=] of [=background fetch records=]) in |realm| (a [=Realm=]), run these steps:
+
+  1. Let |settledFetches| be a new [=/list=].
+  1. [=list/For each=] |record| of |records|:
+    1. Let |settledFetch| be a new {{BackgroundFetchSettledFetch}}.
+    1. Let |requestObject| be a new {{Request}} object with the following set:
+
+      : [=Request/Request=]
+      :: A copy of |record|'s [=background fetch record/request=].
+      : [=Request/Headers=]
+      :: A new {{Headers}} object associated with this {{Request}}'s [=Request/request=]'s [=request/header list=].
+
+    1. Set |settledFetch|'s [=BackgroundFetchSettledFetch/request=] to |requestObject|.
+    1. If |record|'s [=background fetch record/body complete flag=] is set, then:
+      1. Let |response| be copy of |record|'s [=background fetch record/response=].
+      1. Let |transmittedBytes| be 0.
+      1. Let |stream| be a new {{ReadableStream}} object with a pull action that returns [=a new promise=] |bytePromise| and runs these steps [=in parallel=]:
+        1. Let |bytes| be a user agent determined slice of |record|'s [=background fetch record/response body source=], starting from an offset of |transmittedBytes|.
+        1. Increment |transmittedBytes| by |bytes|' [=byte sequence/length=].
+        1. [=Resolve=] |bytePromise| with a new {{Uint8Array}} wrapping a new {{ArrayBuffer}} of |bytes|.
+      1. Let |body| be a new [=/body=] with the following set:
+
+        : [=body/Stream=]
+        :: |stream|.
+        : [=body/Source=]
+        :: |record|'s [=background fetch record/response body source=].
+        : [=body/Total bytes=]
+        :: The [=byte sequence/length=] of |record|'s [=background fetch record/response body source=].
+
+      1. Set |response|'s [=response/body=] to |body|.
+      1. Let |responseObject| be a new {{Response}} object with the following set:
+
+        : [=Response/Response=]
+        :: A copy of |record|'s [=background fetch record/response=].
+        : [=Response/Headers=]
+        :: A new {{Headers}} object associated with this {{Response}}'s [=Response/response=]'s [=response/header list=].
+
+      1. [=Resolve=] |responseObject|'s [=Response/trailer promise=] with a new {{Headers}} object associated with |responseObject|'s [=Response/response=]'s [=response/trailer=].
+
+        Issue: [=Response/Trailer promise=] isn't exported. [fetch/771](https://github.com/whatwg/fetch/issues/771).
+
+      1. Set |settledFetch|'s [=BackgroundFetchSettledFetch/response=] to |responseObject|.
+    1. [=list/Append=] |settledFetch| to |settledFetches|.
+  1. Return |settledFetches|.
 </div>
 
 <script type="idl">
