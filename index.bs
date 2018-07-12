@@ -1,4 +1,3 @@
-
 <pre class="metadata">
 Title: Background Fetch
 Shortname: background-fetch
@@ -17,6 +16,16 @@ Indent: 2
 spec:infra; type:dfn; text:list
 spec:fetch; type:interface; text:ReadableStream
 spec:promises-guide-1; type:dfn; text:resolve
+</pre>
+
+<pre class="anchors">
+urlPrefix: https://tc39.github.io/ecma262/; spec: ECMA-262
+  type: dfn
+    text: realm; url: realm
+
+urlPrefix: https://tools.ietf.org/html/rfc7230
+  type: dfn
+    text: HTTP ABNF; url: section-7
 </pre>
 
 <style>
@@ -57,7 +66,7 @@ This specification aims to:
 
 # Realms # {#realms}
 
-All platform objects are created in the [=context object=]'s [=relevant Realm=] unless otherwise noted.
+All platform objects are created in the [=context object=]'s [=relevant Realm=] unless otherwise specified.
 
 # Infrastructure # {#infrastructure}
 
@@ -186,12 +195,12 @@ A <dfn>background fetch record</dfn> consists of:
         1. Append |bytes| to |record|'s [=background fetch record/response body source=].
         1. [=Report progress for background fetch=] |bgFetch|.
       1. If at any point the bytes transmission for |stream| is done normally, then:
-        1. Set |record|'s [=record/body complete flag=].
+        1. Set |record|'s [=background fetch record/body complete flag=].
         1. Set |readComplete| to true.
         1. If |response|'s [=response/status=] is not an [=ok status=], then set |abandoned| to true.
         1. Otherwise, increment |successfulFetches|.
         1. Set |readEnded| to true.
-      1. If at any point |stream| becomes [=stream/errored=], then:
+      1. If at any point |stream| becomes [=ReadableStream/errored=], then:
         1. If |response|'s [=response/aborted flag=] is set, then set |aborted| to true, and |abandoned| to true.
         1. If |response|'s [=response/status=] is not an [=ok status=], then set |abandoned| to true.
         1. Set |readComplete| to true.
@@ -212,16 +221,18 @@ A <dfn>background fetch record</dfn> consists of:
     1. If |operationAborted| is true, then [=fire a functional event=] named "`backgroundfetchabort`" using {{BackgroundFetchSettledEvent}} on |swRegistration| with the following properties:
       : {{BackgroundFetchEvent/id}}
       :: |id|
-      : {{BackgroundFetchSettledEvent/fetches}}
-      :: A new {{BackgroundFetchSettledFetches}}. TODO: associate this with |bgFetch|'s [=background fetch/records=].
 
-      Issue: The above prose is based on [ServiceWorker/#1199](https://github.com/w3c/ServiceWorker/pull/1199).
+      And with [=BackgroundFetchSettledEvent/records=] set to |bgFetch|'s [=background fetch/records=].
     1. Otherwise, if |abandoned| is true, then [=fire a functional event=] named "`backgroundfetchfail`" using {{BackgroundFetchUpdateEvent}} on |swRegistration| with the following properties:
-      : {{BackgroundFetchSettledEvent/fetches}}
-      :: A new {{BackgroundFetchSettledFetches}}. TODO: associate this with |bgFetch|'s [=background fetch/records=].
+      : {{BackgroundFetchEvent/id}}
+      :: |id|
+
+      And with [=BackgroundFetchSettledEvent/records=] set to |bgFetch|'s [=background fetch/records=].
     1. Otherwise, [=fire a functional event=] named "`backgroundfetched`" using {{BackgroundFetchUpdateEvent}} on |swRegistration| with the following properties:
-      : {{BackgroundFetchSettledEvent/fetches}}
-      :: A new {{BackgroundFetchSettledFetches}}. TODO: associate this with |bgFetch|'s [=background fetch/records=].
+      : {{BackgroundFetchEvent/id}}
+      :: |id|
+
+      And with [=BackgroundFetchSettledEvent/records=] set to |bgFetch|'s [=background fetch/records=].
 </div>
 
 ## [=Report progress for background fetch=] ## {#report-progress-for-background-fetch-algorithm}
@@ -315,7 +326,7 @@ A <dfn>background fetch record</dfn> consists of:
       :: A copy of |record|'s [=background fetch record/request=].
       : [=Request/Headers=]
       :: A new {{Headers}} object associated with this {{Request}}'s [=Request/request=]'s [=request/header list=].
-    1. Set |settledFetch|'s [=BackgroundFetchSettledFetch/request=] to |requestObject|.
+    1. Set |settledFetch|'s {{BackgroundFetchFetch/request}} to |requestObject|.
     1. If |record|'s [=background fetch record/body complete flag=] is set, then:
       1. Let |response| be copy of |record|'s [=background fetch record/response=].
       1. Let |transmittedBytes| be 0.
@@ -340,7 +351,7 @@ A <dfn>background fetch record</dfn> consists of:
 
         Issue: [=Response/Trailer promise=] isn't exported. [fetch/771](https://github.com/whatwg/fetch/issues/771).
 
-      1. Set |settledFetch|'s [=BackgroundFetchSettledFetch/response=] to |responseObject|.
+      1. Set |settledFetch|'s {{BackgroundFetchSettledFetch/response}} to |responseObject|.
     1. [=list/Append=] |settledFetch| to |settledFetches|.
   1. Return |settledFetches|.
 
@@ -349,7 +360,7 @@ A <dfn>background fetch record</dfn> consists of:
 
 # Header syntax # {#header-syntax}
 
-The following is [=ABNF=] for a <dfn>single byte content-range</dfn>:
+The following is [=HTTP ABNF=] for a <dfn>single byte content-range</dfn>:
 
 <pre>
 "bytes=" first-byte-pos "-" last-byte-pos "/" complete-length
@@ -484,10 +495,10 @@ dictionary IconDefinition {
         1. Run these steps [=in parallel=]:
           1. Run these steps but [=abort when=] |requestReadAborted| is true:
             1. [=body/Wait=] for |request|'s [=request/body=].
-            1. If |stream| has [=stream/errored=], then set |requestReadAborted| to true.
+            1. If |stream| has [=ReadableStream/errored=], then set |requestReadAborted| to true.
 
             Note: This ensures we have a copy of the request bytes before resolving.
-          1. [=If aborted=] and |stream| is [=stream/readable=], then [=stream/error=] |stream| with an {{AbortError}} {{DOMException}} and abort these steps.
+          1. [=If aborted=] and |stream| is [=ReadableStream/readable=], then [=ReadableStream/error=] |stream| with an {{AbortError}} {{DOMException}} and abort these steps.
           1. Increment |uploadTotal| by |request|'s [=request/body=]'s [=body/total bytes=].
           1. Decrement |requestBodiesRemaining| by 1.
       1. Wait for |requestBodiesRemaining| to be 0, or |requestReadAborted| to be true.
@@ -674,25 +685,17 @@ dictionary BackgroundFetchEventInit : ExtendableEventInit {
 ## {{BackgroundFetchSettledEvent}} ## {#background-fetch-settled-event}
 
 <script type="idl">
-[Constructor(DOMString type, BackgroundFetchSettledEventInit init), Exposed=ServiceWorker]
+[Constructor(DOMString type, BackgroundFetchEventInit init), Exposed=ServiceWorker]
 interface BackgroundFetchSettledEvent : BackgroundFetchEvent {
-  readonly attribute BackgroundFetchSettledFetches fetches;
-
   Promise<BackgroundFetchSettledFetch> match(RequestInfo request, optional CacheQueryOptions options);
   Promise<sequence<BackgroundFetchSettledFetch>> matchAll(RequestInfo request, optional CacheQueryOptions options);
   Promise<sequence<BackgroundFetchSettledFetch>> values();
-};
-
-dictionary BackgroundFetchSettledEventInit : BackgroundFetchEventInit {
-  required BackgroundFetchSettledFetches fetches;
 };
 </script>
 
 Issue: {{CacheQueryOptions}} includes {{CacheQueryOptions/cacheName}} which doesn't make sense here. I need to abstract it out.
 
 <div dfn-for="BackgroundFetchSettledEvent">
-  The <dfn attribute>fetches</dfn> attribute must return the value it was initialized to.
-
   A {{BackgroundFetchSettledEvent}} object has <dfn>records</dfn> (a [=list=] of [=background fetch records=]).</p>
 
   ### {{BackgroundFetchSettledEvent/match()}} ### {#background-fetch-settled-event-match}
@@ -738,7 +741,7 @@ interface BackgroundFetchSettledFetch : BackgroundFetchFetch {
 ## {{BackgroundFetchUpdateEvent}} ## {#background-fetch-update-event}
 
 <script type="idl">
-[Constructor(DOMString type, BackgroundFetchSettledEventInit init), Exposed=ServiceWorker]
+[Constructor(DOMString type, BackgroundFetchEventInit init), Exposed=ServiceWorker]
 interface BackgroundFetchUpdateEvent : BackgroundFetchSettledEvent {
   Promise<void> updateUI(DOMString title);
 };
