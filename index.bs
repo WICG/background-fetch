@@ -73,7 +73,7 @@ All platform objects are created in the [=context object=]'s [=relevant Realm=] 
 The <dfn>background fetch task source</dfn> is a [=task source=].
 
 <div algorithm>
-  To <dfn>queue a bgfetch task</dfn> on an optional |eventLoop| (an [=event loop=], defaulting to the [=context object=]'s [=relevant settings object=]'s [=responsible event loop=]) with |steps| (steps), [=queue a task=] on |eventLoop| using the [=background fetch task source=] to run |steps|.
+  To <dfn>queue a bgfetch task</dfn> on an optional |eventLoop| (an [=event loop=], defaulting to the caller's [=context object=]'s [=relevant settings object=]'s [=responsible event loop=]) with |steps| (steps), [=queue a task=] on |eventLoop| using the [=background fetch task source=] to run |steps|.
 </div>
 
 ## Extensions to service worker registration ## {#service-worker-registration-concept-extensions}
