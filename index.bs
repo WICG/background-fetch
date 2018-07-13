@@ -81,8 +81,8 @@ The <dfn>background fetch task source</dfn> is a [=task source=].
 A [=/service worker registration=] additionally has:
 
 <div dfn-for="service worker registration">
-  * An associated <dfn>active background fetches</dfn> (a [=map=]), where each key is a DOMString, and each item is a [=/background fetch=]. It is initially an empty [=map=].
-  * An associated <dfn>active background fetches edit queue</dfn> (a [=parallel queue=]), initially the result of [=starting a new parallel queue=].
+  * <dfn>Active background fetches</dfn> (a [=map=]), where each key is a DOMString, and each item is a [=/background fetch=]. It is initially an empty [=map=].
+  * An <dfn>active background fetches edit queue</dfn> (a [=parallel queue=]), initially the result of [=starting a new parallel queue=].
 </div>
 
 <div algorithm>
@@ -576,19 +576,25 @@ interface BackgroundFetchRegistration : EventTarget {
 </script>
 
 <div dfn-for="BackgroundFetchRegistration">
-  A {{BackgroundFetchRegistration}} instance has an associated <dfn>background fetch</dfn> (a [=/background fetch=]).
 
-  A {{BackgroundFetchRegistration}} instance has an associated <dfn>downloaded</dfn> (a number), initially 0.
+  A {{BackgroundFetchRegistration}} instance has:
 
-  A {{BackgroundFetchRegistration}} instance has an associated <dfn>id</dfn>, <dfn>uploadTotal</dfn>, and <dfn>downloadTotal</dfn>, which are copied from the [=BackgroundFetchRegistration/background fetch=] upon instantiation.
+  * A <dfn>background fetch</dfn> (a [=/background fetch=]).
+  * A <dfn>downloaded</dfn> (a number), initially 0.
+  * A <dfn>uploaded</dfn> (a number), initially 0.
+  * An <dfn>id</dfn> (a number), a copy of [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/id=].
+  * An <dfn>upload total</dfn> (a number), a copy of [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/upload total=].
+  * A <dfn>download total</dfn> (a number), a copy of [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/download total=].
+
+  Note: The above values are copied so they're available synchronously.
 
   The <dfn attribute>id</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchRegistration/id=].
 
-  The <dfn attribute>uploadTotal</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchRegistration/uploadTotal=].
+  The <dfn attribute>uploadTotal</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchRegistration/upload total=].
 
-  The <dfn attribute>downloadTotal</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchRegistration/downloadTotal=].
+  The <dfn attribute>downloadTotal</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchRegistration/download total=].
 
-  The <dfn attribute>uploaded</dfn> attribute's getter must return TODO.
+  The <dfn attribute>uploaded</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchRegistration/uploaded=].
 
   The <dfn attribute>downloaded</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchRegistration/downloaded=].
 
@@ -642,18 +648,36 @@ interface BackgroundFetchRegistration : EventTarget {
   </div>
 </div>
 
-<script type="idl">
-[Exposed=(Window,Worker)]
-interface BackgroundFetchActiveFetch : BackgroundFetchFetch {
-  readonly attribute Promise<Response> responseReady;
-  // In future this will include a fetch observer
-};
+## {{BackgroundFetchFetch}} ## {#background-fetch-fetch}
 
+<script type="idl">
 [Exposed=(Window,Worker)]
 interface BackgroundFetchFetch {
   readonly attribute Request request;
 };
 </script>
+
+<div dfn-for="BackgroundFetchFetch">
+  A {{BackgroundFetchFetch}} has a <dfn>request</dfn> (a [=/request=]).
+
+  The <dfn attribute>request</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchFetch/request=].
+</div>
+
+## {{BackgroundFetchActiveFetch}} ## {#background-fetch-active-fetch}
+
+<script type="idl">
+[Exposed=(Window,Worker)]
+interface BackgroundFetchActiveFetch : BackgroundFetchFetch {
+  readonly attribute Promise<Response> responseReady;
+  // TODO: In future this will include a fetch observer
+};
+</script>
+
+<div dfn-for="BackgroundFetchActiveFetch">
+  A {{BackgroundFetchActiveFetch}} has a <dfn>response promise</dfn> (a {{Promise}} for a [=/response=]).
+
+  The <dfn attribute>responseReady</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchActiveFetch/response promise=].
+</div>
 
 ## {{BackgroundFetchEvent}} ## {#background-fetch-event}
 
