@@ -425,9 +425,12 @@ partial interface ServiceWorkerRegistration {
 };
 </script>
 
-Each {{ServiceWorkerRegistration}} instance has a unique instance of {{BackgroundFetchManager}}, allocated when the {{ServiceWorkerRegistration}} object is created. It's [=BackgroundFetchManager/service worker registration=] is set to {{ServiceWorkerRegistration}}'s [=/service worker registration=].
+<div dfn-for="ServiceWorkerRegistration">
 
-The <dfn attribute for="ServiceWorkerRegistration">backgroundFetch</dfn> attribute must return the {{BackgroundFetchManager}} object that is associated with the [=context object=].
+  A {{ServiceWorkerRegistration}} has a <dfn>background fetch manager</dfn> (a {{BackgroundFetchManager}}), initially a new {{BackgroundFetchManager}} whose [=BackgroundFetchManager/service worker registration=] is the [=context object=]'s [=/service worker registration=].
+
+  The <dfn attribute>backgroundFetch</dfn> attribute's getter must return the [=context object=]'s [=ServiceWorkerRegistration/background fetch manager=].
+</div>
 
 ## {{BackgroundFetchManager}} ## {#background-fetch-manager}
 
@@ -460,7 +463,7 @@ dictionary IconDefinition {
   A {{BackgroundFetchManager}} has:
 
   <div dfn-for="BackgroundFetchManager">
-    * A <dfn>BackgroundFetchRegistration instances</dfn> (a [=map=]), where the keys are [=/background fetch|background fetches=] and the values are {{BackgroundFetchRegistration}} objects. It is initially empty.
+    * <dfn>BackgroundFetchRegistration instances</dfn> (a [=map=]), where the keys are [=/background fetch|background fetches=] and the values are {{BackgroundFetchRegistration}} objects. It is initially an empty [=map=].
     * A <dfn>service worker registration</dfn> (a [=/service worker registration=]).
   </div>
 
