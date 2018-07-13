@@ -104,6 +104,7 @@ A <dfn>background fetch</dfn> consists of:
   * A <dfn>title</dfn> (a DOMString).
   * A <dfn>download total</dfn> (a number).
   * An <dfn>upload total</dfn> (a number).
+  * A <dfn>stored body bytes</dfn> (a number), initially 0.
   * A <dfn>last reported download</dfn> (a number), initially 0.
   * <dfn>Icons</dfn> (a [=list=] of {{IconDefinition}}s).
   * A <dfn>service worker registration</dfn> (a [=/service worker registration=]).
@@ -136,77 +137,34 @@ A <dfn>background fetch record</dfn> consists of:
   * A <dfn>request</dfn> (a [=/request=]).
   * A <dfn>response</dfn> (a [=/response=]), initially null.
   * A <dfn>response body source</dfn> (a [=byte sequence=]), initially empty.
-  * A <dfn>body complete flag</dfn>, initially unset.
+
+  <div algorithm>
+    To <dfn>fail</dfn> a |record| with a given |networkError| (a [=network error=]), set |record|'s [=background fetch record/response body source=] to an empty [=byte sequence=] and set |record|'s [=background fetch record/response=] to |networkError|.
+  </div>
 </div>
 
 # Algorithms # {#algorithms}
 
-## [=Attempt a background fetch=] ## {#attempt-a-background-fetch-algorithm}
+## [=Perform a background fetch=] ## {#perform-a-background-fetch-algorithm}
 
 <div algorithm>
-  To <dfn>attempt a background fetch</dfn> for |bgFetch| (a [=/background fetch=]), run these steps:
+  To <dfn>perform a background fetch</dfn> for |bgFetch| (a [=/background fetch=]), run these steps:
 
   1. [=background fetch/Display=] |bgFetch|.
   1. Let |swRegistration| be |bgFetch|'s [=background fetch/service worker registration=].
-  1. Let |successfulFetches| be 0.
-  1. Let |storedBytes| be 0. TODO: track and react to this, to prevent too much being downloaded.
   1. Let |downloadTotal| be |bgFetch|'s [=background fetch/download total=] if it is not 0, otherwise infinity.
+  1. Let |successfulFetches| be 0.
   1. Let |abandoned| be false.
   1. Let |aborted| be false.
   1. [=list/For each=] |record| in |bgFetch|'s [=background fetch/records=], run these steps [=in parallel=]:
-    1. While true:
-      1. Wait for |bgFetch|'s [=background fetch/paused flag=] to be unset.
-      1. Let |request| be a copy of |record|'s [=background fetch record/request=].
-      1. Set |request|'s [=request/keepalive flag=].
-      1. Set |request|'s [=request/synchronous flag=].
-      1. Let |rangeStart| be the [=byte sequence/length=] of |record|'s [=background fetch record/response body source=].
-      1. If |rangeStart| is not 0, then [=request/add a range header=] to |request| with |currentLength|.
+    1. [=Complete a record=] for |bgFetch| and |record|.
+    1. If |bgFetch|'s [=background fetch/stored body bytes=] is greater than |downloadTotal|, then set |abandoned| to true.
 
-        Note: This allows the initially request to make use of content encoding, since `Accept-Encoding: identity` is added to requests with a range header.
+      Issue: Accessing [=background fetch/stored body bytes=] is racey. It may have been decremented below the failure value.
 
-      1. Let |response| be the result of [=/fetching=] |request|.
-
-        Issue: Fetch waits for the body before returning |response|. Let's pretend it *doesn't* do that ([issue](https://github.com/whatwg/fetch/issues/536#issuecomment-330184276)).
-
-      1. If |response| is a [=network error=], then:
-        1. If the user agent is offline and |request|'s [=request/method=] is \``GET`\`, wait until the user agent is not offline and [=continue=].
-
-          Issue: Is "user agent is offline" hand-waving too much? Also discussed in [fetch/526](https://github.com/whatwg/fetch/issues/526#issuecomment-380686368).
-
-          Note: If |request|'s [=request/method=] is not \``GET`\`, reissuing the request may have unwanted side effects. If a standard method to resume requests becomes available, it'll be adopted here.
-
-        1. If |response| is an [=aborted network error=], then set |aborted| to true.
-        1. Set |abandoned| to true and abort these steps.
-      1. If |response|'s [=response/status=] is `206`, then:
-        1. If [=validate a partial response=] for |rangeStart|, |response|, and |record|'s [=background fetch record/response=] returns invalid, then set |abandoned| to true and abort these steps.
-      1. Otherwise:
-        1. Decrement |storedBytes| by the [=byte sequence/length=] of |record|'s [=background fetch record/response body source=].
-        1. Set |record|'s [=background fetch record/response body source=] to an empty [=byte sequence=].
-      1. Set |record|'s [=background fetch record/response=] to a copy of |response| except for its [=response/body=].
-
-        Note: This may be replacing an existing value. It's acceptable for earlier responses to be missing things like \``ETag`\` headers, and complete lengths from \``Content-Range`\` headers, but once a later response has them, we want to compare them against subsequent responses.
-
-      1. Let |stream| be |response|'s [=response/body=]'s [=body/stream=].
-      1. Let |readEnded| be false.
-      1. Let |readComplete| be false.
-      1. Whenever one or more bytes are transmitted from |stream|, let |bytes| be the transmitted bytes and run these steps:
-        1. Increment |storedBytes| by |bytes|' size.
-        1. If |storedBytes| is greater than |downloadTotal|, then set |abandoned| and |readEnded| to true and abort these steps.
-        1. Append |bytes| to |record|'s [=background fetch record/response body source=].
-        1. [=Report progress for background fetch=] |bgFetch|.
-      1. If at any point the bytes transmission for |stream| is done normally, then:
-        1. Set |record|'s [=background fetch record/body complete flag=].
-        1. Set |readComplete| to true.
-        1. If |response|'s [=response/status=] is not an [=ok status=], then set |abandoned| to true.
-        1. Otherwise, increment |successfulFetches|.
-        1. Set |readEnded| to true.
-      1. If at any point |stream| becomes [=ReadableStream/errored=], then:
-        1. If |response|'s [=response/aborted flag=] is set, then set |aborted| to true, and |abandoned| to true.
-        1. If |response|'s [=response/status=] is not an [=ok status=], then set |abandoned| to true.
-        1. Set |readComplete| to true.
-      1. Wait for |readEnded| to be true.
-      1. If either of |readComplete| or |abandoned| is true, [=break=].
-      1. TODO handle "paused" being set after the first step in this block.
+    1. Otherwise, if |record|'s [=background fetch record/response=]'s [=response/aborted flag=] is set, then set |aborted| and |abandoned| to true.
+    1. Otherwise, if |record|'s [=background fetch record/response=]'s [=response/status=] is not an [=ok status=], then set |abandoned| to true.
+    1. Otherwise, increment |successfulFetches| by 1.
   1. Wait for either |abandoned| to be true, or |successfulFetches| to be |bgFetch|'s [=background fetch/records=]'s [=list/size=].
   1. Let |operationAborted| be |aborted|.
   1. If |abandoned| is true:
@@ -218,6 +176,7 @@ A <dfn>background fetch record</dfn> consists of:
     1. Otherwise, set |operationAborted| to true.
 
       Note: This handles a race condition where {{BackgroundFetchRegistration/abort()}} was successfully called but one of the fetches failed at the same time. If we've returned true from {{BackgroundFetchRegistration/abort()}}, this ensures we fire the related abort event.
+
     1. If |operationAborted| is true, then [=fire a functional event=] named "`backgroundfetchabort`" using {{BackgroundFetchSettledEvent}} on |swRegistration| with the following properties:
       : {{BackgroundFetchEvent/id}}
       :: |id|
@@ -235,22 +194,86 @@ A <dfn>background fetch record</dfn> consists of:
       And with [=BackgroundFetchSettledEvent/records=] set to |bgFetch|'s [=background fetch/records=].
 </div>
 
+## [=Complete a record=] ## {#complete-a-record-algorithm}
+
+<div algorithm>
+  To <dfn>complete a record</dfn> for |bgFetch| (a [=/background fetch=]) and |record| (a [=/background fetch record=]), run these steps:
+
+  1. Let |downloadTotal| be |bgFetch|'s [=background fetch/download total=] if it is not 0, otherwise infinity.
+  1. Wait for |bgFetch|'s [=background fetch/paused flag=] to be unset.
+  1. Let |request| be a copy of |record|'s [=background fetch record/request=].
+  1. Set |request|'s [=request/keepalive flag=].
+  1. Let |rangeStart| be the [=byte sequence/length=] of |record|'s [=background fetch record/response body source=].
+  1. If |rangeStart| is not 0, then [=request/add a range header=] to |request| with |currentLength|.
+
+    Note: This allows the initial request to make use of content encoding, since `Accept-Encoding: identity` is added to requests with a range header.
+
+  1. Let |fetchAttemptComplete| be false.
+  1. Let |continue| be false.
+  1. [=/Fetch=] |request|.
+
+    Issue: The remainder of this step uses fetch "callbacks" which currently queue tasks. This isn't desirable here, so let's pretend that tasks aren't queued. ([issue](https://github.com/whatwg/fetch/issues/536#issuecomment-330184276))
+
+    To [=process request body=], run these steps:
+      1. TODO: handle upload progress.
+
+    To [=process response=] for |response|, run these steps:
+      1. If |response| is a [=network error=], then:
+        1. If the user agent is offline and |request|'s [=request/method=] is \``GET`\`, wait until the user agent is not offline and set continue| and |fetchAttemptComplete| to true, and abort these steps.
+
+          Issue: Is "user agent is offline" hand-waving too much? Also discussed in [fetch/526](https://github.com/whatwg/fetch/issues/526#issuecomment-380686368).
+
+          Note: If |request|'s [=request/method=] is not \``GET`\`, reissuing the request may have unwanted side effects. If a standard method to resume requests becomes available, it'll be adopted here.
+
+        1. If |response| is an [=aborted network error=], then [=background fetch record/fail=] |record| with |response|, set |fetchAttemptComplete| to true, and abort these steps.
+      1. If |response|'s [=response/status=] is `206`, then:
+        1. If [=validate a partial response=] for |rangeStart|, |response|, and |record|'s [=background fetch record/response=] returns invalid, then [=background fetch record/fail=] |record| with |response|, set |fetchAttemptComplete| to true, and abort these steps.
+      1. Otherwise:
+        1. Decrement |bgFetch|'s [=background fetch/stored body bytes=] by the [=byte sequence/length=] of |record|'s [=background fetch record/response body source=].
+        1. Set |record|'s [=background fetch record/response body source=] to an empty [=byte sequence=].
+      1. Set |record|'s [=background fetch record/response=] to a copy of |response| except for its [=response/body=].
+
+        Note: This may be replacing an existing value. It's acceptable for earlier responses to be missing things like \``ETag`\` headers, and complete lengths from \``Content-Range`\` headers, but once a later response has them, we want to compare them against subsequent responses.
+
+      1. Let |stream| be |response|'s [=response/body=]'s [=body/stream=].
+      1. Whenever one or more bytes are transmitted from |stream|, let |bytes| be the transmitted bytes and run these steps:
+        1. Increment |beFetch|'s [=background fetch/stored body bytes=] by |bytes|' size.
+        1. If |bgFetch|'s [=background fetch/stored body bytes=] is greater than |downloadTotal|, then:
+          1. [=ReadableStream/Cancel=] |stream|.
+          1. [=background fetch record/Fail=] |record| with an [=aborted network error=].
+          1. Set |fetchAttemptComplete| to true and abort these steps.
+        1. Append |bytes| to |record|'s [=background fetch record/response body source=].
+        1. [=Report progress for background fetch=] |bgFetch|.
+      1. If at any point the bytes transmission for |stream| is done normally, then:
+        1. If |response|'s [=response/status=] is `206`, then:
+          1. Let |firstBytePos|, |lastBytePos|, and |completeLength| be the result of [=extracting content-range values=] from |response|.
+          1. If |completeLength| is null, or not equal to the [=byte sequence/length=] of |record|'s [=background fetch record/response body source=], set |continue| to true.
+
+            Note: Although we ask for the whole resource, or the remainder of the resource, the server may not have returned the remainder, in which case we need to make an additional request.
+
+        1. Set |fetchAttemptComplete| to true.
+      1. If at any point |stream| becomes [=ReadableStream/errored=], then [=background fetch record/fail=] |record| with a [=network error=] and |fetchAttemptComplete| to true.
+  1. Wait for |fetchAttemptComplete| to be true.
+  1. If |continue| is true, then [=complete a record=] for |bgFetch| and |record|.
+
+  TODO: handle "paused" being set after the first step in this block.
+</div>
+
 ## [=Report progress for background fetch=] ## {#report-progress-for-background-fetch-algorithm}
 
 <div algorithm>
   To <dfn>report progress for background fetch</dfn> |bgFetch| (a [=/background fetch=]), [=enqueue the following steps=] to |bgFetch|'s [=background fetch/progress handling queue=]:
 
-  1. Let |downloaded| be 0.
-  1. [=list/For each=] |record| in |bgFetch|'s [=background fetch/records=], increment |downloaded| by the number of bytes in [=background fetch record/response body source=].
+  1. Let |downloaded| be |bgFetch|'s [=background fetch/stored body bytes=].
   1. If |downloaded| is equal to |bgFetch|'s [=background fetch/last reported download=], then abort these steps.
   1. Set |bgFetch|'s [=background fetch/last reported download=] to |downloaded|.
   1. For each [=environment settings object=] |env| whose [=environment settings object/origin=] is equal to |bgFetch|'s [=background fetch/service worker registration=]'s [=service worker registration/scope URL=]'s [=url/origin=], [=queue a bgfetch task=] on |env|'s [=environment settings object/responsible event loop=] to run these steps:
-    1. Let |bgFetchRegistration| be the instance of {{BackgroundFetchRegistration}} within this environment whose [=BackgroundFetchRegistration/background fetch=] is equal to |bgFetch|, or null if none exists.
+    1. Let |bgFetchRegistration| be the instance of {{BackgroundFetchRegistration}} within the [=relevant realm=] whose [=BackgroundFetchRegistration/background fetch=] is equal to |bgFetch|, or null if none exists.
 
-      Note: There will be at most one per environment, because of the [=get a BackgroundFetchRegistration instance=] algorithm.
-    1. If |bgFetchRegistration| is not null, then:
-      1. Set [=BackgroundFetchRegistration/downloaded=] to |downloaded|.
-      1. [=fire an event=] named "`progress`" at |bgFetchRegistration|.
+      Note: There will be at most one per environment, due to the [=get a BackgroundFetchRegistration instance=] algorithm.
+    1. If |bgFetchRegistration| is null, then abort these steps.
+    1. Set [=BackgroundFetchRegistration/downloaded=] to |downloaded|.
+    1. [=Fire an event=] named "`progress`" at |bgFetchRegistration|.
 </div>
 
 ## [=Get a BackgroundFetchRegistration instance=] ## {#get-a-backgroundfetchregistration-instance-algorithm}
@@ -525,7 +548,7 @@ dictionary IconDefinition {
       1. Set |bgFetchMap|[|id|] to |bgFetch|.
       1. [=Queue a bgfetch task=] to run these steps:
         1. [=Resolve=] |promise| with the result of [=getting a BackgroundFetchRegistration instance=] passing |bgFetchInstances| and |bgFetch|.
-      1. [=In parallel=], [=attempt a background fetch=] with |bgFetch|.
+      1. [=In parallel=], [=perform a background fetch=] with |bgFetch|.
     1. Return |promise|.
   </div>
 
