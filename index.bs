@@ -104,12 +104,22 @@ A <dfn>background fetch</dfn> consists of:
   * A <dfn>title</dfn> (a DOMString).
   * A <dfn>download total</dfn> (a number).
   * An <dfn>upload total</dfn> (a number).
-  * A <dfn>stored body bytes</dfn> (a number), initially 0.
+  * A <dfn>uploaded</dfn> (a number), initially 0.
+  * A <dfn>last reported upload</dfn> (a number), initially 0.
   * A <dfn>last reported download</dfn> (a number), initially 0.
   * <dfn>Icons</dfn> (a [=list=] of {{IconDefinition}}s).
   * A <dfn>service worker registration</dfn> (a [=/service worker registration=]).
   * A <dfn>progress handling queue</dfn> (a [=parallel queue=]), initially the result of [=starting a new parallel queue=].
   * A <dfn>paused flag</dfn>, initially unset.
+
+  <div algorithm>
+    To get a [=/background fetch=]'s (|bgFetch|) <dfn>stored body bytes</dfn>, run these steps:
+
+    1. Let |total| be 0.
+    1. [=list/For each=] |record| of |bgFetch|'s [=background fetch/records=]:
+      1. Increment |total| by the [=byte sequence/size=] of |record|'s [=background fetch record/response body source=].
+    1. Return |total|.
+  </div>
 
   <div algorithm>
     To <dfn>display</dfn> a [=/background fetch=] (|bgFetch|), the user agent must present a user interface that follows these rules:
@@ -206,12 +216,16 @@ A <dfn>background fetch record</dfn> consists of:
     Note: This allows the initial request to make use of content encoding, since `Accept-Encoding: identity` is added to requests with a range header.
 
   1. Let |fetchAttemptComplete| be false.
+  1. Let |lastTransmittedSize| be 0.
   1. [=/Fetch=] |request|.
 
     Issue: The remainder of this step uses fetch "callbacks" which currently queue tasks. This isn't desirable here, so let's pretend that tasks aren't queued. ([issue](https://github.com/whatwg/fetch/issues/536#issuecomment-330184276))
 
-    To [=process request body=], run these steps:
-      1. TODO: handle upload progress.
+    To [=process request body=] for |request|, run these steps:
+      1. Let |transmittedSize| be |request|'s [=request/body=]'s [=body/transmitted bytes=].
+      1. Increment |bgFetch|'s [=background fetch/uploaded=] by |transmittedSize| minus |lastTransmittedSize|.
+      1. Set |lastTransmittedSize| to |transmittedSize|.
+      1. [=Report progress for background fetch=] |bgFetch|.
 
     To [=process response=] for |response|, run these steps:
       1. If |response| is a [=network error=], then:
@@ -226,17 +240,14 @@ A <dfn>background fetch record</dfn> consists of:
         1. Set |fetchAttemptComplete| to true, and abort these steps.
       1. If |response|'s [=response/status=] is `206`, then:
         1. If [=validate a partial response=] for |rangeStart|, |response|, and |record|'s [=background fetch record/response=] returns invalid, then [=background fetch record/fail=] |record| with |response|, set |result| to `"invalid-response"`, |fetchAttemptComplete| to true, and abort these steps.
-      1. Otherwise:
-        1. Decrement |bgFetch|'s [=background fetch/stored body bytes=] by the [=byte sequence/length=] of |record|'s [=background fetch record/response body source=].
-        1. Set |record|'s [=background fetch record/response body source=] to an empty [=byte sequence=].
+      1. Otherwise, set |record|'s [=background fetch record/response body source=] to an empty [=byte sequence=].
       1. Set |record|'s [=background fetch record/response=] to a copy of |response| except for its [=response/body=].
 
         Note: This may replace an existing value. It's acceptable for earlier responses to be missing things like \``ETag`\` headers, and complete lengths from \``Content-Range`\` headers, but once a later response has them, we want to compare them against subsequent responses.
 
       1. Let |stream| be |response|'s [=response/body=]'s [=body/stream=].
       1. Whenever one or more bytes are transmitted from |stream|, let |bytes| be the transmitted bytes and run these steps:
-        1. Increment |beFetch|'s [=background fetch/stored body bytes=] by |bytes|' size.
-        1. If |bgFetch|'s [=background fetch/stored body bytes=] is greater than |downloadTotal|, then:
+        1. If |bgFetch|'s [=background fetch/stored body bytes=] plus the size of |bytes| is greater than |downloadTotal|, then:
           1. [=ReadableStream/Cancel=] |stream|.
           1. [=background fetch record/Fail=] |record| with an [=aborted network error=].
           1. Set |result| to `"download-limit-exceeded"`, |fetchAttemptComplete| to true, and abort these steps.
@@ -266,15 +277,21 @@ A <dfn>background fetch record</dfn> consists of:
   To <dfn>report progress for background fetch</dfn> |bgFetch| (a [=/background fetch=]), [=enqueue the following steps=] to |bgFetch|'s [=background fetch/progress handling queue=]:
 
   1. Let |downloaded| be |bgFetch|'s [=background fetch/stored body bytes=].
-  1. If |downloaded| is equal to |bgFetch|'s [=background fetch/last reported download=], then abort these steps.
+  1. Let |uploaded| be |bgFetch|'s [=background fetch/uploaded=].
+  1. If |uploaded| is equal to |bgFetch|'s [=background fetch/last reported upload=] and |downloaded| is equal to |bgFetch|'s [=background fetch/last reported download=], then abort these steps.
+  1. Set |bgFetch|'s [=background fetch/last reported upload=] to |uploaded|.
   1. Set |bgFetch|'s [=background fetch/last reported download=] to |downloaded|.
   1. For each [=environment settings object=] |env| whose [=environment settings object/origin=] is equal to |bgFetch|'s [=background fetch/service worker registration=]'s [=service worker registration/scope URL=]'s [=url/origin=], [=queue a bgfetch task=] on |env|'s [=environment settings object/responsible event loop=] to run these steps:
     1. Let |bgFetchRegistration| be the instance of {{BackgroundFetchRegistration}} within the [=relevant realm=] whose [=BackgroundFetchRegistration/background fetch=] is equal to |bgFetch|, or null if none exists.
 
       Note: There will be at most one per environment, due to the [=get a BackgroundFetchRegistration instance=] algorithm.
+
     1. If |bgFetchRegistration| is null, then abort these steps.
     1. Set [=BackgroundFetchRegistration/downloaded=] to |downloaded|.
+    1. Set [=BackgroundFetchRegistration/uploaded=] to |uploaded|.
     1. [=Fire an event=] named "`progress`" at |bgFetchRegistration|.
+
+    Issue: I need to debounce this similar to how mouse move events work.
 </div>
 
 ## [=Get a BackgroundFetchRegistration instance=] ## {#get-a-backgroundfetchregistration-instance-algorithm}
