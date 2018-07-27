@@ -1214,7 +1214,7 @@ Possible extra rowspan handling
 </style>
   <meta content="Bikeshed version 45e8ecaee91d0279f1fcff49412103c12b49542f" name="generator">
   <link href="https://wicg.github.io/background-fetch/" rel="canonical">
-  <meta content="1e11087725c2ad4f3a4354a1c39b7088511babda" name="document-revision">
+  <meta content="8b1f39c391222242ea3687739536986f7a5b37b3" name="document-revision">
 <style>
   .algorithm dl {
     overflow: hidden;
@@ -1883,8 +1883,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
        <li data-md="">
         <p>Otherwise, set <var>record</var>’s <a data-link-type="dfn" href="#background-fetch-record-response-body-source" id="ref-for-background-fetch-record-response-body-source③">response body source</a> to an empty <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#byte-sequence" id="ref-for-byte-sequence②">byte sequence</a>.</p>
        <li data-md="">
-        <p>Set <var>record</var>’s <a data-link-type="dfn" href="#background-fetch-record-response" id="ref-for-background-fetch-record-response②">response</a> to a copy of <var>response</var> except for its <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-body" id="ref-for-concept-response-body">body</a>.</p>
-        <p class="note" role="note"><span>Note:</span> This may replace an existing value. It’s acceptable for earlier responses to be missing things like `<code>ETag</code>` headers, and complete lengths from `<code>Content-Range</code>` headers, but once a later response has them, we want to compare them against subsequent responses.</p>
+        <p>If <var>rangeStart</var> is 0 or <var>response</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-status" id="ref-for-concept-response-status①">status</a> is not <code>206</code>, then set <var>record</var>’s <a data-link-type="dfn" href="#background-fetch-record-response" id="ref-for-background-fetch-record-response②">response</a> to a copy of <var>response</var> except for its <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-body" id="ref-for-concept-response-body">body</a>.</p>
        <li data-md="">
         <p>Let <var>stream</var> be <var>response</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-body" id="ref-for-concept-response-body①">body</a>'s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-body-stream" id="ref-for-concept-body-stream">stream</a>.</p>
        <li data-md="">
@@ -1909,7 +1908,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
         <p>If at any point the bytes transmission for <var>stream</var> is done normally, then:</p>
         <ol>
          <li data-md="">
-          <p>If <var>response</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-status" id="ref-for-concept-response-status①">status</a> is <code>206</code>, then:</p>
+          <p>If <var>response</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-status" id="ref-for-concept-response-status②">status</a> is <code>206</code>, then:</p>
           <ol>
            <li data-md="">
             <p>Let <var>firstBytePos</var>, <var>lastBytePos</var>, and <var>completeLength</var> be the result of <a data-link-type="dfn" href="#extract-content-range-values" id="ref-for-extract-content-range-values">extracting content-range values</a> from <var>response</var>.</p>
@@ -1918,7 +1917,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
             <p class="note" role="note"><span>Note:</span> Although we ask for the whole resource, or the remainder of the resource, the server may not have returned the remainder, in which case we need to make an additional request.</p>
           </ol>
          <li data-md="">
-          <p>Otherwise, if <var>response</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-status" id="ref-for-concept-response-status②">status</a> is not an <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#ok-status" id="ref-for-ok-status">ok status</a>, set <var>result</var> to <code>"invalid-response"</code>.</p>
+          <p>Otherwise, if <var>response</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-status" id="ref-for-concept-response-status③">status</a> is not an <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#ok-status" id="ref-for-ok-status">ok status</a>, set <var>result</var> to <code>"invalid-response"</code>.</p>
          <li data-md="">
           <p>Otherwise, set <var>result</var> to <code>"success"</code>.</p>
          <li data-md="">
@@ -2007,7 +2006,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
      To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="validate-a-partial-response">validate a partial response</dfn> for an <var>expectedRangeStart</var> (a number), a <var>partialResponse</var> (a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response" id="ref-for-concept-response①">response</a>), and an optional <var>previousResponse</var> (a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response" id="ref-for-concept-response②">response</a> or null, null unless otherwise specified), run these steps: 
     <ol>
      <li data-md="">
-      <p class="assertion">Assert: <var>partialResponse</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-status" id="ref-for-concept-response-status③">status</a> is <code>206</code>.</p>
+      <p class="assertion">Assert: <var>partialResponse</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-status" id="ref-for-concept-response-status④">status</a> is <code>206</code>.</p>
      <li data-md="">
       <p>Let <var>responseFirstBytePos</var>, <var>responseLastBytePos</var>, and <var>responseCompleteLength</var> be the result of <a data-link-type="dfn" href="#extract-content-range-values" id="ref-for-extract-content-range-values①">extracting content-range values</a> from <var>partialResponse</var>. If this fails, then return invalid.</p>
      <li data-md="">
@@ -2020,7 +2019,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
        <li data-md="">
         <p>If <var>previousResponse</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-header-list" id="ref-for-concept-response-header-list③">header list</a> <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#header-list-contains" id="ref-for-header-list-contains①">contains</a> `<code>Last-Modified</code>`, and <a data-link-type="dfn" href="#header-equality" id="ref-for-header-equality①">header equality</a> for `<code>Last-Modified</code>`, <var>previousResponse</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-header-list" id="ref-for-concept-response-header-list④">header list</a>, and <var>partialResponse</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-header-list" id="ref-for-concept-response-header-list⑤">header list</a> is false, then return invalid.</p>
        <li data-md="">
-        <p>If <var>previousResponse</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-status" id="ref-for-concept-response-status④">status</a> is <code>206</code>, then:</p>
+        <p>If <var>previousResponse</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-status" id="ref-for-concept-response-status⑤">status</a> is <code>206</code>, then:</p>
         <ol>
          <li data-md="">
           <p>Let <var>previousResponseFirstBytePos</var>, <var>previousResponseLastBytePos</var>, and <var>previousResponseCompleteLength</var> be the result of <a data-link-type="dfn" href="#extract-content-range-values" id="ref-for-extract-content-range-values②">extracting content-range values</a> from <var>previousResponse</var>. If this fails, then return invalid.</p>
@@ -2114,6 +2113,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
             <p>Increment <var>transmittedBytes</var> by <var>bytes</var>’ <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#byte-sequence-length" id="ref-for-byte-sequence-length②">length</a>.</p>
            <li data-md="">
             <p><a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#resolve-promise" id="ref-for-resolve-promise">Resolve</a> <var>bytePromise</var> with a new <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#idl-Uint8Array" id="ref-for-idl-Uint8Array">Uint8Array</a></code> wrapping a new <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#idl-ArrayBuffer" id="ref-for-idl-ArrayBuffer">ArrayBuffer</a></code> of <var>bytes</var>.</p>
+            <p class="issue" id="issue-727270bf"><a class="self-link" href="#issue-727270bf"></a> This is wrong. I need to enqueue the data &amp; close it when done.</p>
           </ol>
          <li data-md="">
           <p>Let <var>body</var> be a new <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-body" id="ref-for-concept-body">body</a> with the following set:</p>
@@ -2152,7 +2152,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
      <li data-md="">
       <p>Return <var>settledFetches</var>.</p>
     </ol>
-    <p class="issue" id="issue-3a09bfc2"><a class="self-link" href="#issue-3a09bfc2"></a> I need to make sure the response objects have the correct content-length and no content-range. Although, maybe I don’t need to, since compression is already an issue here. Check with Ben.</p>
+    <p class="issue" id="issue-8f5e98a2"><a class="self-link" href="#issue-8f5e98a2"></a> I need to make sure the response objects have the correct content-length and no content-range.</p>
    </div>
    <h2 class="heading settled" data-level="5" id="header-syntax"><span class="secno">5. </span><span class="content">Header syntax</span><a class="self-link" href="#header-syntax"></a></h2>
    <p>The following is <a data-link-type="dfn" href="https://tools.ietf.org/html/rfc7230#section-7" id="ref-for-section-7">HTTP ABNF</a> for a <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="single-byte-content-range">single byte content-range</dfn>:</p>
@@ -3248,8 +3248,8 @@ complete-length = ( 1*DIGIT / "*" )</pre>
   <aside class="dfn-panel" data-for="term-for-concept-response-status">
    <a href="https://fetch.spec.whatwg.org/#concept-response-status">https://fetch.spec.whatwg.org/#concept-response-status</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-concept-response-status">4.2. Complete a record</a> <a href="#ref-for-concept-response-status①">(2)</a> <a href="#ref-for-concept-response-status②">(3)</a>
-    <li><a href="#ref-for-concept-response-status③">4.5. Validate a partial response</a> <a href="#ref-for-concept-response-status④">(2)</a>
+    <li><a href="#ref-for-concept-response-status">4.2. Complete a record</a> <a href="#ref-for-concept-response-status①">(2)</a> <a href="#ref-for-concept-response-status②">(3)</a> <a href="#ref-for-concept-response-status③">(4)</a>
+    <li><a href="#ref-for-concept-response-status④">4.5. Validate a partial response</a> <a href="#ref-for-concept-response-status⑤">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-concept-body-stream">
@@ -4024,8 +4024,9 @@ complete-length = ( 1*DIGIT / "*" )</pre>
    <div class="issue"> Is "user agent is offline" hand-waving too much? Also discussed in <a href="https://github.com/whatwg/fetch/issues/526#issuecomment-380686368">fetch/526</a>.<a href="#issue-6a6d7250"> ↵ </a></div>
    <div class="issue"> I need to debounce this similar to how mouse move events work.<a href="#issue-f0a2dc23"> ↵ </a></div>
    <div class="issue"> Parsing as an integer <a href="https://github.com/whatwg/infra/issues/189">infra/189</a>.<a href="#issue-cddfe468"> ↵ </a></div>
+   <div class="issue"> This is wrong. I need to enqueue the data &amp; close it when done.<a href="#issue-727270bf"> ↵ </a></div>
    <div class="issue"> <a data-link-type="dfn">Trailer promise</a> isn’t exported. <a href="https://github.com/whatwg/fetch/issues/771">fetch/771</a>.<a href="#issue-09f0762e"> ↵ </a></div>
-   <div class="issue"> I need to make sure the response objects have the correct content-length and no content-range. Although, maybe I don’t need to, since compression is already an issue here. Check with Ben.<a href="#issue-3a09bfc2"> ↵ </a></div>
+   <div class="issue"> I need to make sure the response objects have the correct content-length and no content-range.<a href="#issue-8f5e98a2"> ↵ </a></div>
    <div class="issue"> <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/ServiceWorker/#dictdef-cachequeryoptions">CacheQueryOptions</a></code> includes <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/ServiceWorker/#dom-cachequeryoptions-cachename">cacheName</a></code> which doesn’t make sense here. I need to abstract it out.<a href="#issue-37a72fb2"> ↵ </a></div>
    <div class="issue"> The above needs to be abstracted.<a href="#issue-0e36e319"> ↵ </a></div>
    <div class="issue"> The above needs to be abstracted.<a href="#issue-0e36e319①"> ↵ </a></div>

@@ -380,6 +380,9 @@ A <dfn>background fetch record</dfn> consists of:
         1. Let |bytes| be a user agent determined slice of |record|'s [=background fetch record/response body source=], starting from an offset of |transmittedBytes|.
         1. Increment |transmittedBytes| by |bytes|' [=byte sequence/length=].
         1. [=Resolve=] |bytePromise| with a new {{Uint8Array}} wrapping a new {{ArrayBuffer}} of |bytes|.
+
+          Issue: This is wrong. I need to enqueue the data & close it when done.
+
       1. Let |body| be a new [=/body=] with the following set:
         : [=body/Stream=]
         :: |stream|.
@@ -401,7 +404,7 @@ A <dfn>background fetch record</dfn> consists of:
     1. [=list/Append=] |settledFetch| to |settledFetches|.
   1. Return |settledFetches|.
 
-  Issue: I need to make sure the response objects have the correct content-length and no content-range. Although, maybe I don't need to, since compression is already an issue here. Check with Ben.
+  Issue: I need to make sure the response objects have the correct content-length and no content-range.
 </div>
 
 # Header syntax # {#header-syntax}
