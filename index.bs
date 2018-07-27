@@ -186,21 +186,21 @@ A <dfn>background fetch record</dfn> consists of:
 
       Note: This handles a race condition where {{BackgroundFetchRegistration/abort()}} was successfully called but one of the fetches failed at the same time. If we've returned true from {{BackgroundFetchRegistration/abort()}}, this ensures we fire the related abort event.
 
-    1. If |operationAborted| is true, then [=fire a functional event=] named "`backgroundfetchabort`" using {{BackgroundFetchSettledEvent}} on |swRegistration| with the following properties:
+    1. If |operationAborted| is true, then [=fire a functional event=] named "`backgroundfetchabort`" using {{BackgroundFetchAbortEvent}} on |swRegistration| with the following properties:
       : {{BackgroundFetchEvent/id}}
       :: |id|
 
-      And with [=BackgroundFetchSettledEvent/records=] set to |bgFetch|'s [=background fetch/records=].
-    1. Otherwise, if |abandoned| is true, then [=fire a functional event=] named "`backgroundfetchfail`" using {{BackgroundFetchUpdateEvent}} on |swRegistration| with the following properties:
+      And with [=BackgroundFetchEvent/records=] set to |bgFetch|'s [=background fetch/records=].
+    1. Otherwise, if |abandoned| is true, then [=fire a functional event=] named "`backgroundfetchfail`" using {{BackgroundFetchFailEvent}} on |swRegistration| with the following properties:
       : {{BackgroundFetchEvent/id}}
       :: |id|
 
-      And with [=BackgroundFetchSettledEvent/records=] set to |bgFetch|'s [=background fetch/records=].
-    1. Otherwise, [=fire a functional event=] named "`backgroundfetched`" using {{BackgroundFetchUpdateEvent}} on |swRegistration| with the following properties:
+      And with [=BackgroundFetchEvent/records=] set to |bgFetch|'s [=background fetch/records=].
+    1. Otherwise, [=fire a functional event=] named "`backgroundfetched`" using {{BackgroundFetchSuccessEvent}} on |swRegistration| with the following properties:
       : {{BackgroundFetchEvent/id}}
       :: |id|
 
-      And with [=BackgroundFetchSettledEvent/records=] set to |bgFetch|'s [=background fetch/records=].
+      And with [=BackgroundFetchEvent/records=] set to |bgFetch|'s [=background fetch/records=].
 </div>
 
 ## [=Complete a record=] ## {#complete-a-record-algorithm}
@@ -446,17 +446,17 @@ The following is the <a>event handler</a> (and its corresponding <a>event handle
     <tr>
       <td><dfn>backgroundfetched</dfn></td>
       <td>{{ServiceWorkerGlobalScope/onbackgroundfetched}}</td>
-      <td>{{BackgroundFetchUpdateEvent}}</td>
+      <td>{{BackgroundFetchSuccessEvent}}</td>
     </tr>
     <tr>
       <td><dfn>backgroundfetchfail</dfn></td>
       <td>{{ServiceWorkerGlobalScope/onbackgroundfetchfail}}</td>
-      <td>{{BackgroundFetchUpdateEvent}}</td>
+      <td>{{BackgroundFetchFailEvent}}</td>
     </tr>
     <tr>
       <td><dfn>backgroundfetchabort</dfn></td>
       <td>{{ServiceWorkerGlobalScope/onbackgroundfetchabort}}</td>
-      <td>{{BackgroundFetchSettledEvent}}</td>
+      <td>{{BackgroundFetchAbortEvent}}</td>
     </tr>
     <tr>
       <td><dfn>backgroundfetchclick</dfn></td>
@@ -623,7 +623,6 @@ interface BackgroundFetchRegistration : EventTarget {
   Promise<boolean> abort();
   Promise<BackgroundFetchActiveFetch> match(RequestInfo request, optional CacheQueryOptions options);
   Promise<sequence<BackgroundFetchActiveFetch>> matchAll(optional RequestInfo request, optional CacheQueryOptions options);
-  Promise<sequence<BackgroundFetchActiveFetch>> values();
 };
 </script>
 
@@ -690,14 +689,6 @@ interface BackgroundFetchRegistration : EventTarget {
 
     1. TODO.
   </div>
-
-  ### {{BackgroundFetchRegistration/values()}} ### {#background-fetch-registration-values}
-
-  <div algorithm>
-    The <dfn method>values()</dfn> method, when invoked, must return [=a new promise=] |promise| and run these steps [=in parallel=]:
-
-    1. TODO.
-  </div>
 </div>
 
 ## {{BackgroundFetchFetch}} ## {#background-fetch-fetch}
@@ -731,6 +722,36 @@ interface BackgroundFetchActiveFetch : BackgroundFetchFetch {
   The <dfn attribute>responseReady</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchActiveFetch/response promise=].
 </div>
 
+## {{BackgroundFetchSettledFetch}} ## {#background-fetch-settled-fetch}
+
+<script type="idl">
+[Exposed=ServiceWorker]
+interface BackgroundFetchSettledFetch : BackgroundFetchFetch {
+  readonly attribute Response? response;
+};
+</script>
+
+<div dfn-for="BackgroundFetchSettledFetch">
+  A {{BackgroundFetchSettledFetch}} has an optional <dfn>response</dfn> (a [=/response=]), initially undefined.
+
+  The <dfn attribute>response</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchSettledFetch/response=].
+</div>
+
+## {{BackgroundFetchSuccessfulFetch}} ## {#background-fetch-successful-fetch}
+
+<script type="idl">
+[Exposed=ServiceWorker]
+interface BackgroundFetchSuccessfulFetch : BackgroundFetchFetch {
+  readonly attribute Response response;
+};
+</script>
+
+<div dfn-for="BackgroundFetchSuccessfulFetch">
+  A {{BackgroundFetchSuccessfulFetch}} has an <dfn>response</dfn> (a [=/response=]).
+
+  The <dfn attribute>response</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchSuccessfulFetch/response=].
+</div>
+
 ## {{BackgroundFetchEvent}} ## {#background-fetch-event}
 
 <script type="idl">
@@ -745,80 +766,19 @@ dictionary BackgroundFetchEventInit : ExtendableEventInit {
 </script>
 
 <div dfn-for="BackgroundFetchEvent">
-  A {{BackgroundFetchEvent}} has an associated <dfn>id</dfn>, a DOMString.
+  A {{BackgroundFetchEvent}} has:
+
+  * An <dfn>id</dfn> (a DOMString).
+  * <dfn>Records</dfn> (a [=list=] of [=background fetch records=] or undefined), initially undefined.
 
   The <dfn attribute>id</dfn> attribute must return the [=BackgroundFetchEvent/id=].
-
-  TODO
 </div>
-
-<div algorithm>
-  The <dfn constructor for="BackgroundFetchEvent">BackgroundFetchEvent(|type|, |init|)</dfn> constructor, when invoked, must run these steps:
-
-  1. TODO
-</div>
-
-## {{BackgroundFetchSettledEvent}} ## {#background-fetch-settled-event}
-
-<script type="idl">
-[Constructor(DOMString type, BackgroundFetchEventInit init), Exposed=ServiceWorker]
-interface BackgroundFetchSettledEvent : BackgroundFetchEvent {
-  Promise<BackgroundFetchSettledFetch> match(RequestInfo request, optional CacheQueryOptions options);
-  Promise<sequence<BackgroundFetchSettledFetch>> matchAll(optional RequestInfo request, optional CacheQueryOptions options);
-  Promise<sequence<BackgroundFetchSettledFetch>> values();
-};
-</script>
-
-Issue: {{CacheQueryOptions}} includes {{CacheQueryOptions/cacheName}} which doesn't make sense here. I need to abstract it out.
-
-<div dfn-for="BackgroundFetchSettledEvent">
-  A {{BackgroundFetchSettledEvent}} object has <dfn>records</dfn> (a [=list=] of [=background fetch records=]).</p>
-
-  ### {{BackgroundFetchSettledEvent/match()}} ### {#background-fetch-settled-event-match}
-
-  <div algorithm="backgroundFetchSettledEvent.match(|request|, |options|)">
-    The <dfn method>match(|request|, |options|)</dfn> method, when invoked, must run these steps:
-
-    1. Let |promise| be the result of calling the algorithm {{BackgroundFetchSettledEvent/matchAll()}} passing |request| and |options|.
-    1. Return the result of [=transforming=] |promise| with a fulfilment handler that, when called with argument |matches|, returns |matches|[0].
-
-    Note: User agents are encouraged to optimise the above so it's faster than calling {{BackgroundFetchSettledEvent/matchAll()}}.
-  </div>
-
-  ### {{BackgroundFetchSettledEvent/matchAll()}} ### {#background-fetch-settled-event-match-all}
-
-  <div algorithm="backgroundFetchSettledEvent.matchAll(|request|, |options|)">
-    The <dfn method>matchAll(|request|, |options|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run these steps [=in parallel=]:
-
-    1. Let |records| be the result of filtering the [=context object=]'s [=BackgroundFetchSettledEvent/records=] according to the rules of {{Cache/matchAll()|cache.matchAll()}}.
-
-      Issue: The above needs to be abstracted.
-
-    1. [=Queue a bgfetch task=] to [=resolve=] |promise| with the result of [=creating settled fetches=] from |records| in [=context object=]'s [=relevant Realm=].
-  </div>
-
-  ### {{BackgroundFetchSettledEvent/values()}} ### {#background-fetch-settled-event-values}
-
-  <div algorithm="backgroundFetchSettledEvent.values()">
-    The <dfn method>values()</dfn> method, when invoked, must return [=a new promise=] |promise| and run these steps [=in parallel=]:
-
-    1. Let |records| be the [=context object=]'s [=BackgroundFetchSettledEvent/records=].
-    1. [=Queue a bgfetch task=] to [=resolve=] |promise| with the result of [=creating settled fetches=] from |records| in [=context object=]'s [=relevant Realm=].
-  </div>
-</div>
-
-<script type="idl">
-[Exposed=ServiceWorker]
-interface BackgroundFetchSettledFetch : BackgroundFetchFetch {
-  readonly attribute Response? response;
-};
-</script>
 
 ## {{BackgroundFetchUpdateEvent}} ## {#background-fetch-update-event}
 
 <script type="idl">
 [Constructor(DOMString type, BackgroundFetchEventInit init), Exposed=ServiceWorker]
-interface BackgroundFetchUpdateEvent : BackgroundFetchSettledEvent {
+interface BackgroundFetchUpdateEvent : BackgroundFetchEvent {
   Promise<void> updateUI(DOMString title);
 };
 </script>
@@ -826,6 +786,95 @@ interface BackgroundFetchUpdateEvent : BackgroundFetchSettledEvent {
 <div dfn-for="BackgroundFetchUpdateEvent">
   <div algorithm>
     The <dfn method>updateUI(|title|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run these steps [=in parallel=]:
+
+    1. TODO
+  </div>
+</div>
+
+## {{BackgroundFetchSettledMatching}} ## {#background-fetch-settled-matching}
+
+<script type="idl">
+interface mixin BackgroundFetchSettledMatching {
+  Promise<BackgroundFetchSettledFetch> match(RequestInfo request, optional CacheQueryOptions options);
+  Promise<sequence<BackgroundFetchSettledFetch>> matchAll(optional RequestInfo request, optional CacheQueryOptions options);
+};
+</script>
+
+Issue: {{CacheQueryOptions}} includes {{CacheQueryOptions/cacheName}} which doesn't make sense here. I need to abstract it out.
+
+<div dfn-for="BackgroundFetchSettledMatching">
+  ### {{BackgroundFetchSettledMatching/match()}} ### {#background-fetch-settled-matching-match}
+
+  <div algorithm="BackgroundFetchSettledMatching.match(|request|, |options|)">
+    The <dfn method>match(|request|, |options|)</dfn> method, when invoked, must run these steps:
+
+    1. Let |promise| be the result of calling the algorithm {{BackgroundFetchSettledMatching/matchAll()}} passing |request| and |options|.
+    1. Return the result of [=transforming=] |promise| with a fulfilment handler that, when called with argument |matches|, returns |matches|[0].
+
+    Note: User agents are encouraged to optimise the above so it's faster than calling {{BackgroundFetchSettledMatching/matchAll()}}.
+  </div>
+
+  ### {{BackgroundFetchSettledMatching/matchAll()}} ### {#background-fetch-settled-matching-match-all}
+
+  <div algorithm="BackgroundFetchSettledMatching.matchAll(|request|, |options|)">
+    The <dfn method>matchAll(|request|, |options|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run these steps [=in parallel=]:
+
+    1. Assert: The [=context object=]'s [=BackgroundFetchEvent/records=] is not undefined.
+    1. Let |records| be the result of filtering the [=context object=]'s [=BackgroundFetchEvent/records=] according to the rules of {{Cache/matchAll()|cache.matchAll()}}.
+
+      Issue: The above needs to be abstracted.
+
+    1. [=Queue a bgfetch task=] to [=resolve=] |promise| with the result of [=creating settled fetches=] from |records| in [=context object=]'s [=relevant Realm=].
+  </div>
+</div>
+
+## {{BackgroundFetchAbortEvent}} ## {#background-fetch-abort-event}
+
+<script type="idl">
+[Constructor(DOMString type, BackgroundFetchEventInit init), Exposed=ServiceWorker]
+interface BackgroundFetchAbortEvent : BackgroundFetchEvent {};
+BackgroundFetchAbortEvent includes BackgroundFetchSettledMatching;
+</script>
+
+## {{BackgroundFetchFailEvent}} ## {#background-fetch-fail-event}
+
+<script type="idl">
+[Constructor(DOMString type, BackgroundFetchEventInit init), Exposed=ServiceWorker]
+interface BackgroundFetchFailEvent : BackgroundFetchUpdateEvent {};
+BackgroundFetchAbortEvent includes BackgroundFetchSettledMatching;
+</script>
+
+## {{BackgroundFetchSuccessEvent}} ## {#background-fetch-success-event}
+
+<script type="idl">
+[Constructor(DOMString type, BackgroundFetchEventInit init), Exposed=ServiceWorker]
+interface BackgroundFetchSuccessEvent : BackgroundFetchUpdateEvent {
+  Promise<BackgroundFetchSuccessfulFetch> match(RequestInfo request, optional CacheQueryOptions options);
+    Promise<sequence<BackgroundFetchSuccessfulFetch>> matchAll(optional RequestInfo request, optional CacheQueryOptions options);
+};
+</script>
+
+<div dfn-for="BackgroundFetchSuccessEvent">
+  ### {{BackgroundFetchSuccessEvent/match()}} ### {#background-fetch-abort-event-match}
+
+  <div algorithm="BackgroundFetchSuccessEvent.match(|request|, |options|)">
+    The <dfn method>match(|request|, |options|)</dfn> method, when invoked, must run these steps:
+
+    1. Let |promise| be the result of calling the algorithm {{BackgroundFetchSuccessEvent/matchAll()}} passing |request| and |options|.
+    1. Return the result of [=transforming=] |promise| with a fulfilment handler that, when called with argument |matches|, returns |matches|[0].
+
+    Note: User agents are encouraged to optimise the above so it's faster than calling {{BackgroundFetchSuccessEvent/matchAll()}}.
+  </div>
+
+  ### {{BackgroundFetchSuccessEvent/matchAll()}} ### {#background-fetch-abort-event-match-all}
+
+  <div algorithm="BackgroundFetchSuccessEvent.matchAll(|request|, |options|)">
+    The <dfn method>matchAll(|request|, |options|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run these steps [=in parallel=]:
+
+    1. Assert: The [=context object=]'s [=BackgroundFetchEvent/records=] is not undefined.
+    1. Let |records| be the result of filtering the [=context object=]'s [=BackgroundFetchEvent/records=] according to the rules of {{Cache/matchAll()|cache.matchAll()}}.
+
+      Issue: The above needs to be abstracted.
 
     1. TODO
   </div>
