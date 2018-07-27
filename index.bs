@@ -111,6 +111,7 @@ A <dfn>background fetch</dfn> consists of:
   * A <dfn>service worker registration</dfn> (a [=/service worker registration=]).
   * A <dfn>progress handling queue</dfn> (a [=parallel queue=]), initially the result of [=starting a new parallel queue=].
   * A <dfn>paused flag</dfn>, initially unset.
+  * A <dfn>abort all flag</dfn>, initially unset.
 
   <div algorithm>
     To get a [=/background fetch=]'s (|bgFetch|) <dfn>stored body bytes</dfn>, run these steps:
@@ -128,7 +129,7 @@ A <dfn>background fetch</dfn> consists of:
     * The UI may display |bgFetch|'s [=background fetch/title=].
     * The UI may display one of |bgFetch|'s [=background fetch/icons=]. TODO: when to fetch this?
     * The UI may use |bgFetch|'s [=background fetch/download total=], [=background fetch/upload total=], [=background fetch/last reported download=], and [=background fetch/paused flag=] to present the progress of the fetch. TODO what about bytes uploaded? TODO how can I tell when the operation is complete?
-    * The UI must provide a way for the user to abort |bgFetch|. TODO link up to algo.
+    * The UI must provide a way for the user to abort the |bgFetch| by setting |bgFetch|'s [=background fetch/abort all flag=].
     * If every [=background fetch record/request=] in |beFetch|'s [=background fetch/records=] is \``GET`\`, the UI may provide a way to toggle |bgFetch|'s [=background fetch/paused flag=].
 
       Note: If a [=background fetch record/request=] is not \``GET`\`, reissuing the request may have unwanted side effects.
@@ -176,8 +177,7 @@ A <dfn>background fetch record</dfn> consists of:
     1. Otherwise, increment |successfulFetches| by 1.
   1. Wait for either |abandoned| to be true, or |successfulFetches| to be |bgFetch|'s [=background fetch/records=]'s [=list/size=].
   1. Let |operationAborted| be |aborted|.
-  1. If |abandoned| is true:
-      1. TODO: terminate all related fetches.
+  1. If |abandoned| is true, set |bgFetch|'s [=background fetch/abort all flag=].
   1. [=Enqueue the following steps=] to |swRegistration|'s [=active background fetches edit queue=]:
     1. Let |activeBgFetches| be |swRegistration|'s [=active background fetches=].
     1. Let |id| be |bgFetch|'s [=background fetch/id=].
@@ -269,10 +269,11 @@ A <dfn>background fetch record</dfn> consists of:
       1. If at any point |stream| becomes [=ReadableStream/errored=], then:
         1. If the user agent is offline and |request|'s [=request/method=] is \``GET`\`, then wait until the user agent is not offline then set |fetchAttemptComplete| to true.
         1. Otherwise, [=background fetch record/fail=] |record| with a [=network error=], set |result| to `"invalid-response"` and |fetchAttemptComplete| to true.
-  1. Run these steps, but [=abort when=] |bgFetch|'s [=background fetch/paused flag=] is set:
+  1. Run these steps, but [=abort when=] |bgFetch|'s [=background fetch/paused flag=] or [=background fetch/abort all flag=] is set:
     1. Wait for |fetchAttemptComplete| to be true.
   1. [=If aborted=], then:
-    1. Assert: |request|'s [=request/method=] is \``GET`\`.
+    1. If |bgFetch|'s [=background fetch/paused flag=] is set, then assert |request|'s [=request/method=] is \``GET`\`.
+    1. If |bgFetch|'s [=background fetch/abort all flag=] is set, then set |result| to `"aborted"`.
     1. [=fetch/Terminate=] the ongoing fetch.
   1. If |reason| is the empty string, then return the result of [=completing a record=] for |bgFetch| and |record|.
   1. Return |reason|.
@@ -668,7 +669,7 @@ interface BackgroundFetchRegistration : EventTarget {
       1. If |activeBgFetches| does not [=active background fetches/contain=] |bgFetch|, then [=resolve=] |promise| with false and abort these steps.
       1. Remove |activeBgFetches|[|id|].
       1. [=Resolve=] |promise| with true.
-      1. TODO: [=fetch/Terminate=] related fetches with the *aborted* flag set.
+      1. Set |bgFetch|'s [=background fetch/abort all flag=].
   </div>
 
   ### {{BackgroundFetchRegistration/match()}} ### {#background-fetch-registration-match}
