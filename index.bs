@@ -266,12 +266,16 @@ A <dfn>background fetch record</dfn> consists of:
         1. Otherwise, if |response|'s [=response/status=] is not an [=ok status=], set |result| to `"invalid-response"`.
         1. Otherwise, set |result| to `"success"`.
         1. Set |fetchAttemptComplete| to true.
-      1. If at any point |stream| becomes [=ReadableStream/errored=], then [=background fetch record/fail=] |record| with a [=network error=], set |result| to `"invalid-response"` and |fetchAttemptComplete| to true.
-  1. Wait for |fetchAttemptComplete| to be true.
+      1. If at any point |stream| becomes [=ReadableStream/errored=], then:
+        1. If the user agent is offline and |request|'s [=request/method=] is \``GET`\`, then wait until the user agent is not offline then set |fetchAttemptComplete| to true.
+        1. Otherwise, [=background fetch record/fail=] |record| with a [=network error=], set |result| to `"invalid-response"` and |fetchAttemptComplete| to true.
+  1. Run these steps, but [=abort when=] |bgFetch|'s [=background fetch/paused flag=] is set:
+    1. Wait for |fetchAttemptComplete| to be true.
+  1. [=If aborted=], then:
+    1. Assert: |request|'s [=request/method=] is \``GET`\`.
+    1. [=fetch/Terminate=] the ongoing fetch.
   1. If |reason| is the empty string, then return the result of [=completing a record=] for |bgFetch| and |record|.
   1. Return |reason|.
-
-  Issue: TODO: handle "paused" being set after the first step in this block.
 </div>
 
 ## [=Report progress for background fetch=] ## {#report-progress-for-background-fetch-algorithm}
