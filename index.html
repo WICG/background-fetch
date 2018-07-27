@@ -1214,6 +1214,7 @@ Possible extra rowspan handling
 </style>
   <meta content="Bikeshed version 45e8ecaee91d0279f1fcff49412103c12b49542f" name="generator">
   <link href="https://wicg.github.io/background-fetch/" rel="canonical">
+  <meta content="6cce49e3d81468230449038cd93469f0e03ee7b6" name="document-revision">
 <style>
   .algorithm dl {
     overflow: hidden;
@@ -1489,12 +1490,13 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">Background Fetch</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Editor’s Draft, <time class="dt-updated" datetime="2018-07-26">26 July 2018</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Editor’s Draft, <time class="dt-updated" datetime="2018-07-27">27 July 2018</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
      <dd><a class="u-url" href="https://wicg.github.io/background-fetch/">https://wicg.github.io/background-fetch/</a>
      <dt>Issue Tracking:
+     <dd><a href="https://github.com/WICG/background-fetch/issues/">GitHub</a>
      <dd><a href="#issues-index">Inline In Spec</a>
      <dt class="editor">Editors:
      <dd class="editor p-author h-card vcard"><a class="p-name fn u-email email" href="mailto:jakearchibald@google.com">Jake Archibald</a> (<span class="p-org org">Google</span>)
@@ -1711,7 +1713,8 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
       <li data-md="">
        <p>The UI must provide a way for the user to abort <var>bgFetch</var>. TODO link up to algo.</p>
       <li data-md="">
-       <p>The UI may provide a way to toggle <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-paused-flag" id="ref-for-background-fetch-paused-flag①">paused flag</a>.</p>
+       <p>If every <a data-link-type="dfn" href="#background-fetch-record-request" id="ref-for-background-fetch-record-request">request</a> in <var>beFetch</var>’s <a data-link-type="dfn" href="#background-fetch-records" id="ref-for-background-fetch-records①">records</a> is `<code>GET</code>`, the UI may provide a way to toggle <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-paused-flag" id="ref-for-background-fetch-paused-flag①">paused flag</a>.</p>
+       <p class="note" role="note"><span>Note:</span> If a <a data-link-type="dfn" href="#background-fetch-record-request" id="ref-for-background-fetch-record-request①">request</a> is not `<code>GET</code>`, reissuing the request may have unwanted side effects.</p>
       <li data-md="">
        <p>The UI may be activated (for example, by clicking), in which case it must TODO hook this up to the event.</p>
       <li data-md="">
@@ -1752,7 +1755,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
      <li data-md="">
       <p>Let <var>aborted</var> be false.</p>
      <li data-md="">
-      <p><a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-iterate" id="ref-for-list-iterate①">For each</a> <var>record</var> in <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-records" id="ref-for-background-fetch-records①">records</a>, run these steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel">in parallel</a>:</p>
+      <p><a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-iterate" id="ref-for-list-iterate①">For each</a> <var>record</var> in <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-records" id="ref-for-background-fetch-records②">records</a>, run these steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel">in parallel</a>:</p>
       <ol>
        <li data-md="">
         <p>Let <var>result</var> be the result of <a data-link-type="dfn" href="#complete-a-record" id="ref-for-complete-a-record">completing a record</a> for <var>bgFetch</var> and <var>record</var>.</p>
@@ -1764,7 +1767,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
         <p>Otherwise, increment <var>successfulFetches</var> by 1.</p>
       </ol>
      <li data-md="">
-      <p>Wait for either <var>abandoned</var> to be true, or <var>successfulFetches</var> to be <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-records" id="ref-for-background-fetch-records②">records</a>'s <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-size" id="ref-for-list-size">size</a>.</p>
+      <p>Wait for either <var>abandoned</var> to be true, or <var>successfulFetches</var> to be <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-records" id="ref-for-background-fetch-records③">records</a>'s <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-size" id="ref-for-list-size">size</a>.</p>
      <li data-md="">
       <p>Let <var>operationAborted</var> be <var>aborted</var>.</p>
      <li data-md="">
@@ -1792,7 +1795,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
          <dd data-md="">
           <p><var>id</var></p>
         </dl>
-        <p>And with <a data-link-type="dfn" href="#backgroundfetchsettledevent-records" id="ref-for-backgroundfetchsettledevent-records">records</a> set to <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-records" id="ref-for-background-fetch-records③">records</a>.</p>
+        <p>And with <a data-link-type="dfn" href="#backgroundfetchsettledevent-records" id="ref-for-backgroundfetchsettledevent-records">records</a> set to <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-records" id="ref-for-background-fetch-records④">records</a>.</p>
        <li data-md="">
         <p>Otherwise, if <var>abandoned</var> is true, then <a data-link-type="dfn" href="https://w3c.github.io/ServiceWorker/#fire-functional-event" id="ref-for-fire-functional-event①">fire a functional event</a> named "<code>backgroundfetchfail</code>" using <code class="idl"><a data-link-type="idl" href="#backgroundfetchupdateevent" id="ref-for-backgroundfetchupdateevent">BackgroundFetchUpdateEvent</a></code> on <var>swRegistration</var> with the following properties:</p>
         <dl>
@@ -1800,7 +1803,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
          <dd data-md="">
           <p><var>id</var></p>
         </dl>
-        <p>And with <a data-link-type="dfn" href="#backgroundfetchsettledevent-records" id="ref-for-backgroundfetchsettledevent-records①">records</a> set to <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-records" id="ref-for-background-fetch-records④">records</a>.</p>
+        <p>And with <a data-link-type="dfn" href="#backgroundfetchsettledevent-records" id="ref-for-backgroundfetchsettledevent-records①">records</a> set to <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-records" id="ref-for-background-fetch-records⑤">records</a>.</p>
        <li data-md="">
         <p>Otherwise, <a data-link-type="dfn" href="https://w3c.github.io/ServiceWorker/#fire-functional-event" id="ref-for-fire-functional-event②">fire a functional event</a> named "<code>backgroundfetched</code>" using <code class="idl"><a data-link-type="idl" href="#backgroundfetchupdateevent" id="ref-for-backgroundfetchupdateevent①">BackgroundFetchUpdateEvent</a></code> on <var>swRegistration</var> with the following properties:</p>
         <dl>
@@ -1808,7 +1811,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
          <dd data-md="">
           <p><var>id</var></p>
         </dl>
-        <p>And with <a data-link-type="dfn" href="#backgroundfetchsettledevent-records" id="ref-for-backgroundfetchsettledevent-records②">records</a> set to <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-records" id="ref-for-background-fetch-records⑤">records</a>.</p>
+        <p>And with <a data-link-type="dfn" href="#backgroundfetchsettledevent-records" id="ref-for-backgroundfetchsettledevent-records②">records</a> set to <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-records" id="ref-for-background-fetch-records⑥">records</a>.</p>
       </ol>
     </ol>
    </div>
@@ -1823,7 +1826,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
      <li data-md="">
       <p>Wait for <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-paused-flag" id="ref-for-background-fetch-paused-flag⑤">paused flag</a> to be unset.</p>
      <li data-md="">
-      <p>Let <var>request</var> be a copy of <var>record</var>’s <a data-link-type="dfn" href="#background-fetch-record-request" id="ref-for-background-fetch-record-request">request</a>.</p>
+      <p>Let <var>request</var> be a copy of <var>record</var>’s <a data-link-type="dfn" href="#background-fetch-record-request" id="ref-for-background-fetch-record-request②">request</a>.</p>
      <li data-md="">
       <p>Set <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#request-keepalive-flag" id="ref-for-request-keepalive-flag">keepalive flag</a>.</p>
      <li data-md="">
@@ -1869,7 +1872,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
         <p>If <var>response</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-status" id="ref-for-concept-response-status">status</a> is <code>206</code>, then:</p>
         <ol>
          <li data-md="">
-          <p>If <a data-link-type="dfn" href="#validate-a-partial-response" id="ref-for-validate-a-partial-response">validate a partial response</a> for <var>rangeStart</var>, <var>response</var>, and <var>record</var>’s <a data-link-type="dfn" href="#background-fetch-record-response" id="ref-for-background-fetch-record-response①">response</a> returns invalid, then <a data-link-type="dfn" href="#background-fetch-record-fail" id="ref-for-background-fetch-record-fail①">fail</a> <var>record</var> with <var>response</var>, set <var>result</var> to <code>"invalid-response"</code>, <var>fetchAttemptComplete</var> to true, and abort these steps.</p>
+          <p>If <a data-link-type="dfn" href="#validate-a-partial-response" id="ref-for-validate-a-partial-response">validate a partial response</a> for <var>rangeStart</var>, <var>response</var>, and <var>record</var>’s <a data-link-type="dfn" href="#background-fetch-record-response" id="ref-for-background-fetch-record-response①">response</a> returns invalid, then <a data-link-type="dfn" href="#background-fetch-record-fail" id="ref-for-background-fetch-record-fail①">fail</a> <var>record</var> with a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-network-error" id="ref-for-concept-network-error②">network error</a>, set <var>result</var> to <code>"invalid-response"</code>, <var>fetchAttemptComplete</var> to true, and abort these steps.</p>
         </ol>
        <li data-md="">
         <p>Otherwise, set <var>record</var>’s <a data-link-type="dfn" href="#background-fetch-record-response-body-source" id="ref-for-background-fetch-record-response-body-source③">response body source</a> to an empty <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#byte-sequence" id="ref-for-byte-sequence②">byte sequence</a>.</p>
@@ -1916,16 +1919,33 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
           <p>Set <var>fetchAttemptComplete</var> to true.</p>
         </ol>
        <li data-md="">
-        <p>If at any point <var>stream</var> becomes <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-readablestream-errored" id="ref-for-concept-readablestream-errored">errored</a>, then <a data-link-type="dfn" href="#background-fetch-record-fail" id="ref-for-background-fetch-record-fail③">fail</a> <var>record</var> with a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-network-error" id="ref-for-concept-network-error②">network error</a>, set <var>result</var> to <code>"invalid-response"</code> and <var>fetchAttemptComplete</var> to true.</p>
+        <p>If at any point <var>stream</var> becomes <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-readablestream-errored" id="ref-for-concept-readablestream-errored">errored</a>, then:</p>
+        <ol>
+         <li data-md="">
+          <p>If the user agent is offline and <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-method" id="ref-for-concept-request-method②">method</a> is `<code>GET</code>`, then wait until the user agent is not offline then set <var>fetchAttemptComplete</var> to true.</p>
+         <li data-md="">
+          <p>Otherwise, <a data-link-type="dfn" href="#background-fetch-record-fail" id="ref-for-background-fetch-record-fail③">fail</a> <var>record</var> with a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-network-error" id="ref-for-concept-network-error③">network error</a>, set <var>result</var> to <code>"invalid-response"</code> and <var>fetchAttemptComplete</var> to true.</p>
+        </ol>
       </ol>
      <li data-md="">
-      <p>Wait for <var>fetchAttemptComplete</var> to be true.</p>
+      <p>Run these steps, but <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#abort-when" id="ref-for-abort-when">abort when</a> <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-paused-flag" id="ref-for-background-fetch-paused-flag⑥">paused flag</a> is set:</p>
+      <ol>
+       <li data-md="">
+        <p>Wait for <var>fetchAttemptComplete</var> to be true.</p>
+      </ol>
+     <li data-md="">
+      <p><a data-link-type="dfn" href="https://infra.spec.whatwg.org/#if-aborted" id="ref-for-if-aborted">If aborted</a>, then:</p>
+      <ol>
+       <li data-md="">
+        <p class="assertion">Assert: <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-method" id="ref-for-concept-request-method③">method</a> is `<code>GET</code>`.</p>
+       <li data-md="">
+        <p><a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-fetch-terminate" id="ref-for-concept-fetch-terminate">Terminate</a> the ongoing fetch.</p>
+      </ol>
      <li data-md="">
       <p>If <var>reason</var> is the empty string, then return the result of <a data-link-type="dfn" href="#complete-a-record" id="ref-for-complete-a-record②">completing a record</a> for <var>bgFetch</var> and <var>record</var>.</p>
      <li data-md="">
       <p>Return <var>reason</var>.</p>
     </ol>
-    <p class="issue" id="issue-2c6e2b3b"><a class="self-link" href="#issue-2c6e2b3b"></a> TODO: handle "paused" being set after the first step in this block.</p>
    </div>
    <h3 class="heading settled" data-level="4.3" id="report-progress-for-background-fetch-algorithm"><span class="secno">4.3. </span><span class="content"><a data-link-type="dfn" href="#report-progress-for-background-fetch" id="ref-for-report-progress-for-background-fetch②">Report progress for background fetch</a></span><a class="self-link" href="#report-progress-for-background-fetch-algorithm"></a></h3>
    <div class="algorithm" data-algorithm="report progress for background fetch">
@@ -2063,7 +2083,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
         <dl>
          <dt data-md=""><a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-request" id="ref-for-concept-request-request">Request</a>
          <dd data-md="">
-          <p>A copy of <var>record</var>’s <a data-link-type="dfn" href="#background-fetch-record-request" id="ref-for-background-fetch-record-request①">request</a>.</p>
+          <p>A copy of <var>record</var>’s <a data-link-type="dfn" href="#background-fetch-record-request" id="ref-for-background-fetch-record-request③">request</a>.</p>
          <dt data-md=""><a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#request-headers" id="ref-for-request-headers">Headers</a>
          <dd data-md="">
           <p>A new <code class="idl"><a data-link-type="idl" href="https://fetch.spec.whatwg.org/#headers" id="ref-for-headers">Headers</a></code> object associated with this <code class="idl"><a data-link-type="idl" href="https://fetch.spec.whatwg.org/#request" id="ref-for-request①">Request</a></code>'s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-request" id="ref-for-concept-request-request①">request</a>'s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-header-list" id="ref-for-concept-request-header-list">header list</a>.</p>
@@ -2237,7 +2257,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
         <li data-md="">
          <p>Let <var>record</var> be a new <a data-link-type="dfn" href="#background-fetch-record" id="ref-for-background-fetch-record③">background fetch record</a>.</p>
         <li data-md="">
-         <p>Set <var>record</var>’s <a data-link-type="dfn" href="#background-fetch-record-request" id="ref-for-background-fetch-record-request②">request</a> to <var>internalReqeust</var>.</p>
+         <p>Set <var>record</var>’s <a data-link-type="dfn" href="#background-fetch-record-request" id="ref-for-background-fetch-record-request④">request</a> to <var>internalReqeust</var>.</p>
         <li data-md="">
          <p><a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-append" id="ref-for-list-append①">Append</a> <var>record</var> to <var>records</var>.</p>
        </ol>
@@ -2267,7 +2287,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
            <p>Run these steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel②">in parallel</a>:</p>
            <ol>
             <li data-md="">
-             <p>Run these steps but <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#abort-when" id="ref-for-abort-when">abort when</a> <var>requestReadFailed</var> is true:</p>
+             <p>Run these steps but <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#abort-when" id="ref-for-abort-when①">abort when</a> <var>requestReadFailed</var> is true:</p>
              <ol>
               <li data-md="">
                <p><a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-body-wait" id="ref-for-concept-body-wait">Wait</a> for <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-body" id="ref-for-concept-request-body③">body</a>.</p>
@@ -2276,7 +2296,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
              </ol>
              <p class="note" role="note"><span>Note:</span> This ensures we have a copy of the request bytes before resolving.</p>
             <li data-md="">
-             <p><a data-link-type="dfn" href="https://infra.spec.whatwg.org/#if-aborted" id="ref-for-if-aborted">If aborted</a> and <var>stream</var> is <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-readablestream-readable" id="ref-for-concept-readablestream-readable">readable</a>, then <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-readablestream-errored" id="ref-for-concept-readablestream-errored②">error</a> <var>stream</var> with an <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#aborterror" id="ref-for-aborterror">AbortError</a></code> <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#idl-DOMException" id="ref-for-idl-DOMException">DOMException</a></code> and abort these steps.</p>
+             <p><a data-link-type="dfn" href="https://infra.spec.whatwg.org/#if-aborted" id="ref-for-if-aborted①">If aborted</a> and <var>stream</var> is <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-readablestream-readable" id="ref-for-concept-readablestream-readable">readable</a>, then <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-readablestream-errored" id="ref-for-concept-readablestream-errored②">error</a> <var>stream</var> with an <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#aborterror" id="ref-for-aborterror">AbortError</a></code> <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#idl-DOMException" id="ref-for-idl-DOMException">DOMException</a></code> and abort these steps.</p>
             <li data-md="">
              <p>Increment <var>uploadTotal</var> by <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-body" id="ref-for-concept-request-body④">body</a>'s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-body-total-bytes" id="ref-for-concept-body-total-bytes①">total bytes</a>.</p>
             <li data-md="">
@@ -2295,7 +2315,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
           <dt data-md=""><a data-link-type="dfn" href="#background-fetch-id" id="ref-for-background-fetch-id②">id</a>
           <dd data-md="">
            <p><var>id</var>.</p>
-          <dt data-md=""><a data-link-type="dfn" href="#background-fetch-records" id="ref-for-background-fetch-records⑥">records</a>
+          <dt data-md=""><a data-link-type="dfn" href="#background-fetch-records" id="ref-for-background-fetch-records⑦">records</a>
           <dd data-md="">
            <p><var>records</var>.</p>
           <dt data-md=""><a data-link-type="dfn" href="#background-fetch-download-total" id="ref-for-background-fetch-download-total③">download total</a>
@@ -2435,7 +2455,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
         <li data-md="">
          <p><a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#resolve-promise" id="ref-for-resolve-promise⑦">Resolve</a> <var>promise</var> with true.</p>
         <li data-md="">
-         <p>TODO: <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-fetch-terminate" id="ref-for-concept-fetch-terminate">Terminate</a> related fetches with the <em>aborted</em> flag set.</p>
+         <p>TODO: <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-fetch-terminate" id="ref-for-concept-fetch-terminate①">Terminate</a> related fetches with the <em>aborted</em> flag set.</p>
        </ol>
      </ol>
     </div>
@@ -2594,7 +2614,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
    <p>It’s the recommendation of this standard that user agents make background fetch operations highly visible and easily abortable rather than asking permission up front. However, given that background fetches can be paused and retried, a user agent that immediately paused a background fetch and user interaction to resume would be compliant.</p>
    <p>The <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/origin.html#concept-origin" id="ref-for-concept-origin">origin</a> of a background fetch should have equal or great visibility to the developer-provided information, such as a the <a data-link-type="dfn" href="#background-fetch-icons" id="ref-for-background-fetch-icons②">icons</a> and <a data-link-type="dfn" href="#background-fetch-title" id="ref-for-background-fetch-title②">title</a>.</p>
    <p>A user agent may pause background downloads depending on network conditions or battery state. For example, a user agent may download automatically when connected to WiFi, but require user confirmation to download using mobile data. If an implementation has this restriction, the user should be able to persist granting mobile data use for the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/origin.html#concept-origin" id="ref-for-concept-origin①">origin</a>.</p>
-   <p>If the user agent provides a way for a user to abort a background fetch operation, it should <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-fetch-terminate" id="ref-for-concept-fetch-terminate①">terminate</a> all fetches associated with the <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch①③">background fetch</a>'s <a data-link-type="dfn" href="#background-fetch-records" id="ref-for-background-fetch-records⑦">records</a>, with the <em>abort</em> flag set.</p>
+   <p>If the user agent provides a way for a user to abort a background fetch operation, it should <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-fetch-terminate" id="ref-for-concept-fetch-terminate②">terminate</a> all fetches associated with the <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch①③">background fetch</a>'s <a data-link-type="dfn" href="#background-fetch-records" id="ref-for-background-fetch-records⑧">records</a>, with the <em>abort</em> flag set.</p>
    <p>A background fetch exposes the user’s external IPs to the server throughout the duration of the background fetch. An attacker could use an extremely slow background fetch as a way to persistently track the user once they’ve left the site. Good visibility into the progress of the background fetch will help the user identify unwanted use.</p>
   </main>
   <div data-fill-with="conformance">
@@ -3099,7 +3119,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
   <aside class="dfn-panel" data-for="term-for-concept-request-method">
    <a href="https://fetch.spec.whatwg.org/#concept-request-method">https://fetch.spec.whatwg.org/#concept-request-method</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-concept-request-method">4.2. Complete a record</a> <a href="#ref-for-concept-request-method①">(2)</a>
+    <li><a href="#ref-for-concept-request-method">4.2. Complete a record</a> <a href="#ref-for-concept-request-method①">(2)</a> <a href="#ref-for-concept-request-method②">(3)</a> <a href="#ref-for-concept-request-method③">(4)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-concept-request-mode">
@@ -3119,7 +3139,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
    <a href="https://fetch.spec.whatwg.org/#concept-network-error">https://fetch.spec.whatwg.org/#concept-network-error</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-concept-network-error">3.3. Background fetch record</a>
-    <li><a href="#ref-for-concept-network-error①">4.2. Complete a record</a> <a href="#ref-for-concept-network-error②">(2)</a>
+    <li><a href="#ref-for-concept-network-error①">4.2. Complete a record</a> <a href="#ref-for-concept-network-error②">(2)</a> <a href="#ref-for-concept-network-error③">(3)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-ok-status">
@@ -3183,8 +3203,9 @@ complete-length = ( 1*DIGIT / "*" )</pre>
   <aside class="dfn-panel" data-for="term-for-concept-fetch-terminate">
    <a href="https://fetch.spec.whatwg.org/#concept-fetch-terminate">https://fetch.spec.whatwg.org/#concept-fetch-terminate</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-concept-fetch-terminate">6.4.2. abort()</a>
-    <li><a href="#ref-for-concept-fetch-terminate①">7. Privacy and bandwidth usage</a>
+    <li><a href="#ref-for-concept-fetch-terminate">4.2. Complete a record</a>
+    <li><a href="#ref-for-concept-fetch-terminate①">6.4.2. abort()</a>
+    <li><a href="#ref-for-concept-fetch-terminate②">7. Privacy and bandwidth usage</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-concept-body-total-bytes">
@@ -3335,7 +3356,8 @@ complete-length = ( 1*DIGIT / "*" )</pre>
   <aside class="dfn-panel" data-for="term-for-abort-when">
    <a href="https://infra.spec.whatwg.org/#abort-when">https://infra.spec.whatwg.org/#abort-when</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-abort-when">6.3.1. fetch()</a>
+    <li><a href="#ref-for-abort-when">4.2. Complete a record</a>
+    <li><a href="#ref-for-abort-when①">6.3.1. fetch()</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-list-append">
@@ -3398,7 +3420,8 @@ complete-length = ( 1*DIGIT / "*" )</pre>
   <aside class="dfn-panel" data-for="term-for-if-aborted">
    <a href="https://infra.spec.whatwg.org/#if-aborted">https://infra.spec.whatwg.org/#if-aborted</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-if-aborted">6.3.1. fetch()</a>
+    <li><a href="#ref-for-if-aborted">4.2. Complete a record</a>
+    <li><a href="#ref-for-if-aborted①">6.3.1. fetch()</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-byte-sequence-length">
@@ -3919,7 +3942,6 @@ complete-length = ( 1*DIGIT / "*" )</pre>
   <div style="counter-reset:issue">
    <div class="issue"> The remainder of this step uses fetch "callbacks" which currently queue tasks. This isn’t desirable here, so let’s pretend that tasks aren’t queued. (<a href="https://github.com/whatwg/fetch/issues/536#issuecomment-330184276">issue</a>)<a href="#issue-4132a55c"> ↵ </a></div>
    <div class="issue"> Is "user agent is offline" hand-waving too much? Also discussed in <a href="https://github.com/whatwg/fetch/issues/526#issuecomment-380686368">fetch/526</a>.<a href="#issue-6a6d7250"> ↵ </a></div>
-   <div class="issue"> TODO: handle "paused" being set after the first step in this block.<a href="#issue-2c6e2b3b"> ↵ </a></div>
    <div class="issue"> I need to debounce this similar to how mouse move events work.<a href="#issue-f0a2dc23"> ↵ </a></div>
    <div class="issue"> Parsing as an integer <a href="https://github.com/whatwg/infra/issues/189">infra/189</a>.<a href="#issue-cddfe468"> ↵ </a></div>
    <div class="issue"> <a data-link-type="dfn">Trailer promise</a> isn’t exported. <a href="https://github.com/whatwg/fetch/issues/771">fetch/771</a>.<a href="#issue-09f0762e"> ↵ </a></div>
@@ -3997,10 +4019,10 @@ complete-length = ( 1*DIGIT / "*" )</pre>
   <aside class="dfn-panel" data-for="background-fetch-records">
    <b><a href="#background-fetch-records">#background-fetch-records</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-background-fetch-records">3.2. Background fetch</a>
-    <li><a href="#ref-for-background-fetch-records①">4.1. Perform a background fetch</a> <a href="#ref-for-background-fetch-records②">(2)</a> <a href="#ref-for-background-fetch-records③">(3)</a> <a href="#ref-for-background-fetch-records④">(4)</a> <a href="#ref-for-background-fetch-records⑤">(5)</a>
-    <li><a href="#ref-for-background-fetch-records⑥">6.3.1. fetch()</a>
-    <li><a href="#ref-for-background-fetch-records⑦">7. Privacy and bandwidth usage</a>
+    <li><a href="#ref-for-background-fetch-records">3.2. Background fetch</a> <a href="#ref-for-background-fetch-records①">(2)</a>
+    <li><a href="#ref-for-background-fetch-records②">4.1. Perform a background fetch</a> <a href="#ref-for-background-fetch-records③">(2)</a> <a href="#ref-for-background-fetch-records④">(3)</a> <a href="#ref-for-background-fetch-records⑤">(4)</a> <a href="#ref-for-background-fetch-records⑥">(5)</a>
+    <li><a href="#ref-for-background-fetch-records⑦">6.3.1. fetch()</a>
+    <li><a href="#ref-for-background-fetch-records⑧">7. Privacy and bandwidth usage</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="background-fetch-title">
@@ -4079,7 +4101,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
    <b><a href="#background-fetch-paused-flag">#background-fetch-paused-flag</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-background-fetch-paused-flag">3.2. Background fetch</a> <a href="#ref-for-background-fetch-paused-flag①">(2)</a> <a href="#ref-for-background-fetch-paused-flag②">(3)</a> <a href="#ref-for-background-fetch-paused-flag③">(4)</a> <a href="#ref-for-background-fetch-paused-flag④">(5)</a>
-    <li><a href="#ref-for-background-fetch-paused-flag⑤">4.2. Complete a record</a>
+    <li><a href="#ref-for-background-fetch-paused-flag⑤">4.2. Complete a record</a> <a href="#ref-for-background-fetch-paused-flag⑥">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="background-fetch-stored-body-bytes">
@@ -4108,9 +4130,10 @@ complete-length = ( 1*DIGIT / "*" )</pre>
   <aside class="dfn-panel" data-for="background-fetch-record-request">
    <b><a href="#background-fetch-record-request">#background-fetch-record-request</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-background-fetch-record-request">4.2. Complete a record</a>
-    <li><a href="#ref-for-background-fetch-record-request①">4.8. Create settled fetches</a>
-    <li><a href="#ref-for-background-fetch-record-request②">6.3.1. fetch()</a>
+    <li><a href="#ref-for-background-fetch-record-request">3.2. Background fetch</a> <a href="#ref-for-background-fetch-record-request①">(2)</a>
+    <li><a href="#ref-for-background-fetch-record-request②">4.2. Complete a record</a>
+    <li><a href="#ref-for-background-fetch-record-request③">4.8. Create settled fetches</a>
+    <li><a href="#ref-for-background-fetch-record-request④">6.3.1. fetch()</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="background-fetch-record-response">
