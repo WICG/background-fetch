@@ -242,7 +242,7 @@ A <dfn>background fetch record</dfn> consists of:
         1. [=background fetch record/Fail=] |record| with |response|.
         1. Set |fetchAttemptComplete| to true, and abort these steps.
       1. If |response|'s [=response/status=] is `206`, then:
-        1. If [=validate a partial response=] for |rangeStart|, |response|, and |record|'s [=background fetch record/response=] returns invalid, then [=background fetch record/fail=] |record| with |response|, set |result| to `"invalid-response"`, |fetchAttemptComplete| to true, and abort these steps.
+        1. If [=validate a partial response=] for |rangeStart|, |response|, and |record|'s [=background fetch record/response=] returns invalid, then [=background fetch record/fail=] |record| with a [=network error=], set |result| to `"invalid-response"`, |fetchAttemptComplete| to true, and abort these steps.
       1. Otherwise, set |record|'s [=background fetch record/response body source=] to an empty [=byte sequence=].
       1. Set |record|'s [=background fetch record/response=] to a copy of |response| except for its [=response/body=].
 
