@@ -244,10 +244,7 @@ A <dfn>background fetch record</dfn> consists of:
       1. If |response|'s [=response/status=] is `206`, then:
         1. If [=validate a partial response=] for |rangeStart|, |response|, and |record|'s [=background fetch record/response=] returns invalid, then [=background fetch record/fail=] |record| with a [=network error=], set |result| to `"invalid-response"`, |fetchAttemptComplete| to true, and abort these steps.
       1. Otherwise, set |record|'s [=background fetch record/response body source=] to an empty [=byte sequence=].
-      1. Set |record|'s [=background fetch record/response=] to a copy of |response| except for its [=response/body=].
-
-        Note: This may replace an existing value. It's acceptable for earlier responses to be missing things like \``ETag`\` headers, and complete lengths from \``Content-Range`\` headers, but once a later response has them, we want to compare them against subsequent responses.
-
+      1. If |rangeStart| is 0 or |response|'s [=response/status=] is not `206`, then set |record|'s [=background fetch record/response=] to a copy of |response| except for its [=response/body=].
       1. Let |stream| be |response|'s [=response/body=]'s [=body/stream=].
       1. Whenever one or more bytes are transmitted from |stream|, let |bytes| be the transmitted bytes and run these steps:
         1. If |bgFetch|'s [=background fetch/stored body bytes=] plus the size of |bytes| is greater than |downloadTotal|, then:
