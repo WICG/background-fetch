@@ -1214,7 +1214,7 @@ Possible extra rowspan handling
 </style>
   <meta content="Bikeshed version 45e8ecaee91d0279f1fcff49412103c12b49542f" name="generator">
   <link href="https://wicg.github.io/background-fetch/" rel="canonical">
-  <meta content="8a2733f3436cc954ed82c36e0e9c9a99e59ff5b4" name="document-revision">
+  <meta content="1e11087725c2ad4f3a4354a1c39b7088511babda" name="document-revision">
 <style>
   .algorithm dl {
     overflow: hidden;
@@ -1811,7 +1811,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
         </dl>
         <p>And with <a data-link-type="dfn" href="#backgroundfetchevent-records" id="ref-for-backgroundfetchevent-records①">records</a> set to <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-records" id="ref-for-background-fetch-records⑤">records</a>.</p>
        <li data-md="">
-        <p>Otherwise, <a data-link-type="dfn" href="https://w3c.github.io/ServiceWorker/#fire-functional-event" id="ref-for-fire-functional-event②">fire a functional event</a> named "<code>backgroundfetched</code>" using <code class="idl"><a data-link-type="idl" href="#backgroundfetchsuccessevent" id="ref-for-backgroundfetchsuccessevent">BackgroundFetchSuccessEvent</a></code> on <var>swRegistration</var> with the following properties:</p>
+        <p>Otherwise, <a data-link-type="dfn" href="https://w3c.github.io/ServiceWorker/#fire-functional-event" id="ref-for-fire-functional-event②">fire a functional event</a> named "<code>backgroundfetchsuccess</code>" using <code class="idl"><a data-link-type="idl" href="#backgroundfetchsuccessevent" id="ref-for-backgroundfetchsuccessevent">BackgroundFetchSuccessEvent</a></code> on <var>swRegistration</var> with the following properties:</p>
         <dl>
          <dt data-md=""><code class="idl"><a data-link-type="idl" href="#dom-backgroundfetchevent-id" id="ref-for-dom-backgroundfetchevent-id②">id</a></code>
          <dd data-md="">
@@ -2163,7 +2163,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
    <h2 class="heading settled" data-level="6" id="api"><span class="secno">6. </span><span class="content">API</span><a class="self-link" href="#api"></a></h2>
    <h3 class="heading settled" data-level="6.1" id="extensions-to-service-worker-global"><span class="secno">6.1. </span><span class="content">Extensions to <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/ServiceWorker/#serviceworkerglobalscope" id="ref-for-serviceworkerglobalscope">ServiceWorkerGlobalScope</a></code></span><a class="self-link" href="#extensions-to-service-worker-global"></a></h3>
 <pre class="idl highlight def"><c- b="">partial</c-> <c- b="">interface</c-> <a class="idl-code" data-link-type="interface" href="https://w3c.github.io/ServiceWorker/#serviceworkerglobalscope" id="ref-for-serviceworkerglobalscope①"><c- g="">ServiceWorkerGlobalScope</c-></a> {
-  <c- b="">attribute</c-> <a class="n" data-link-type="idl-name"><c- n="">EventHandler</c-></a> <dfn class="dfn-paneled idl-code" data-dfn-for="ServiceWorkerGlobalScope" data-dfn-type="attribute" data-export="" data-type="EventHandler" id="dom-serviceworkerglobalscope-onbackgroundfetched"><code><c- g="">onbackgroundfetched</c-></code></dfn>;
+  <c- b="">attribute</c-> <a class="n" data-link-type="idl-name"><c- n="">EventHandler</c-></a> <dfn class="dfn-paneled idl-code" data-dfn-for="ServiceWorkerGlobalScope" data-dfn-type="attribute" data-export="" data-type="EventHandler" id="dom-serviceworkerglobalscope-onbackgroundfetchsuccess"><code><c- g="">onbackgroundfetchsuccess</c-></code></dfn>;
   <c- b="">attribute</c-> <a class="n" data-link-type="idl-name"><c- n="">EventHandler</c-></a> <dfn class="dfn-paneled idl-code" data-dfn-for="ServiceWorkerGlobalScope" data-dfn-type="attribute" data-export="" data-type="EventHandler" id="dom-serviceworkerglobalscope-onbackgroundfetchfail"><code><c- g="">onbackgroundfetchfail</c-></code></dfn>;
   <c- b="">attribute</c-> <a class="n" data-link-type="idl-name"><c- n="">EventHandler</c-></a> <dfn class="dfn-paneled idl-code" data-dfn-for="ServiceWorkerGlobalScope" data-dfn-type="attribute" data-export="" data-type="EventHandler" id="dom-serviceworkerglobalscope-onbackgroundfetchabort"><code><c- g="">onbackgroundfetchabort</c-></code></dfn>;
   <c- b="">attribute</c-> <a class="n" data-link-type="idl-name"><c- n="">EventHandler</c-></a> <dfn class="dfn-paneled idl-code" data-dfn-for="ServiceWorkerGlobalScope" data-dfn-type="attribute" data-export="" data-type="EventHandler" id="dom-serviceworkerglobalscope-onbackgroundfetchclick"><code><c- g="">onbackgroundfetchclick</c-></code></dfn>;
@@ -2179,8 +2179,8 @@ complete-length = ( 1*DIGIT / "*" )</pre>
       <th>Interface
     <tbody>
      <tr>
-      <td><dfn class="idl-code" data-dfn-for="ServiceWorkerGlobalScope" data-dfn-type="event" data-export="" id="eventdef-serviceworkerglobalscope-backgroundfetched"><code>backgroundfetched</code><a class="self-link" href="#eventdef-serviceworkerglobalscope-backgroundfetched"></a></dfn>
-      <td><code class="idl"><a data-link-type="idl" href="#dom-serviceworkerglobalscope-onbackgroundfetched" id="ref-for-dom-serviceworkerglobalscope-onbackgroundfetched">onbackgroundfetched</a></code>
+      <td><dfn class="idl-code" data-dfn-for="ServiceWorkerGlobalScope" data-dfn-type="event" data-export="" id="eventdef-serviceworkerglobalscope-backgroundfetchsuccess"><code>backgroundfetchsuccess</code><a class="self-link" href="#eventdef-serviceworkerglobalscope-backgroundfetchsuccess"></a></dfn>
+      <td><code class="idl"><a data-link-type="idl" href="#dom-serviceworkerglobalscope-onbackgroundfetchsuccess" id="ref-for-dom-serviceworkerglobalscope-onbackgroundfetchsuccess">onbackgroundfetchsuccess</a></code>
       <td><code class="idl"><a data-link-type="idl" href="#backgroundfetchsuccessevent" id="ref-for-backgroundfetchsuccessevent①">BackgroundFetchSuccessEvent</a></code>
      <tr>
       <td><dfn class="idl-code" data-dfn-for="ServiceWorkerGlobalScope" data-dfn-type="event" data-export="" id="eventdef-serviceworkerglobalscope-backgroundfetchfail"><code>backgroundfetchfail</code><a class="self-link" href="#eventdef-serviceworkerglobalscope-backgroundfetchfail"></a></dfn>
@@ -2828,7 +2828,6 @@ complete-length = ( 1*DIGIT / "*" )</pre>
    <li><a href="#backgroundfetchclickevent">BackgroundFetchClickEvent</a><span>, in §6.15</span>
    <li><a href="#dictdef-backgroundfetchclickeventinit">BackgroundFetchClickEventInit</a><span>, in §6.15</span>
    <li><a href="#dom-backgroundfetchclickevent-backgroundfetchclickevent">BackgroundFetchClickEvent(type, init)</a><span>, in §6.15</span>
-   <li><a href="#eventdef-serviceworkerglobalscope-backgroundfetched">backgroundfetched</a><span>, in §6.1.1</span>
    <li><a href="#backgroundfetchevent">BackgroundFetchEvent</a><span>, in §6.9</span>
    <li><a href="#dictdef-backgroundfetcheventinit">BackgroundFetchEventInit</a><span>, in §6.9</span>
    <li><a href="#dom-backgroundfetchevent-backgroundfetchevent">BackgroundFetchEvent(type, init)</a><span>, in §6.9</span>
@@ -2845,6 +2844,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
    <li><a href="#backgroundfetchsettledfetch">BackgroundFetchSettledFetch</a><span>, in §6.7</span>
    <li><a href="#backgroundfetchsettledmatching">BackgroundFetchSettledMatching</a><span>, in §6.11</span>
    <li><a href="#enumdef-backgroundfetchstate">BackgroundFetchState</a><span>, in §6.15</span>
+   <li><a href="#eventdef-serviceworkerglobalscope-backgroundfetchsuccess">backgroundfetchsuccess</a><span>, in §6.1.1</span>
    <li><a href="#backgroundfetchsuccessevent">BackgroundFetchSuccessEvent</a><span>, in §6.14</span>
    <li><a href="#dom-backgroundfetchsuccessevent-backgroundfetchsuccessevent">BackgroundFetchSuccessEvent(type, init)</a><span>, in §6.14</span>
    <li><a href="#backgroundfetchsuccessfulfetch">BackgroundFetchSuccessfulFetch</a><span>, in §6.8</span>
@@ -2938,8 +2938,8 @@ complete-length = ( 1*DIGIT / "*" )</pre>
     </ul>
    <li><a href="#dom-serviceworkerglobalscope-onbackgroundfetchabort">onbackgroundfetchabort</a><span>, in §6.1</span>
    <li><a href="#dom-serviceworkerglobalscope-onbackgroundfetchclick">onbackgroundfetchclick</a><span>, in §6.1</span>
-   <li><a href="#dom-serviceworkerglobalscope-onbackgroundfetched">onbackgroundfetched</a><span>, in §6.1</span>
    <li><a href="#dom-serviceworkerglobalscope-onbackgroundfetchfail">onbackgroundfetchfail</a><span>, in §6.1</span>
+   <li><a href="#dom-serviceworkerglobalscope-onbackgroundfetchsuccess">onbackgroundfetchsuccess</a><span>, in §6.1</span>
    <li><a href="#dom-backgroundfetchregistration-onprogress">onprogress</a><span>, in §6.4.1</span>
    <li><a href="#background-fetch-paused-flag">paused flag</a><span>, in §3.2</span>
    <li><a href="#dom-backgroundfetchstate-pending">"pending"</a><span>, in §6.15</span>
@@ -3905,7 +3905,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
   </dl>
   <h2 class="no-num no-ref heading settled" id="idl-index"><span class="content">IDL Index</span><a class="self-link" href="#idl-index"></a></h2>
 <pre class="idl highlight def"><c- b="">partial</c-> <c- b="">interface</c-> <a class="idl-code" data-link-type="interface" href="https://w3c.github.io/ServiceWorker/#serviceworkerglobalscope" id="ref-for-serviceworkerglobalscope①①"><c- g="">ServiceWorkerGlobalScope</c-></a> {
-  <c- b="">attribute</c-> <a class="n" data-link-type="idl-name"><c- n="">EventHandler</c-></a> <a data-type="EventHandler" href="#dom-serviceworkerglobalscope-onbackgroundfetched"><code><c- g="">onbackgroundfetched</c-></code></a>;
+  <c- b="">attribute</c-> <a class="n" data-link-type="idl-name"><c- n="">EventHandler</c-></a> <a data-type="EventHandler" href="#dom-serviceworkerglobalscope-onbackgroundfetchsuccess"><code><c- g="">onbackgroundfetchsuccess</c-></code></a>;
   <c- b="">attribute</c-> <a class="n" data-link-type="idl-name"><c- n="">EventHandler</c-></a> <a data-type="EventHandler" href="#dom-serviceworkerglobalscope-onbackgroundfetchfail"><code><c- g="">onbackgroundfetchfail</c-></code></a>;
   <c- b="">attribute</c-> <a class="n" data-link-type="idl-name"><c- n="">EventHandler</c-></a> <a data-type="EventHandler" href="#dom-serviceworkerglobalscope-onbackgroundfetchabort"><code><c- g="">onbackgroundfetchabort</c-></code></a>;
   <c- b="">attribute</c-> <a class="n" data-link-type="idl-name"><c- n="">EventHandler</c-></a> <a data-type="EventHandler" href="#dom-serviceworkerglobalscope-onbackgroundfetchclick"><code><c- g="">onbackgroundfetchclick</c-></code></a>;
@@ -4313,10 +4313,10 @@ complete-length = ( 1*DIGIT / "*" )</pre>
     <li><a href="#ref-for-single-byte-content-range">4.6. Extract content-range values</a> <a href="#ref-for-single-byte-content-range①">(2)</a> <a href="#ref-for-single-byte-content-range②">(3)</a> <a href="#ref-for-single-byte-content-range③">(4)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="dom-serviceworkerglobalscope-onbackgroundfetched">
-   <b><a href="#dom-serviceworkerglobalscope-onbackgroundfetched">#dom-serviceworkerglobalscope-onbackgroundfetched</a></b><b>Referenced in:</b>
+  <aside class="dfn-panel" data-for="dom-serviceworkerglobalscope-onbackgroundfetchsuccess">
+   <b><a href="#dom-serviceworkerglobalscope-onbackgroundfetchsuccess">#dom-serviceworkerglobalscope-onbackgroundfetchsuccess</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-serviceworkerglobalscope-onbackgroundfetched">6.1.1. Events</a>
+    <li><a href="#ref-for-dom-serviceworkerglobalscope-onbackgroundfetchsuccess">6.1.1. Events</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-serviceworkerglobalscope-onbackgroundfetchfail">

@@ -196,7 +196,7 @@ A <dfn>background fetch record</dfn> consists of:
       :: |id|
 
       And with [=BackgroundFetchEvent/records=] set to |bgFetch|'s [=background fetch/records=].
-    1. Otherwise, [=fire a functional event=] named "`backgroundfetched`" using {{BackgroundFetchSuccessEvent}} on |swRegistration| with the following properties:
+    1. Otherwise, [=fire a functional event=] named "`backgroundfetchsuccess`" using {{BackgroundFetchSuccessEvent}} on |swRegistration| with the following properties:
       : {{BackgroundFetchEvent/id}}
       :: |id|
 
@@ -423,7 +423,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
 
 <script type="idl">
 partial interface ServiceWorkerGlobalScope {
-  attribute EventHandler onbackgroundfetched;
+  attribute EventHandler onbackgroundfetchsuccess;
   attribute EventHandler onbackgroundfetchfail;
   attribute EventHandler onbackgroundfetchabort;
   attribute EventHandler onbackgroundfetchclick;
@@ -444,8 +444,8 @@ The following is the <a>event handler</a> (and its corresponding <a>event handle
   </thead>
   <tbody dfn-for="ServiceWorkerGlobalScope" dfn-type="event">
     <tr>
-      <td><dfn>backgroundfetched</dfn></td>
-      <td>{{ServiceWorkerGlobalScope/onbackgroundfetched}}</td>
+      <td><dfn>backgroundfetchsuccess</dfn></td>
+      <td>{{ServiceWorkerGlobalScope/onbackgroundfetchsuccess}}</td>
       <td>{{BackgroundFetchSuccessEvent}}</td>
     </tr>
     <tr>
