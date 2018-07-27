@@ -129,7 +129,10 @@ A <dfn>background fetch</dfn> consists of:
     * The UI may display one of |bgFetch|'s [=background fetch/icons=]. TODO: when to fetch this?
     * The UI may use |bgFetch|'s [=background fetch/download total=], [=background fetch/upload total=], [=background fetch/last reported download=], and [=background fetch/paused flag=] to present the progress of the fetch. TODO what about bytes uploaded? TODO how can I tell when the operation is complete?
     * The UI must provide a way for the user to abort |bgFetch|. TODO link up to algo.
-    * The UI may provide a way to toggle |bgFetch|'s [=background fetch/paused flag=].
+    * If every [=background fetch record/request=] in |beFetch|'s [=background fetch/records=] is \``GET`\`, the UI may provide a way to toggle |bgFetch|'s [=background fetch/paused flag=].
+
+      Note: If a [=background fetch record/request=] is not \``GET`\`, reissuing the request may have unwanted side effects.
+
     * The UI may be activated (for example, by clicking), in which case it must TODO hook this up to the event.
     * The UI may remain once the operation is complete, in which case it can still be activated.
 
