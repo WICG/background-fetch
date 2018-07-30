@@ -1214,7 +1214,7 @@ Possible extra rowspan handling
 </style>
   <meta content="Bikeshed version 45e8ecaee91d0279f1fcff49412103c12b49542f" name="generator">
   <link href="https://wicg.github.io/background-fetch/" rel="canonical">
-  <meta content="e5b9f5181d2981b89344a1fffcc4548ebbb31a39" name="document-revision">
+  <meta content="4f3a941d4f4a896b10f9a684e73e189d78781004" name="document-revision">
 <style>
   .algorithm dl {
     overflow: hidden;
@@ -2240,9 +2240,9 @@ complete-length = ( 1*DIGIT / "*" )</pre>
        <p><a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-iterate" id="ref-for-list-iterate③">For each</a> <var>request</var> of <var>requests</var>:</p>
        <ol>
         <li data-md="">
-         <p>Let <var>internalRequest</var> be the <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-request" id="ref-for-concept-request-request②">request</a> of the result of invoking the <code class="idl"><a data-link-type="idl" href="https://fetch.spec.whatwg.org/#request" id="ref-for-request②">Request</a></code> constructor with <var>request</var>.</p>
+         <p>Let <var>internalRequest</var> be the <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-request" id="ref-for-concept-request-request②">request</a> of the result of invoking the <code class="idl"><a data-link-type="idl" href="https://fetch.spec.whatwg.org/#request" id="ref-for-request②">Request</a></code> constructor with <var>request</var>. If this throws an exception, return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-promise-rejected-with" id="ref-for-a-promise-rejected-with①">a promise rejected with</a> the exception.</p>
         <li data-md="">
-         <p>If <var>internalRequest</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-mode" id="ref-for-concept-request-mode">mode</a> is "<code>no-cors</code>", then return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-promise-rejected-with" id="ref-for-a-promise-rejected-with①">a promise rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#exceptiondef-typeerror" id="ref-for-exceptiondef-typeerror①">TypeError</a></code>.</p>
+         <p>If <var>internalRequest</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-mode" id="ref-for-concept-request-mode">mode</a> is "<code>no-cors</code>", then return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-promise-rejected-with" id="ref-for-a-promise-rejected-with②">a promise rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#exceptiondef-typeerror" id="ref-for-exceptiondef-typeerror①">TypeError</a></code>.</p>
         <li data-md="">
          <p>Set <var>internalRequest</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-client" id="ref-for-concept-request-client">client</a> to null.</p>
         <li data-md="">
@@ -3334,7 +3334,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
   <aside class="dfn-panel" data-for="term-for-a-promise-rejected-with">
    <a href="https://www.w3.org/2001/tag/doc/promises-guide/#a-promise-rejected-with">https://www.w3.org/2001/tag/doc/promises-guide/#a-promise-rejected-with</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-a-promise-rejected-with">6.3.1. fetch()</a> <a href="#ref-for-a-promise-rejected-with①">(2)</a>
+    <li><a href="#ref-for-a-promise-rejected-with">6.3.1. fetch()</a> <a href="#ref-for-a-promise-rejected-with①">(2)</a> <a href="#ref-for-a-promise-rejected-with②">(3)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-reject-promise">

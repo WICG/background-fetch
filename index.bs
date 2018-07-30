@@ -527,7 +527,7 @@ dictionary IconDefinition {
     1. If |requests| is a {{RequestInfo}}, set |requests| to « |requests| ».
     1. If |requests| is [=list/empty=], then return [=a promise rejected with=] a {{TypeError}}.
     1. [=list/For each=] |request| of |requests|:
-      1. Let |internalRequest| be the [=Request/request=] of the result of invoking the {{Request}} constructor with |request|.
+      1. Let |internalRequest| be the [=Request/request=] of the result of invoking the {{Request}} constructor with |request|. If this throws an exception, return [=a promise rejected with=] the exception.
       1. If |internalRequest|'s [=request/mode=] is "`no-cors`", then return [=a promise rejected with=] a {{TypeError}}.
       1. Set |internalRequest|'s [=request/client=] to null.
       1. Let |record| be a new [=background fetch record=].
