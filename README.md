@@ -21,6 +21,8 @@ These are eventual goals, some features be missing from "v1".
 
 # API Design
 
+**OUT OF DATE**. I'm working on the spec right now, and will update this once changes settle.
+
 ## Starting a background fetch
 
 ```js
