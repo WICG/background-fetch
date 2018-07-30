@@ -189,10 +189,10 @@ A <dfn>background fetch record</dfn> consists of:
     1. If |operationAborted| is true, then [=fire a functional event=] named "`backgroundfetchabort`" using {{BackgroundFetchEvent}} on |swRegistration| with the following properties:
       : {{BackgroundFetchEvent/registration}}
       :: The result of [=getting a BackgroundFetchRegistration instance=] for |bgFetch| in the event object's [=relevant Realm=].
-    1. Otherwise, if |abandoned| is true, then [=fire a functional event=] named "`backgroundfetchfail`" using {{BackgroundFetchUpdateEvent}} on |swRegistration| with the following properties:
+    1. Otherwise, if |abandoned| is true, then [=fire a functional event=] named "`backgroundfetchfail`" using {{BackgroundFetchUpdateUIEvent}} on |swRegistration| with the following properties:
       : {{BackgroundFetchEvent/registration}}
       :: The result of [=getting a BackgroundFetchRegistration instance=] for |bgFetch| in the event object's [=relevant Realm=].
-    1. Otherwise, [=fire a functional event=] named "`backgroundfetchsuccess`" using {{BackgroundFetchUpdateEvent}} on |swRegistration| with the following properties:
+    1. Otherwise, [=fire a functional event=] named "`backgroundfetchsuccess`" using {{BackgroundFetchUpdateUIEvent}} on |swRegistration| with the following properties:
       : {{BackgroundFetchEvent/registration}}
       :: The result of [=getting a BackgroundFetchRegistration instance=] for |bgFetch| in the event object's [=relevant Realm=].
 </div>
@@ -445,12 +445,12 @@ The following is the <a>event handler</a> (and its corresponding <a>event handle
     <tr>
       <td><dfn>backgroundfetchsuccess</dfn></td>
       <td>{{ServiceWorkerGlobalScope/onbackgroundfetchsuccess}}</td>
-      <td>{{BackgroundFetchUpdateEvent}}</td>
+      <td>{{BackgroundFetchUpdateUIEvent}}</td>
     </tr>
     <tr>
       <td><dfn>backgroundfetchfail</dfn></td>
       <td>{{ServiceWorkerGlobalScope/onbackgroundfetchfail}}</td>
-      <td>{{BackgroundFetchUpdateEvent}}</td>
+      <td>{{BackgroundFetchUpdateUIEvent}}</td>
     </tr>
     <tr>
       <td><dfn>backgroundfetchabort</dfn></td>
@@ -737,16 +737,16 @@ dictionary BackgroundFetchEventInit : ExtendableEventInit {
   The <dfn attribute>registration</dfn> attribute must return the value it was initialized to.
 </div>
 
-## {{BackgroundFetchUpdateEvent}} ## {#background-fetch-update-event}
+## {{BackgroundFetchUpdateUIEvent}} ## {#background-fetch-update-event}
 
 <script type="idl">
 [Constructor(DOMString type, BackgroundFetchEventInit init), Exposed=ServiceWorker]
-interface BackgroundFetchUpdateEvent : BackgroundFetchEvent {
+interface BackgroundFetchUpdateUIEvent : BackgroundFetchEvent {
   Promise<void> updateUI(DOMString title);
 };
 </script>
 
-<div dfn-for="BackgroundFetchUpdateEvent">
+<div dfn-for="BackgroundFetchUpdateUIEvent">
   <div algorithm>
     The <dfn method>updateUI(|title|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run these steps [=in parallel=]:
 
