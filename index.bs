@@ -500,9 +500,12 @@ interface BackgroundFetchManager {
   // TODO: in future this should become an async iterator for BackgroundFetchRegistration objects
 };
 
-dictionary BackgroundFetchOptions {
+dictionary BackgroundFetchUIOptions {
   sequence<IconDefinition> icons = [];
   DOMString title = "";
+};
+
+dictionary BackgroundFetchOptions : BackgroundFetchUIOptions {
   unsigned long long downloadTotal = 0;
 };
 
@@ -755,13 +758,13 @@ dictionary BackgroundFetchEventInit : ExtendableEventInit {
 <script type="idl">
 [Constructor(DOMString type, BackgroundFetchEventInit init), Exposed=ServiceWorker]
 interface BackgroundFetchUpdateUIEvent : BackgroundFetchEvent {
-  Promise<void> updateUI(DOMString title);
+  Promise<void> updateUI(BackgroundFetchUIOptions options);
 };
 </script>
 
 <div dfn-for="BackgroundFetchUpdateUIEvent">
   <div algorithm>
-    The <dfn method>updateUI(|title|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run these steps [=in parallel=]:
+    The <dfn method>updateUI(|options|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run these steps [=in parallel=]:
 
     1. TODO
   </div>
