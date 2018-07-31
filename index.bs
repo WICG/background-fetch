@@ -758,7 +758,7 @@ dictionary BackgroundFetchEventInit : ExtendableEventInit {
 <script type="idl">
 [Constructor(DOMString type, BackgroundFetchEventInit init), Exposed=ServiceWorker]
 interface BackgroundFetchUpdateUIEvent : BackgroundFetchEvent {
-  Promise<void> updateUI(BackgroundFetchUIOptions options);
+  Promise<void> updateUI(optional BackgroundFetchUIOptions options);
 };
 </script>
 
