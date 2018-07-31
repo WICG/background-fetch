@@ -701,7 +701,11 @@ enum BackgroundFetchState { "pending", "succeeded", "failed" };
   <div algorithm>
     The <dfn method>matchAll(|request|, |options|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run these steps [=in parallel=]:
 
-    1. TODO.
+    1. Let |records| be the result of filtering the [=context object=]'s [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/records=] according to the rules of {{Cache/matchAll()|cache.matchAll()}}.
+
+      Issue: The above needs to be abstracted.
+
+    1. [=Queue a bgfetch task=] to [=resolve=] |promise| with the result of [=creating record objects=] from |records| in [=context object=]'s [=relevant Realm=].
   </div>
 </div>
 
