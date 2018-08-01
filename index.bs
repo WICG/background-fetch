@@ -403,16 +403,19 @@ Note: This algorithm creates platform objects for [=background fetch records=]. 
     1. Let |stream| be a new {{ReadableStream}} object with a pull action that returns [=a new promise=] |promise| and runs these steps [=in parallel=]:
       1. Wait for the [=byte sequence/length=] of |responseData|'s [=background fetch response/bytes=] to be greater than |transmittedBytes|, or |responseData|'s [=background fetch response/result=] not to be the empty string.
       1. Let |bytes| be null.
-      1. If the [=byte sequence/length=] of |responseData|'s [=background fetch response/bytes=] is greater than |transmittedBytes|, then:
+      1. If the [=byte sequence/length=] of |responseData|'s [=background fetch response/bytes=] is greater than |transmittedBytes| and |responseData|'s [=background fetch response/result=] is not the empty string or `"success"`, then:
         1. Set |bytes| to a user agent determined slice of |responseData|'s [=background fetch response/bytes=], starting from an offset of |transmittedBytes|.
+
+          Note: This allows the user agent to stream the resource from storage at an appropriate rate.
+
         1. Increment |transmittedBytes| by |bytes|' [=byte sequence/length=].
       1. [=Queue a task=] in |stream|'s [=relevant settings object=]'s [=responsible event loop=] using the [=networking task source=] to run these steps:
         1. If |bytes| is not null, then:
           1. Let |array| be a new {{Uint8Array}} wrapping a new {{ArrayBuffer}} of |bytes|.
           1. [=ReadableStream/Enqueue=] |array| into |stream|.
-        1. If |responseData|'s [=background fetch response/result=] is `"success"`, then [=ReadableStream/close=] |stream|.
+        1. If |responseData|'s [=background fetch response/result=] is `"success"` and |transmittedBytes| is the [=byte sequence/length=] of |responseData|'s [=background fetch response/bytes=], then [=ReadableStream/close=] |stream|.
         1. Otherwise, if |responseData|'s [=background fetch response/result=] is `"aborted"`, then [=ReadableStream/error=] |stream| with an {{AbortError}} {{DOMException}}.
-        1. Otherwise, if |responseData|'s [=background fetch response/result=] is not the empty string, then [=ReadableStream/error=] |stream| with a {{TypeError}}.
+        1. Otherwise, if |responseData|'s [=background fetch response/result=] is not the empty string [=ReadableStream/error=] |stream| with a {{TypeError}}.
         1. [=Resolve=] |promise|.
     1. Run these steps [=in parallel=]:
       1. Wait for |responseData|'s [=background fetch response/result=] to not be the empty string.
