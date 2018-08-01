@@ -130,14 +130,14 @@ A <dfn>background fetch</dfn> consists of:
     * The UI may display one of |bgFetch|'s [=background fetch/icons=]. TODO: when to fetch this?
     * The UI may use |bgFetch|'s [=background fetch/download total=], [=background fetch/upload total=], [=background fetch/last reported download=], and [=background fetch/paused flag=] to present the progress of the fetch. TODO what about bytes uploaded? TODO how can I tell when the operation is complete?
     * The UI must provide a way for the user to abort the |bgFetch| by setting |bgFetch|'s [=background fetch/abort all flag=].
-    * If every [=background fetch record/request=] in |beFetch|'s [=background fetch/records=] is \``GET`\`, the UI may provide a way to toggle |bgFetch|'s [=background fetch/paused flag=].
+    * If every [=background fetch record/request=] in |beFetch|'s [=background fetch/records=] has a [=request/method=] of \``GET`\`, the UI may provide a way to toggle |bgFetch|'s [=background fetch/paused flag=].
 
-      Note: If a [=background fetch record/request=] is not \``GET`\`, reissuing the request may have unwanted side effects.
+      Note: If a [=request/method=] is not \``GET`\`, reissuing the request may have unwanted side effects.
 
     * The UI may be activated (for example, by clicking), in which case it must TODO hook this up to the event.
     * The UI may remain once the operation is complete, in which case it can still be activated.
 
-    The user agent may initially set |bgFetch|'s [=background fetch/paused flag=], and allow the user to either accept the background fetch (unsetting |bgFetch|'s [=background fetch/paused flag=]), or refuse the background fetch (aborting TODO hook this up).
+    The user agent may set |bgFetch|'s [=background fetch/paused flag=] at the beginning of this algorithm, allowing the user to either accept the background fetch (unsetting |bgFetch|'s [=background fetch/paused flag=]), or refuse the background fetch (setting |bgFetch|'s [=background fetch/abort all flag=]).
 
     Note: The user agent may consider initially setting |bgFetch|'s [=background fetch/paused flag=] if the user is on a metered connection, or the background fetch was started in the background.
   </div>
@@ -166,6 +166,8 @@ A <dfn>Background fetch response</dfn> consists of:
 
 ## [=Perform a background fetch=] ## {#perform-a-background-fetch-algorithm}
 
+Note: This is the algorithm that manages the 'background' parts of a background fetch. Only one instance of this algorithm runs per [=/background fetch=].
+
 <div algorithm>
   To <dfn>perform a background fetch</dfn> for |bgFetch| (a [=/background fetch=]), run these steps:
 
@@ -184,6 +186,9 @@ A <dfn>Background fetch response</dfn> consists of:
   1. Wait for either |abandoned| to be true, or |successfulFetches| to be |bgFetch|'s [=background fetch/records=]'s [=list/size=].
   1. Let |operationAborted| be |aborted|.
   1. If |abandoned| is true, set |bgFetch|'s [=background fetch/abort all flag=].
+
+    Note: The [=complete a record=] algorithm listens to this flag and terminates its fetch if it's set.
+
   1. [=Enqueue the following steps=] to |swRegistration|'s [=active background fetches edit queue=]:
     1. Let |activeBgFetches| be |swRegistration|'s [=active background fetches=].
     1. Let |id| be |bgFetch|'s [=background fetch/id=].
@@ -205,6 +210,8 @@ A <dfn>Background fetch response</dfn> consists of:
 
 ## [=Complete a record=] ## {#complete-a-record-algorithm}
 
+Note: This algorithm manages the fetching of a [=/background fetch record=]. One instance of this algorithm is started per [=/background fetch record=], but it is called recursively to retry fetches or to fetch the next part of a partial response.
+
 <div algorithm>
   To <dfn>complete a record</dfn> for |bgFetch| (a [=/background fetch=]) and |record| (a [=/background fetch record=]), run these steps:
 
@@ -216,13 +223,13 @@ A <dfn>Background fetch response</dfn> consists of:
   1. Let |rangeStart| be the [=byte sequence/length=] of |responseData|'s [=background fetch response/bytes=].
   1. If |rangeStart| is not 0, then [=request/add a range header=] to |request| with |currentLength|.
 
-    Note: This allows the initial request to make use of content encoding, since `Accept-Encoding: identity` is added to requests with a range header.
+    Note: If the |rangeStart| is 0, a normal request is made. This allows the initial request to make use of content encoding, since `Accept-Encoding: identity` is added to requests with a range header.
 
   1. Let |fetchAttemptComplete| be false.
   1. Let |lastTransmittedSize| be 0.
   1. [=/Fetch=] |request|.
 
-    Issue: The remainder of this step uses fetch "callbacks" which currently queue tasks. This isn't desirable here, so let's pretend that tasks aren't queued. ([issue](https://github.com/whatwg/fetch/issues/536#issuecomment-330184276))
+    Issue: The remainder of this step uses fetch "callbacks" which currently queue tasks. This isn't desirable or possible here, so let's pretend that tasks aren't queued. ([issue](https://github.com/whatwg/fetch/issues/536#issuecomment-330184276))
 
     To [=process request body=] for |request|, run these steps:
       1. Let |transmittedSize| be |request|'s [=request/body=]'s [=body/transmitted bytes=].
@@ -246,9 +253,12 @@ A <dfn>Background fetch response</dfn> consists of:
         1. Set |responseData|'s [=background fetch response/result=] to `"redundant"`.
         1. Set |responseData| to a new [=background fetch response=].
         1. Set |record|'s [=background fetch record/response data=] to |responseData|.
+
+          Note: The [=create record objects=] algorithm may hold a reference to the previous [=background fetch response=].
+
         1. [=Report progress for background fetch=] |bgFetch|.
       1. If |rangeStart| is 0 or |response|'s [=response/status=] is not `206`, then set |responseData|'s [=background fetch response/response=] to a copy of |response| except for its [=response/body=].
-      1. Let |stream| be |response|'s [=response/body=]'s [=body/stream=].
+      1. Let |stream| be the |response| [=response/body=]'s [=body/stream=].
       1. Whenever one or more bytes are transmitted from |stream|, let |bytes| be the transmitted bytes and run these steps:
         1. If |bgFetch|'s [=background fetch/stored body bytes total=] plus the size of |bytes| is greater than |downloadTotal|, then:
           1. [=ReadableStream/Cancel=] |stream|.
@@ -266,7 +276,7 @@ A <dfn>Background fetch response</dfn> consists of:
         1. Otherwise, set |responseData|'s [=background fetch response/result=] to `"success"`.
         1. Set |fetchAttemptComplete| to true.
       1. If at any point |stream| becomes [=ReadableStream/errored=], then:
-        1. If the user agent is offline and |request|'s [=request/method=] is \``GET`\`, then wait until the user agent is not offline then set |fetchAttemptComplete| to true.
+        1. If the user agent is offline and |request|'s [=request/method=] is \``GET`\`, then wait until the user agent is not offline, then set |fetchAttemptComplete| to true.
         1. Otherwise, set |responseData|'s [=background fetch response/result=] to `"invalid-response"` and |fetchAttemptComplete| to true.
   1. Run these steps, but [=abort when=] |bgFetch|'s [=background fetch/paused flag=] or [=background fetch/abort all flag=] is set:
     1. Wait for |fetchAttemptComplete| to be true.
@@ -298,9 +308,13 @@ A <dfn>Background fetch response</dfn> consists of:
     1. [=Fire an event=] named "`progress`" at |bgFetchRegistration|.
 
     Issue: I need to debounce this similar to how mouse move events work.
+
+    Issue: State needs to be updated as part of this.
 </div>
 
 ## [=Get a BackgroundFetchRegistration instance=] ## {#get-a-backgroundfetchregistration-instance-algorithm}
+
+Note: This algorithm ensures the same {{BackgroundFetchRegistration}} instance is returned for a given [=/background fetch=] throughout the life of a {{BackgroundFetchManager}}. It's okay for browsers to optimise this, as long as there's no way to tell that more than one instance has been created for a given [=/background fetch=] (e.g through equality, expandos, or weakly-associated data).
 
 <div algorithm>
   To <dfn data-lt="get a BackgroundFetchRegistration instance|getting a BackgroundFetchRegistration instance">get a BackgroundFetchRegistration instance</dfn> for a |bgFetch| (a [=/background fetch=]) in |realm| (a [=Realm=]), run these steps:
@@ -310,11 +324,11 @@ A <dfn>Background fetch response</dfn> consists of:
   1. Let |instance| be a new {{BackgroundFetchRegistration}} in |realm|, and set its [=BackgroundFetchRegistration/background fetch=] to |bgFetch|.
   1. Set |instancesMap|[|bgFetch|] to |instance|.
   1. Return |instance|.
-
-  Note: This is to ensure the same instance is returned for a given [=/background fetch=] throughout the life of a {{BackgroundFetchManager}}. It's okay for browsers to optimise this, as long as there's no way to tell that more than one instance has been created for a given [=/background fetch=] (e.g through equality, expandos, or weakly-associated data).
 </div>
 
 ## [=Validate a partial response=] ## {#validate-partial-response-algorithm}
+
+Note: This algorithm checks if a partial response reasonably matches what was requested, and optionally checks if it should be combined with a previous response.
 
 <div algorithm>
   To <dfn>validate a partial response</dfn> for an |expectedRangeStart| (a number), a |partialResponse| (a [=/response=]), and an optional |previousResponse| (a [=/response=] or null, null unless otherwise specified), run these steps:
@@ -333,6 +347,8 @@ A <dfn>Background fetch response</dfn> consists of:
 
 ## [=Extract content-range values=] ## {#extract-content-range-values-algorithm}
 
+Note: This algorithm parses \``Content-Range`\` as a [=single byte content-range=] and extracts the values.
+
 <div algorithm>
   To <dfn lt="extract content-range values|extracting content-range values">extract content-range values</dfn> from a |response| (a [=/response=]), run these steps:
 
@@ -350,6 +366,8 @@ A <dfn>Background fetch response</dfn> consists of:
 
 ## [=Header equality=] ## {#header-equality-algorithm}
 
+Note: This algorithm returns true if two [=/header lists=] contain the same value for a given header name, or neither has a header of that name.
+
 <div algorithm>
   To determine <dfn>header equality</dfn> for a |headerName| (a [=byte sequence=]), in |headerList1| (a [=/header list=]), and |headerList2| (a [=/header list=]), run these steps:
 
@@ -362,6 +380,8 @@ A <dfn>Background fetch response</dfn> consists of:
 </div>
 
 ## [=Create record objects=] ## {#create-settled-fetches-algorithm}
+
+Note: This algorithm creates platform objects for [=background fetch records=]. It also manages the streaming of the [=/response=] from the stored [=background fetch response/bytes=]. The background fetch operation may still be in progress at this point.
 
 <div algorithm>
   To <dfn lt="create record objects|creating record objects">create record objects</dfn> from |records| (a [=/list=] of [=background fetch records=]) in |realm| (a [=/Realm=]), run these steps:
@@ -424,6 +444,8 @@ The following is [=HTTP ABNF=] for a <dfn>single byte content-range</dfn>:
 first-byte-pos = 1*DIGIT
 last-byte-pos  = 1*DIGIT
 complete-length = ( 1*DIGIT / "*" )</pre>
+
+Note: This is a subset of what <a href="https://tools.ietf.org/html/rfc7233#section-3.1">rfc7233</a> allows.
 
 # API # {#api}
 
