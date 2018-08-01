@@ -313,9 +313,9 @@ Note: This algorithm manages the fetching of a [=/background fetch record=]. One
       Note: There will be at most one per environment, due to the [=get a BackgroundFetchRegistration instance=] algorithm.
 
     1. If |bgFetchRegistration| is null, then abort these steps.
-    1. Set [=BackgroundFetchRegistration/downloaded=] to |downloaded|.
-    1. Set [=BackgroundFetchRegistration/uploaded=] to |uploaded|.
-    1. Set [=BackgroundFetchRegistration/state=] to |state|.
+    1. Set |bgFetchRegistration|'s [=BackgroundFetchRegistration/downloaded=] to |downloaded|.
+    1. Set |bgFetchRegistration|'s [=BackgroundFetchRegistration/uploaded=] to |uploaded|.
+    1. Set |bgFetchRegistration|'s [=BackgroundFetchRegistration/state=] to |state|.
     1. [=Fire an event=] named "`progress`" at |bgFetchRegistration|.
 
     Issue: I need to debounce this similar to how mouse move events work.
