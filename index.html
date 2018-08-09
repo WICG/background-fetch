@@ -1214,7 +1214,7 @@ Possible extra rowspan handling
 </style>
   <meta content="Bikeshed version 9c7b3c1bf4afcf8eca4fd3a1529a298ee35be006" name="generator">
   <link href="https://wicg.github.io/background-fetch/" rel="canonical">
-  <meta content="9a4e0bf9ace61cb12a694c686780a4aee1b77e9b" name="document-revision">
+  <meta content="638fd31a12c7a1708127be367c5f4c94ee7c66fc" name="document-revision">
 <style>
   .algorithm dl {
     overflow: hidden;
@@ -2721,7 +2721,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
   // A response had a not-ok-status.
   <dfn class="idl-code" data-dfn-for="BackgroundFetchFailureReason" data-dfn-type="enum-value" data-export id="dom-backgroundfetchfailurereason-bad-status"><code><c- s>"bad-status"</c-></code><a class="self-link" href="#dom-backgroundfetchfailurereason-bad-status"></a></dfn>,
   // A fetch failed for other reasons, e.g. CORS, MIX, an invalid partial response,
-  // network failure and the fetch cannot be retried.
+  // or a general network failure for a fetch that cannot be retried.
   <dfn class="idl-code" data-dfn-for="BackgroundFetchFailureReason" data-dfn-type="enum-value" data-export id="dom-backgroundfetchfailurereason-fetch-error"><code><c- s>"fetch-error"</c-></code><a class="self-link" href="#dom-backgroundfetchfailurereason-fetch-error"></a></dfn>,
   // Storage quota was reached during the operation.
   <dfn class="idl-code" data-dfn-for="BackgroundFetchFailureReason" data-dfn-type="enum-value" data-export id="dom-backgroundfetchfailurereason-quota-exceeded"><code><c- s>"quota-exceeded"</c-></code><a class="self-link" href="#dom-backgroundfetchfailurereason-quota-exceeded"></a></dfn>,
@@ -4127,7 +4127,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
   // A response had a not-ok-status.
   <a href="#dom-backgroundfetchfailurereason-bad-status"><code><c- s>"bad-status"</c-></code></a>,
   // A fetch failed for other reasons, e.g. CORS, MIX, an invalid partial response,
-  // network failure and the fetch cannot be retried.
+  // or a general network failure for a fetch that cannot be retried.
   <a href="#dom-backgroundfetchfailurereason-fetch-error"><code><c- s>"fetch-error"</c-></code></a>,
   // Storage quota was reached during the operation.
   <a href="#dom-backgroundfetchfailurereason-quota-exceeded"><code><c- s>"quota-exceeded"</c-></code></a>,

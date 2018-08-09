@@ -729,7 +729,7 @@ enum BackgroundFetchFailureReason {
   // A response had a not-ok-status.
   "bad-status",
   // A fetch failed for other reasons, e.g. CORS, MIX, an invalid partial response,
-  // network failure and the fetch cannot be retried.
+  // or a general network failure for a fetch that cannot be retried.
   "fetch-error",
   // Storage quota was reached during the operation.
   "quota-exceeded",
