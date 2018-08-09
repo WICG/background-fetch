@@ -478,6 +478,37 @@ complete-length = ( 1*DIGIT / "*" )</pre>
 
 Note: This is a subset of what <a href="https://tools.ietf.org/html/rfc7233#section-3.1">rfc7233</a> allows.
 
+<div class="note">
+
+  The above as a railroad diagram:
+
+  <pre class="railroad">
+  T: "bytes="
+  Stack:
+    Sequence:
+      Comment: first-byte-pos
+      OneOrMore:
+        N: digit
+      Comment: /first-byte-pos
+      N: "/"
+    Sequence:
+      Comment: last-byte-pos
+      OneOrMore:
+        N: digit
+      Comment: /last-byte-pos
+      N: "/"
+    Sequence:
+      Comment: complete-length
+      Choice:
+        N: "*"
+        OneOrMore:
+          N: digit
+      Comment: /complete-length
+  </pre>
+</div>
+
+
+
 # API # {#api}
 
 ## Extensions to {{ServiceWorkerGlobalScope}} ## {#extensions-to-service-worker-global}
