@@ -109,6 +109,7 @@ A <dfn>background fetch</dfn> consists of:
   * A <dfn>last reported download</dfn> (a number), initially 0.
   * A <dfn>state</dfn> (a {{BackgroundFetchState}}), initially `"pending"`.
   * A <dfn>last reported state</dfn> (a {{BackgroundFetchState}}), initially `"pending"`.
+  * A <dfn>failure reason</dfn> (a {{BackgroundFetchFailureReason}}), initially the empty string.
   * <dfn>Icons</dfn> (a [=list=] of {{IconDefinition}}s).
   * A <dfn>service worker registration</dfn> (a [=/service worker registration=]).
   * A <dfn>progress handling queue</dfn> (a [=parallel queue=]), initially the result of [=starting a new parallel queue=].
@@ -161,9 +162,9 @@ A <dfn>Background fetch response</dfn> consists of:
 <div dfn-for="background fetch response">
   * A <dfn>response</dfn> (a [=/response=]), initially null.
   * <dfn>Bytes</dfn> (a [=byte sequence=]), initially empty.
-  * A <dfn>result</dfn>, (`"aborted"`, `"response-invalid"`, `"response-bad-status"`, `"download-limit-exceeded"`, `"success"`, `"redundant"`, or the empty string), initially the empty string.
+  * A <dfn>result</dfn>, (any {{BackgroundFetchFailureReason}}, `"success"`, or `"redundant"`), initially the empty string.
 
-  The [=background fetch response/response=] may be <dfn>exposed</dfn> if the [=background fetch response/result=] is the empty string, `"success"`, or `"response-bad-status"`.
+  The [=background fetch response/response=] may be <dfn>exposed</dfn> if the [=background fetch response/result=] is the empty string, `"success"`, or `"bad-status"`.
 </div>
 
 # Algorithms # {#algorithms}
@@ -180,16 +181,17 @@ Note: This is the algorithm that manages the 'background' parts of a background 
   1. Let |downloadTotal| be |bgFetch|'s [=background fetch/download total=] if it is not 0, otherwise infinity.
   1. Let |successfulFetches| be 0.
   1. Let |abandoned| be false.
-  1. Let |aborted| be false.
+  1. Let |failureReason| be the empty string.
   1. [=list/For each=] |record| in |bgFetch|'s [=background fetch/records=], run these steps [=in parallel=]:
     1. [=Complete a record=] for |bgFetch| and |record|.
     1. Let |result| be |record|'s [=background fetch record/response data=]'s [=background fetch response/result=].
-    1. If |result| is `"aborted"`, then set |aborted| to true.
-    1. If |result| is not `"success"`, then set |abandoned| to true.
-    1. Otherwise, increment |successfulFetches| by 1.
-  1. Wait for either |abandoned| to be true, or |successfulFetches| to be |bgFetch|'s [=background fetch/records=]'s [=list/size=].
-  1. Let |operationAborted| be |aborted|.
-  1. If |abandoned| is true, set |bgFetch|'s [=background fetch/abort all flag=].
+    1. If |result| is `"success"`, then increment |successfulFetches| by 1.
+    1. Otherwise, if |failureReason| is not the empty string:
+      1. Assert: |result| is not `"redundant"`.
+      1. Set |failureReason| to |result|.
+  1. Wait for either |failureReason| to be something other than the empty string, or |successfulFetches| to be |bgFetch|'s [=background fetch/records=]'s [=list/size=].
+  1. Let |operationAborted| be true if |aborted|.
+  1. If |failureReason| is not the empty string, set |bgFetch|'s [=background fetch/abort all flag=].
 
     Note: The [=complete a record=] algorithm listens to this flag and terminates its fetch if it's set.
 
@@ -197,16 +199,19 @@ Note: This is the algorithm that manages the 'background' parts of a background 
     1. Let |activeBgFetches| be |swRegistration|'s [=active background fetches=].
     1. Let |id| be |bgFetch|'s [=background fetch/id=].
     1. If |activeBgFetches| [=active background fetches/contains=] |bgFetch|, then remove |activeBgFetches|[|id|].
-    1. Otherwise, set |operationAborted| to true.
+    1. Otherwise, set |failureReason| to `"aborted"`.
 
       Note: This handles a race condition where {{BackgroundFetchRegistration/abort()}} was successfully called but one of the fetches failed at the same time. If we've returned true from {{BackgroundFetchRegistration/abort()}}, this ensures we fire the related abort event.
 
-    1. If |abandoned| is true, then set |bgFetch|'s [=background fetch/state=] to `"failure"`, otherwise `"success"`.
+    1. If |failureReason| is not the empty string, then:
+      1. Set |bgFetch|'s [=background fetch/state=] to `"failure"`.
+      1. Set |bgFetch|'s [=background fetch/failure reason=] to |failureReason|.
+    1. Otherwise, set |bgFetch|'s [=background fetch/state=] to `"success"`.
     1. [=Report progress for background fetch=] |bgFetch|.
-    1. If |operationAborted| is true, then [=fire a functional event=] named "`backgroundfetchabort`" using {{BackgroundFetchEvent}} on |swRegistration| with the following properties:
+    1. If |failureReason| is `"aborted"`, then [=fire a functional event=] named "`backgroundfetchabort`" using {{BackgroundFetchEvent}} on |swRegistration| with the following properties:
       : {{BackgroundFetchEvent/registration}}
       :: The result of [=getting a BackgroundFetchRegistration instance=] for |bgFetch| in the event object's [=relevant Realm=].
-    1. Otherwise, if |abandoned| is true, then [=fire a functional event=] named "`backgroundfetchfail`" using {{BackgroundFetchUpdateUIEvent}} on |swRegistration| with the following properties:
+    1. Otherwise, if |failureReason| is not the empty string, then [=fire a functional event=] named "`backgroundfetchfail`" using {{BackgroundFetchUpdateUIEvent}} on |swRegistration| with the following properties:
       : {{BackgroundFetchEvent/registration}}
       :: The result of [=getting a BackgroundFetchRegistration instance=] for |bgFetch| in the event object's [=relevant Realm=].
     1. Otherwise, [=fire a functional event=] named "`backgroundfetchsuccess`" using {{BackgroundFetchUpdateUIEvent}} on |swRegistration| with the following properties:
@@ -251,10 +256,13 @@ Note: This algorithm manages the fetching of a [=/background fetch record=]. One
 
           Note: If |request|'s [=request/method=] is not \``GET`\`, reissuing the request may have unwanted side effects. If a standard method to resume requests becomes available, it'll be adopted here.
 
-        1. If |response| is an [=aborted network error=], then set |responseData|'s [=background fetch response/result=] to `"aborted"`, otherwise `"response-invalid"`.
+        1. If |response| is an [=aborted network error=], then set |responseData|'s [=background fetch response/result=] to `"aborted"`, otherwise `"fetch-error"`.
         1. Set |fetchAttemptComplete| to true, and abort these steps.
       1. If |response|'s [=response/status=] is `206`, then:
-        1. If [=validate a partial response=] for |rangeStart|, |response|, and |responseData|'s [=background fetch response/response=] returns invalid, then set |responseData|'s [=background fetch response/result=] to `"response-invalid"`, |fetchAttemptComplete| to true, and abort these steps.
+        1. If [=validate a partial response=] for |rangeStart|, |response|, and |responseData|'s [=background fetch response/response=] returns invalid, then:
+          1. Set |responseData|'s [=background fetch response/result=] to `"fetch-error"`.
+          1. Set |fetchAttemptComplete| to true.
+          1. [=fetch/Terminate=] the ongoing fetch, and abort these steps.
       1. Otherwise:
         1. Set |responseData|'s [=background fetch response/result=] to `"redundant"`.
         1. Set |responseData| to a new [=background fetch response=].
@@ -268,8 +276,9 @@ Note: This algorithm manages the fetching of a [=/background fetch record=]. One
       1. Whenever one or more bytes are transmitted from |stream|, let |bytes| be the transmitted bytes and run these steps:
         1. If |bgFetch|'s [=background fetch/stored body bytes total=] plus the size of |bytes| is greater than |downloadTotal|, then:
           1. [=ReadableStream/Cancel=] |stream|.
-          1. Set |responseData|'s [=background fetch response/result=] to `"download-limit-exceeded"`, |fetchAttemptComplete| to true, and abort these steps.
+          1. Set |responseData|'s [=background fetch response/result=] to `"total-download-exceeded"`, |fetchAttemptComplete| to true, and abort these steps.
         1. Append |bytes| to |responseData|'s [=background fetch response/bytes=].
+        1. If the previous step fails due to exceeding a quota limit, set |responseData|'s [=background fetch response/result=] to `"quota-exceeded"`, |fetchAttemptComplete| to true, and abort these steps.
         1. [=Report progress for background fetch=] |bgFetch|.
       1. If at any point the bytes transmission for |stream| is done normally, then:
         1. If |response|'s [=response/status=] is `206`, then:
@@ -278,19 +287,25 @@ Note: This algorithm manages the fetching of a [=/background fetch record=]. One
 
             Note: Although we ask for the whole resource, or the remainder of the resource, the server may not have returned the remainder, in which case we need to make an additional request.
 
-        1. Otherwise, if |response|'s [=response/status=] is not an [=ok status=], set |responseData|'s [=background fetch response/result=] to `"response-bad-status"`.
+        1. Otherwise, if |response|'s [=response/status=] is not an [=ok status=], set |responseData|'s [=background fetch response/result=] to `"bad-status"`.
         1. Otherwise, set |responseData|'s [=background fetch response/result=] to `"success"`.
         1. Set |fetchAttemptComplete| to true.
       1. If at any point |stream| becomes [=ReadableStream/errored=], then:
         1. If the user agent is offline and |request|'s [=request/method=] is \``GET`\`, then wait until the user agent is not offline, then set |fetchAttemptComplete| to true.
-        1. Otherwise, set |responseData|'s [=background fetch response/result=] to `"response-invalid"` and |fetchAttemptComplete| to true.
+        1. Otherwise, set |responseData|'s [=background fetch response/result=] to `"fetch-error"` and |fetchAttemptComplete| to true.
+  1. Let |result| be the empty string.
   1. Run these steps, but [=abort when=] |bgFetch|'s [=background fetch/paused flag=] or [=background fetch/abort all flag=] is set:
     1. Wait for |fetchAttemptComplete| to be true.
+    1. Set |result| to |responseData|'s [=background fetch response/result=].
   1. [=If aborted=], then:
     1. If |bgFetch|'s [=background fetch/paused flag=] is set, then assert |request|'s [=request/method=] is \``GET`\`.
     1. If |bgFetch|'s [=background fetch/abort all flag=] is set, then set |responseData|'s [=background fetch response/result=] to `"aborted"`.
+    1. Set |result| to |responseData|'s [=background fetch response/result=].
+
+      Note: The result is stored now, as terminating the fetch may change the result.
+
     1. [=fetch/Terminate=] the ongoing fetch.
-  1. If |responseData|'s [=background fetch response/result=] is the empty string, then [=complete a record=] for |bgFetch| and |record|.
+  1. If |result| is the empty string, then [=complete a record=] for |bgFetch| and |record|.
 </div>
 
 ## [=Report progress for background fetch=] ## {#report-progress-for-background-fetch-algorithm}
@@ -305,6 +320,7 @@ Note: This algorithm manages the fetching of a [=/background fetch record=]. One
   1. Let |downloaded| be |bgFetch|'s [=background fetch/stored body bytes total=].
   1. Let |uploaded| be |bgFetch|'s [=background fetch/uploaded=].
   1. Let |state| be |bgFetch|'s [=background fetch/state=].
+  1. Let |failureReason| be |bgFetch|'s [=background fetch/failure reason=].
   1. If |uploaded| is equal to |bgFetch|'s [=background fetch/last reported upload=] and |downloaded| is equal to |bgFetch|'s [=background fetch/last reported download=] and |state| is equal to |bgFetch|'s [=background fetch/last reported state=], then abort these steps.
   1. Set |bgFetch|'s [=background fetch/last reported upload=] to |uploaded|.
   1. Set |bgFetch|'s [=background fetch/last reported download=] to |downloaded|.
@@ -318,6 +334,7 @@ Note: This algorithm manages the fetching of a [=/background fetch record=]. One
     1. Set |bgFetchRegistration|'s [=BackgroundFetchRegistration/downloaded=] to |downloaded|.
     1. Set |bgFetchRegistration|'s [=BackgroundFetchRegistration/uploaded=] to |uploaded|.
     1. Set |bgFetchRegistration|'s [=BackgroundFetchRegistration/state=] to |state|.
+    1. Set |bgFetchRegistration|'s [=BackgroundFetchRegistration/failure reason=] to |failureReason|.
     1. [=Fire an event=] named "`progress`" at |bgFetchRegistration|.
 
     Issue: I need to debounce this similar to how mouse move events work.
@@ -663,6 +680,7 @@ interface BackgroundFetchRegistration : EventTarget {
   readonly attribute unsigned long long downloadTotal;
   readonly attribute unsigned long long downloaded;
   readonly attribute BackgroundFetchState state;
+  readonly attribute BackgroundFetchFailureReason failureReason;
 
   attribute EventHandler onprogress;
 
@@ -672,6 +690,21 @@ interface BackgroundFetchRegistration : EventTarget {
 };
 
 enum BackgroundFetchState { "pending", "success", "failure" };
+
+enum BackgroundFetchFailureReason {
+  "",
+  // The operation was aborted by the user, or abort() was called.
+  "aborted",
+  // A response had a not-ok-status.
+  "bad-status",
+  // A fetch failed for other reasons, e.g. CORS, MIX, an invalid partial response,
+  // network failure and the fetch cannot be retried.
+  "fetch-error",
+  // Storage quota was reached during the operation.
+  "quota-exceeded",
+  // The provided downloadTotal was exceeded.
+  "total-download-exceeded"
+};
 </script>
 
 <div dfn-for="BackgroundFetchRegistration">
@@ -682,6 +715,10 @@ enum BackgroundFetchState { "pending", "success", "failure" };
   * A <dfn>downloaded</dfn> (a number), initially a copy of [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/last reported download=].
   * A <dfn>uploaded</dfn> (a number), initially a copy of [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/last reported upload=].
   * A <dfn>state</dfn> (a {{BackgroundFetchState}}), a copy of [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/last reported state=].
+  * A <dfn>failure reason</dfn> (a {{BackgroundFetchFailureReason}}), a copy of [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/failure reason=] if [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/last reported state=] is not `"pending"`, otherwise the empty string.
+
+    Note: Both [=BackgroundFetchRegistration/state=] and [=BackgroundFetchRegistration/failure reason=] are only set once, at the same time, so [=background fetch/last reported state=] is a suitable check here.
+
   * An <dfn>id</dfn> (a number), a copy of [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/id=].
   * An <dfn>upload total</dfn> (a number), a copy of [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/upload total=].
   * A <dfn>download total</dfn> (a number), a copy of [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/download total=].
@@ -699,6 +736,8 @@ enum BackgroundFetchState { "pending", "success", "failure" };
   The <dfn attribute>downloaded</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchRegistration/downloaded=].
 
   The <dfn attribute>state</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchRegistration/state=].
+
+  The <dfn attribute>failureReason</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchRegistration/failure reason=].
 
   ### Events ### {#background-fetch-registration-events}
 
