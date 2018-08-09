@@ -161,7 +161,9 @@ A <dfn>Background fetch response</dfn> consists of:
 <div dfn-for="background fetch response">
   * A <dfn>response</dfn> (a [=/response=]), initially null.
   * <dfn>Bytes</dfn> (a [=byte sequence=]), initially empty.
-  * A <dfn>result</dfn>, (`"aborted"`, `"invalid-response"`, `"download-limit-exceeded"`, `"success"`, `"redundant"`, or the empty string), initially the empty string.
+  * A <dfn>result</dfn>, (`"aborted"`, `"response-invalid"`, `"response-bad-status"`, `"download-limit-exceeded"`, `"success"`, `"redundant"`, or the empty string), initially the empty string.
+
+  The [=background fetch response/response=] may be <dfn>exposed</dfn> if the [=background fetch response/result=] is the empty string, `"success"`, or `"response-bad-status"`.
 </div>
 
 # Algorithms # {#algorithms}
@@ -249,10 +251,10 @@ Note: This algorithm manages the fetching of a [=/background fetch record=]. One
 
           Note: If |request|'s [=request/method=] is not \``GET`\`, reissuing the request may have unwanted side effects. If a standard method to resume requests becomes available, it'll be adopted here.
 
-        1. If |response| is an [=aborted network error=], then set |responseData|'s [=background fetch response/result=] to `"aborted"`, otherwise `"invalid-response"`.
+        1. If |response| is an [=aborted network error=], then set |responseData|'s [=background fetch response/result=] to `"aborted"`, otherwise `"response-invalid"`.
         1. Set |fetchAttemptComplete| to true, and abort these steps.
       1. If |response|'s [=response/status=] is `206`, then:
-        1. If [=validate a partial response=] for |rangeStart|, |response|, and |responseData|'s [=background fetch response/response=] returns invalid, then set |responseData|'s [=background fetch response/result=] to `"invalid-response"`, |fetchAttemptComplete| to true, and abort these steps.
+        1. If [=validate a partial response=] for |rangeStart|, |response|, and |responseData|'s [=background fetch response/response=] returns invalid, then set |responseData|'s [=background fetch response/result=] to `"response-invalid"`, |fetchAttemptComplete| to true, and abort these steps.
       1. Otherwise:
         1. Set |responseData|'s [=background fetch response/result=] to `"redundant"`.
         1. Set |responseData| to a new [=background fetch response=].
@@ -276,12 +278,12 @@ Note: This algorithm manages the fetching of a [=/background fetch record=]. One
 
             Note: Although we ask for the whole resource, or the remainder of the resource, the server may not have returned the remainder, in which case we need to make an additional request.
 
-        1. Otherwise, if |response|'s [=response/status=] is not an [=ok status=], set |responseData|'s [=background fetch response/result=] to `"invalid-response"`.
+        1. Otherwise, if |response|'s [=response/status=] is not an [=ok status=], set |responseData|'s [=background fetch response/result=] to `"response-bad-status"`.
         1. Otherwise, set |responseData|'s [=background fetch response/result=] to `"success"`.
         1. Set |fetchAttemptComplete| to true.
       1. If at any point |stream| becomes [=ReadableStream/errored=], then:
         1. If the user agent is offline and |request|'s [=request/method=] is \``GET`\`, then wait until the user agent is not offline, then set |fetchAttemptComplete| to true.
-        1. Otherwise, set |responseData|'s [=background fetch response/result=] to `"invalid-response"` and |fetchAttemptComplete| to true.
+        1. Otherwise, set |responseData|'s [=background fetch response/result=] to `"response-invalid"` and |fetchAttemptComplete| to true.
   1. Run these steps, but [=abort when=] |bgFetch|'s [=background fetch/paused flag=] or [=background fetch/abort all flag=] is set:
     1. Wait for |fetchAttemptComplete| to be true.
   1. [=If aborted=], then:
@@ -412,7 +414,7 @@ Note: This algorithm creates platform objects for [=background fetch records=]. 
     1. Let |stream| be a new {{ReadableStream}} object with a pull action that returns [=a new promise=] |promise| and runs these steps [=in parallel=]:
       1. Wait for the [=byte sequence/length=] of |responseData|'s [=background fetch response/bytes=] to be greater than |transmittedBytes|, or |responseData|'s [=background fetch response/result=] not to be the empty string.
       1. Let |bytes| be null.
-      1. If the [=byte sequence/length=] of |responseData|'s [=background fetch response/bytes=] is greater than |transmittedBytes| and |responseData|'s [=background fetch response/result=] is not the empty string or `"success"`, then:
+      1. If the [=byte sequence/length=] of |responseData|'s [=background fetch response/bytes=] is greater than |transmittedBytes| and |responseData| may be [=background fetch response/exposed=], then:
         1. Set |bytes| to a user agent determined slice of |responseData|'s [=background fetch response/bytes=], starting from an offset of |transmittedBytes|.
 
           Note: This allows the user agent to stream the resource from storage at an appropriate rate.
@@ -422,13 +424,13 @@ Note: This algorithm creates platform objects for [=background fetch records=]. 
         1. If |bytes| is not null, then:
           1. Let |array| be a new {{Uint8Array}} wrapping a new {{ArrayBuffer}} of |bytes|.
           1. [=ReadableStream/Enqueue=] |array| into |stream|.
-        1. If |responseData|'s [=background fetch response/result=] is `"success"` and |transmittedBytes| is the [=byte sequence/length=] of |responseData|'s [=background fetch response/bytes=], then [=ReadableStream/close=] |stream|.
+        1. If |responseData| may be [=background fetch response/exposed=], |responseData|'s [=background fetch response/result=] is not the empty string, and |transmittedBytes| is the [=byte sequence/length=] of |responseData|'s [=background fetch response/bytes=], then [=ReadableStream/close=] |stream|.
         1. Otherwise, if |responseData|'s [=background fetch response/result=] is `"aborted"`, then [=ReadableStream/error=] |stream| with an {{AbortError}} {{DOMException}}.
-        1. Otherwise, if |responseData|'s [=background fetch response/result=] is not the empty string [=ReadableStream/error=] |stream| with a {{TypeError}}.
+        1. Otherwise, if |responseData| may not be [=background fetch response/exposed=], then [=ReadableStream/error=] |stream| with a {{TypeError}}.
         1. [=Resolve=] |promise|.
     1. Run these steps [=in parallel=]:
-      1. Wait for |responseData|'s [=background fetch response/result=] to not be the empty string.
-      1. If |responseData|'s [=background fetch response/result=] is `"success"`:
+      1. Wait for |responseData|'s [=background fetch response/response=] to not be not-null.
+      1. If |responseData| may be [=background fetch response/exposed=], then:
         1. Let |response| be a copy of |responseData|'s [=background fetch response/response=].
         1. [=header list/Delete=] \``Content-Range`\` from |response|'s [=response/header list=].
         1. [=header list/Delete=] \``Content-Length`\` from |response|'s [=response/header list=].
