@@ -808,11 +808,10 @@ enum BackgroundFetchFailureReason {
   <div algorithm>
     The <dfn method>matchAll(|request|, |options|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run these steps [=in parallel=]:
 
-    1. Let |records| be the result of filtering the [=context object=]'s [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/records=] according to the rules of {{Cache/matchAll()|cache.matchAll()}}.
-
-      Issue: The above needs to be abstracted.
-
-    1. [=Queue a bgfetch task=] to [=resolve=] |promise| with the result of [=creating record objects=] from |records| in [=context object=]'s [=relevant Realm=].
+    1. Let |matchingRecords| be an empty [=list=].
+    1. For each |record| of [=context object=]'s [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/records=]:
+      1. If [=request matches cached item=] for |request|, |record|'s [=background fetch record/request=], |record|'s [=background fetch record/response data=]'s [=background fetch response/response=], and |options| returns true, then [=list/append=] |record| to |matchingRecords|.
+    1. [=Queue a bgfetch task=] to [=resolve=] |promise| with the result of [=creating record objects=] from |matchingRecords| in [=context object=]'s [=relevant Realm=].
   </div>
 </div>
 
