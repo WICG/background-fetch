@@ -884,9 +884,9 @@ interface BackgroundFetchUpdateUIEvent : BackgroundFetchEvent {
 <div dfn-for="BackgroundFetchUpdateUIEvent">
 
   A {{BackgroundFetchUpdateUIEvent}} has an <dfn>UI updated flag</dfn> which is initially unset.
-</div>
 
-<div dfn-for="BackgroundFetchUpdateUIEvent">
+  ### {{BackgroundFetchUpdateUIEvent/updateUI()}} ### {#background-fetch-update-ui-event-update-ui}
+
   <div algorithm>
     The <dfn method>updateUI(|options|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run these steps [=in parallel=]:
 
