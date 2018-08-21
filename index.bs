@@ -606,7 +606,6 @@ interface BackgroundFetchManager {
   Promise<BackgroundFetchRegistration> fetch(DOMString id, (RequestInfo or sequence<RequestInfo>) requests, optional BackgroundFetchOptions options);
   Promise<BackgroundFetchRegistration?> get(DOMString id);
   Promise<sequence<DOMString>> getIds();
-  // TODO: in future this should become an async iterator for BackgroundFetchRegistration objects
 };
 
 dictionary BackgroundFetchUIOptions {
@@ -840,7 +839,6 @@ enum BackgroundFetchFailureReason {
 interface BackgroundFetchRecord {
   readonly attribute Request request;
   readonly attribute Promise<Response> responseReady;
-  // TODO: In future this will include a fetch observer
 };
 </script>
 
@@ -884,10 +882,28 @@ interface BackgroundFetchUpdateUIEvent : BackgroundFetchEvent {
 </script>
 
 <div dfn-for="BackgroundFetchUpdateUIEvent">
+
+  A {{BackgroundFetchUpdateUIEvent}} has an <dfn>UI updated flag</dfn> which is initially unset.
+</div>
+
+<div dfn-for="BackgroundFetchUpdateUIEvent">
   <div algorithm>
     The <dfn method>updateUI(|options|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run these steps [=in parallel=]:
 
-    1. TODO
+    1. If any of the following is true:
+      * The [=context object=]'s {{Event/isTrusted}} attribute is false.
+      * The [=context object=]'s [=BackgroundFetchUpdateUIEvent/UI updated flag=] is set.
+      * The [=context object=] is not [=ExtendableEvent/active=].
+
+        Issue: [ServiceWorker/1348](https://github.com/w3c/ServiceWorker/pull/1348).
+
+      Throw an {{InvalidStateError}} {{DOMException}}.
+
+    1. Set the [=context object=]'s [=BackgroundFetchUpdateUIEvent/UI updated flag=].
+    1. If |option| is null, return.
+    1. Let |bgFetch| be the [=context object=]'s [=BackgroundFetchEvent/background fetch=].
+    1. If |option|'s {{BackgroundFetchUIOptions/icons}} member is present, set |bgFetch|'s [=background fetch/icons=] to |option|'s {{BackgroundFetchUIOptions/icons}}.
+    1. If |option|'s {{BackgroundFetchUIOptions/title}} member is present, set |bgFetch|'s [=background fetch/title=] to |option|'s {{BackgroundFetchUIOptions/title}}.
   </div>
 </div>
 
