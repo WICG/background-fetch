@@ -231,6 +231,7 @@ Note: This algorithm manages the fetching of a [=/background fetch record=]. One
   1. Wait for |bgFetch|'s [=background fetch/paused flag=] to be unset.
   1. Let |request| be a copy of |record|'s [=background fetch record/request=].
   1. Set |request|'s [=request/keepalive flag=].
+  1. Set |request|'s [=request/service-workers mode=] to "`none`".
   1. Let |rangeStart| be the [=byte sequence/length=] of |responseData|'s [=background fetch response/bytes=].
   1. If |rangeStart| is not 0, then [=request/add a range header=] to |request| with |currentLength|.
 
