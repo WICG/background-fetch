@@ -110,7 +110,7 @@ A <dfn>background fetch</dfn> consists of:
   * A <dfn>state</dfn> (a {{BackgroundFetchState}}), initially `"pending"`.
   * A <dfn>last reported state</dfn> (a {{BackgroundFetchState}}), initially `"pending"`.
   * A <dfn>failure reason</dfn> (a {{BackgroundFetchFailureReason}}), initially the empty string.
-  * <dfn>Icons</dfn> (a [=list=] of {{IconDefinition}}s).
+  * <dfn>Icons</dfn> (a [=list=] of {{ImageResource}}s).
   * A <dfn>service worker registration</dfn> (a [=/service worker registration=]).
   * A <dfn>progress handling queue</dfn> (a [=parallel queue=]), initially the result of [=starting a new parallel queue=].
   * A <dfn>paused flag</dfn>, initially unset.
@@ -126,11 +126,28 @@ A <dfn>background fetch</dfn> consists of:
   </div>
 
   <div algorithm>
-    To <dfn>display</dfn> a [=/background fetch=] (|bgFetch|), the user agent must present a user interface that follows these rules:
+    To <dfn>display</dfn> a [=/background fetch=] (|bgFetch|) for a given |environment| (an [=environment settings object=]), the user agent must present a user interface that follows these rules:
 
     * The |bgFetch|'s [=background fetch/service worker registration=]'s [=service worker registration/scope url=]'s [=url/origin=] must be displayed.
     * The UI may display |bgFetch|'s [=background fetch/title=].
-    * The UI may display one of |bgFetch|'s [=background fetch/icons=]. TODO: when to fetch this?
+    * The UI may [=select an icon=] for display from |bgFetch|'s [=background fetch/icons=], and [=/fetch=] it using a new [=/request=] with the following properties:
+      : [=request/URL=]
+      :: The {{ImageResource}}'s [=ImageResource/src=].
+      : [=request/Client=]
+      :: |environment|.
+      : [=request/Keepalive flag=]
+      :: Set.
+      : [=request/Service-workers mode=]
+      :: "`none`".
+      : [=request/Destination=]
+      :: "`image`".
+      : [=request/Mode=]
+      :: "`no-cors`".
+      : [=request/Credentials mode=]
+      :: "`include`".
+
+      Issue: [manifest/pull/710](https://github.com/w3c/manifest/pull/710).
+
     * The UI may use |bgFetch|'s [=background fetch/download total=], [=background fetch/upload total=], [=background fetch/last reported download=], and [=background fetch/paused flag=] to present the progress of the fetch. TODO what about bytes uploaded? TODO how can I tell when the operation is complete?
     * The UI must provide a way for the user to abort the |bgFetch| by setting |bgFetch|'s [=background fetch/abort all flag=].
     * If every [=background fetch record/request=] in |beFetch|'s [=background fetch/records=] has a [=request/method=] of \``GET`\`, the UI may provide a way to toggle |bgFetch|'s [=background fetch/paused flag=].
@@ -176,7 +193,6 @@ Note: This is the algorithm that manages the 'background' parts of a background 
 <div algorithm>
   To <dfn>perform a background fetch</dfn> for |bgFetch| (a [=/background fetch=]), run these steps:
 
-  1. [=background fetch/Display=] |bgFetch|.
   1. Let |swRegistration| be |bgFetch|'s [=background fetch/service worker registration=].
   1. Let |downloadTotal| be |bgFetch|'s [=background fetch/download total=] if it is not 0, otherwise infinity.
   1. Let |successfulFetches| be 0.
@@ -586,20 +602,12 @@ interface BackgroundFetchManager {
 };
 
 dictionary BackgroundFetchUIOptions {
-  sequence<IconDefinition> icons = [];
+  sequence<ImageResource> icons = [];
   DOMString title = "";
 };
 
 dictionary BackgroundFetchOptions : BackgroundFetchUIOptions {
   unsigned long long downloadTotal = 0;
-};
-
-// This is taken from https://w3c.github.io/manifest/#icons-member.
-// This definition should probably be moved somewhere more general.
-dictionary IconDefinition {
-  DOMString src;
-  DOMString sizes = "";
-  DOMString type = "";
 };
 </script>
 
@@ -670,6 +678,7 @@ dictionary IconDefinition {
       1. Set |bgFetchMap|[|id|] to |bgFetch|.
       1. [=Queue a bgfetch task=] to run these steps:
         1. [=Resolve=] |promise| with the result of [=getting a BackgroundFetchRegistration instance=] for |bgFetch| in the [=context object=]'s [=relevant Realm=].
+      1. [=In parallel=], [=background fetch/display=] |bgFetch| from the [=context object=]'s [=relevant settings object=].
       1. [=In parallel=], [=perform a background fetch=] with |bgFetch|.
     1. Return |promise|.
   </div>

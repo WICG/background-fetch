@@ -1214,7 +1214,7 @@ Possible extra rowspan handling
 </style>
   <meta content="Bikeshed version a816d78e14132d4d4d2ee44ccaf1b8bc90ac75d5" name="generator">
   <link href="https://wicg.github.io/background-fetch/" rel="canonical">
-  <meta content="c5fecd8014ac0dce8ff823622fb78e7a3ee6e876" name="document-revision">
+  <meta content="00f1f85fd5df599e338e11fb91a6f59515ed1558" name="document-revision">
 <style>
   .algorithm dl {
     overflow: hidden;
@@ -1492,7 +1492,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">Background Fetch</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Editor’s Draft, <time class="dt-updated" datetime="2018-08-20">20 August 2018</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Editor’s Draft, <time class="dt-updated" datetime="2018-08-21">21 August 2018</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1675,7 +1675,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
      <li data-md>
       <p>A <dfn class="dfn-paneled" data-dfn-for="background fetch" data-dfn-type="dfn" data-noexport id="background-fetch-failure-reason">failure reason</dfn> (a <code class="idl"><a data-link-type="idl" href="#enumdef-backgroundfetchfailurereason" id="ref-for-enumdef-backgroundfetchfailurereason">BackgroundFetchFailureReason</a></code>), initially the empty string.</p>
      <li data-md>
-      <p><dfn class="dfn-paneled" data-dfn-for="background fetch" data-dfn-type="dfn" data-noexport id="background-fetch-icons">Icons</dfn> (a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list" id="ref-for-list①">list</a> of <code class="idl"><a data-link-type="idl" href="#dictdef-icondefinition" id="ref-for-dictdef-icondefinition">IconDefinition</a></code>s).</p>
+      <p><dfn class="dfn-paneled" data-dfn-for="background fetch" data-dfn-type="dfn" data-noexport id="background-fetch-icons">Icons</dfn> (a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list" id="ref-for-list①">list</a> of <code class="idl"><a data-link-type="idl">ImageResource</a></code>s).</p>
      <li data-md>
       <p>A <dfn class="dfn-paneled" data-dfn-for="background fetch" data-dfn-type="dfn" data-noexport id="background-fetch-service-worker-registration">service worker registration</dfn> (a <a data-link-type="dfn" href="https://w3c.github.io/ServiceWorker/#dfn-service-worker-registration" id="ref-for-dfn-service-worker-registration①">service worker registration</a>).</p>
      <li data-md>
@@ -1701,14 +1701,38 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
      </ol>
     </div>
     <div class="algorithm" data-algorithm="display">
-      To <dfn class="dfn-paneled" data-dfn-for="background fetch" data-dfn-type="dfn" data-noexport id="background-fetch-display">display</dfn> a <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch③">background fetch</a> (<var>bgFetch</var>), the user agent must present a user interface that follows these rules: 
+      To <dfn class="dfn-paneled" data-dfn-for="background fetch" data-dfn-type="dfn" data-noexport id="background-fetch-display">display</dfn> a <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch③">background fetch</a> (<var>bgFetch</var>) for a given <var>environment</var> (an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object" id="ref-for-environment-settings-object">environment settings object</a>), the user agent must present a user interface that follows these rules: 
      <ul>
       <li data-md>
        <p>The <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-service-worker-registration" id="ref-for-background-fetch-service-worker-registration">service worker registration</a>'s <a data-link-type="dfn" href="https://w3c.github.io/ServiceWorker/#dfn-scope-url" id="ref-for-dfn-scope-url">scope url</a>'s <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url-origin" id="ref-for-concept-url-origin">origin</a> must be displayed.</p>
       <li data-md>
        <p>The UI may display <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-title" id="ref-for-background-fetch-title">title</a>.</p>
       <li data-md>
-       <p>The UI may display one of <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-icons" id="ref-for-background-fetch-icons">icons</a>. TODO: when to fetch this?</p>
+       <p>The UI may <a data-link-type="dfn">select an icon</a> for display from <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-icons" id="ref-for-background-fetch-icons">icons</a>, and <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-fetch" id="ref-for-concept-fetch④">fetch</a> it using a new <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request" id="ref-for-concept-request">request</a> with the following properties:</p>
+       <dl>
+        <dt data-md><a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-url" id="ref-for-concept-request-url">URL</a>
+        <dd data-md>
+         <p>The <code class="idl"><a data-link-type="idl">ImageResource</a></code>'s <a data-link-type="dfn">src</a>.</p>
+        <dt data-md><a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-client" id="ref-for-concept-request-client">Client</a>
+        <dd data-md>
+         <p><var>environment</var>.</p>
+        <dt data-md><a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#request-keepalive-flag" id="ref-for-request-keepalive-flag">Keepalive flag</a>
+        <dd data-md>
+         <p>Set.</p>
+        <dt data-md><a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#request-service-workers-mode" id="ref-for-request-service-workers-mode">Service-workers mode</a>
+        <dd data-md>
+         <p>"<code>none</code>".</p>
+        <dt data-md><a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-destination" id="ref-for-concept-request-destination">Destination</a>
+        <dd data-md>
+         <p>"<code>image</code>".</p>
+        <dt data-md><a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-mode" id="ref-for-concept-request-mode">Mode</a>
+        <dd data-md>
+         <p>"<code>no-cors</code>".</p>
+        <dt data-md><a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-credentials-mode" id="ref-for-concept-request-credentials-mode">Credentials mode</a>
+        <dd data-md>
+         <p>"<code>include</code>".</p>
+       </dl>
+       <p class="issue" id="issue-20b63876"><a class="self-link" href="#issue-20b63876"></a> <a href="https://github.com/w3c/manifest/pull/710">manifest/pull/710</a>.</p>
       <li data-md>
        <p>The UI may use <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-download-total" id="ref-for-background-fetch-download-total">download total</a>, <a data-link-type="dfn" href="#background-fetch-upload-total" id="ref-for-background-fetch-upload-total">upload total</a>, <a data-link-type="dfn" href="#background-fetch-last-reported-download" id="ref-for-background-fetch-last-reported-download">last reported download</a>, and <a data-link-type="dfn" href="#background-fetch-paused-flag" id="ref-for-background-fetch-paused-flag">paused flag</a> to present the progress of the fetch. TODO what about bytes uploaded? TODO how can I tell when the operation is complete?</p>
       <li data-md>
@@ -1730,7 +1754,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
    <div>
     <ul>
      <li data-md>
-      <p>A <dfn class="dfn-paneled" data-dfn-for="background fetch record" data-dfn-type="dfn" data-noexport id="background-fetch-record-request">request</dfn> (a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request" id="ref-for-concept-request">request</a>).</p>
+      <p>A <dfn class="dfn-paneled" data-dfn-for="background fetch record" data-dfn-type="dfn" data-noexport id="background-fetch-record-request">request</dfn> (a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request" id="ref-for-concept-request①">request</a>).</p>
      <li data-md>
       <p>A <dfn class="dfn-paneled" data-dfn-for="background fetch record" data-dfn-type="dfn" data-noexport id="background-fetch-record-response-data">response data</dfn> (a <a data-link-type="dfn" href="#background-fetch-response①" id="ref-for-background-fetch-response①">background fetch response</a>), initially a new <a data-link-type="dfn" href="#background-fetch-response①" id="ref-for-background-fetch-response①①">background fetch response</a>.</p>
     </ul>
@@ -1754,8 +1778,6 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
    <div class="algorithm" data-algorithm="perform a background fetch">
      To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="perform-a-background-fetch">perform a background fetch</dfn> for <var>bgFetch</var> (a <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch⑤">background fetch</a>), run these steps: 
     <ol>
-     <li data-md>
-      <p><a data-link-type="dfn" href="#background-fetch-display" id="ref-for-background-fetch-display">Display</a> <var>bgFetch</var>.</p>
      <li data-md>
       <p>Let <var>swRegistration</var> be <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-service-worker-registration" id="ref-for-background-fetch-service-worker-registration①">service worker registration</a>.</p>
      <li data-md>
@@ -1853,7 +1875,9 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
      <li data-md>
       <p>Let <var>request</var> be a copy of <var>record</var>’s <a data-link-type="dfn" href="#background-fetch-record-request" id="ref-for-background-fetch-record-request①">request</a>.</p>
      <li data-md>
-      <p>Set <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#request-keepalive-flag" id="ref-for-request-keepalive-flag">keepalive flag</a>.</p>
+      <p>Set <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#request-keepalive-flag" id="ref-for-request-keepalive-flag①">keepalive flag</a>.</p>
+     <li data-md>
+      <p>Set <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#request-service-workers-mode" id="ref-for-request-service-workers-mode①">service-workers mode</a> to "<code>none</code>".</p>
      <li data-md>
       <p>Let <var>rangeStart</var> be the <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#byte-sequence-length" id="ref-for-byte-sequence-length①">length</a> of <var>responseData</var>’s <a data-link-type="dfn" href="#background-fetch-response-bytes" id="ref-for-background-fetch-response-bytes①">bytes</a>.</p>
      <li data-md>
@@ -1864,7 +1888,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
      <li data-md>
       <p>Let <var>lastTransmittedSize</var> be 0.</p>
      <li data-md>
-      <p><a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-fetch" id="ref-for-concept-fetch④">Fetch</a> <var>request</var>.</p>
+      <p><a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-fetch" id="ref-for-concept-fetch⑤">Fetch</a> <var>request</var>.</p>
       <p class="issue" id="issue-775cdb79"><a class="self-link" href="#issue-775cdb79"></a> The remainder of this step uses fetch "callbacks" which currently queue tasks. This isn’t desirable or possible here, so let’s pretend that tasks aren’t queued. (<a href="https://github.com/whatwg/fetch/issues/536#issuecomment-330184276">issue</a>)</p>
       <p>To <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#process-request-body" id="ref-for-process-request-body">process request body</a> for <var>request</var>, run these steps:</p>
       <ol>
@@ -2019,7 +2043,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
      <li data-md>
       <p>Set <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-last-reported-state" id="ref-for-background-fetch-last-reported-state②">last reported state</a> to <var>state</var>.</p>
      <li data-md>
-      <p>For each <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object" id="ref-for-environment-settings-object">environment settings object</a> <var>env</var> whose <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-settings-object-origin" id="ref-for-concept-settings-object-origin">origin</a> is equal to <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-service-worker-registration" id="ref-for-background-fetch-service-worker-registration②">service worker registration</a>'s <a data-link-type="dfn" href="https://w3c.github.io/ServiceWorker/#dfn-scope-url" id="ref-for-dfn-scope-url①">scope URL</a>'s <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url-origin" id="ref-for-concept-url-origin①">origin</a>, <a data-link-type="dfn" href="#queue-a-bgfetch-task" id="ref-for-queue-a-bgfetch-task">queue a bgfetch task</a> on <var>env</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#responsible-event-loop" id="ref-for-responsible-event-loop①">responsible event loop</a> to run these steps:</p>
+      <p>For each <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object" id="ref-for-environment-settings-object①">environment settings object</a> <var>env</var> whose <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-settings-object-origin" id="ref-for-concept-settings-object-origin">origin</a> is equal to <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-service-worker-registration" id="ref-for-background-fetch-service-worker-registration②">service worker registration</a>'s <a data-link-type="dfn" href="https://w3c.github.io/ServiceWorker/#dfn-scope-url" id="ref-for-dfn-scope-url①">scope URL</a>'s <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url-origin" id="ref-for-concept-url-origin①">origin</a>, <a data-link-type="dfn" href="#queue-a-bgfetch-task" id="ref-for-queue-a-bgfetch-task">queue a bgfetch task</a> on <var>env</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#responsible-event-loop" id="ref-for-responsible-event-loop①">responsible event loop</a> to run these steps:</p>
       <ol>
        <li data-md>
         <p>Let <var>bgFetchRegistration</var> be the instance of <code class="idl"><a data-link-type="idl" href="#backgroundfetchregistration" id="ref-for-backgroundfetchregistration">BackgroundFetchRegistration</a></code> within the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-realm" id="ref-for-concept-relevant-realm④">relevant realm</a> whose <a data-link-type="dfn" href="#backgroundfetchregistration-background-fetch" id="ref-for-backgroundfetchregistration-background-fetch">background fetch</a> is equal to <var>bgFetch</var>, or null if none exists.</p>
@@ -2510,20 +2534,12 @@ complete-length = ( 1*DIGIT / "*" )</pre>
 };
 
 <c- b>dictionary</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="dictionary" data-export id="dictdef-backgroundfetchuioptions"><code><c- g>BackgroundFetchUIOptions</c-></code></dfn> {
-  <c- b>sequence</c->&lt;<a class="n" data-link-type="idl-name" href="#dictdef-icondefinition" id="ref-for-dictdef-icondefinition①"><c- n>IconDefinition</c-></a>> <dfn class="idl-code" data-default="None" data-dfn-for="BackgroundFetchUIOptions" data-dfn-type="dict-member" data-export data-type="sequence<IconDefinition> " id="dom-backgroundfetchuioptions-icons"><code><c- g>icons</c-></code><a class="self-link" href="#dom-backgroundfetchuioptions-icons"></a></dfn> = [];
+  <c- b>sequence</c->&lt;<a class="n" data-link-type="idl-name"><c- n>ImageResource</c-></a>> <dfn class="idl-code" data-default="None" data-dfn-for="BackgroundFetchUIOptions" data-dfn-type="dict-member" data-export data-type="sequence<ImageResource> " id="dom-backgroundfetchuioptions-icons"><code><c- g>icons</c-></code><a class="self-link" href="#dom-backgroundfetchuioptions-icons"></a></dfn> = [];
   <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString③"><c- b>DOMString</c-></a> <dfn class="idl-code" data-default="&quot;&quot;" data-dfn-for="BackgroundFetchUIOptions" data-dfn-type="dict-member" data-export data-type="DOMString " id="dom-backgroundfetchuioptions-title"><code><c- g>title</c-></code><a class="self-link" href="#dom-backgroundfetchuioptions-title"></a></dfn> = "";
 };
 
 <c- b>dictionary</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="dictionary" data-export id="dictdef-backgroundfetchoptions"><code><c- g>BackgroundFetchOptions</c-></code></dfn> : <a class="n" data-link-type="idl-name" href="#dictdef-backgroundfetchuioptions" id="ref-for-dictdef-backgroundfetchuioptions"><c- n>BackgroundFetchUIOptions</c-></a> {
   <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long"><c- b>unsigned</c-> <c- b>long</c-> <c- b>long</c-></a> <dfn class="idl-code" data-default="0" data-dfn-for="BackgroundFetchOptions" data-dfn-type="dict-member" data-export data-type="unsigned long long " id="dom-backgroundfetchoptions-downloadtotal"><code><c- g>downloadTotal</c-></code><a class="self-link" href="#dom-backgroundfetchoptions-downloadtotal"></a></dfn> = 0;
-};
-
-// This is taken from https://w3c.github.io/manifest/#icons-member.
-// This definition should probably be moved somewhere more general.
-<c- b>dictionary</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="dictionary" data-export id="dictdef-icondefinition"><code><c- g>IconDefinition</c-></code></dfn> {
-  <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString④"><c- b>DOMString</c-></a> <dfn class="idl-code" data-dfn-for="IconDefinition" data-dfn-type="dict-member" data-export data-type="DOMString " id="dom-icondefinition-src"><code><c- g>src</c-></code><a class="self-link" href="#dom-icondefinition-src"></a></dfn>;
-  <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString⑤"><c- b>DOMString</c-></a> <dfn class="idl-code" data-default="&quot;&quot;" data-dfn-for="IconDefinition" data-dfn-type="dict-member" data-export data-type="DOMString " id="dom-icondefinition-sizes"><code><c- g>sizes</c-></code><a class="self-link" href="#dom-icondefinition-sizes"></a></dfn> = "";
-  <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString⑥"><c- b>DOMString</c-></a> <dfn class="idl-code" data-default="&quot;&quot;" data-dfn-for="IconDefinition" data-dfn-type="dict-member" data-export data-type="DOMString " id="dom-icondefinition-type"><code><c- g>type</c-></code><a class="self-link" href="#dom-icondefinition-type"></a></dfn> = "";
 };
 </pre>
    <div>
@@ -2558,9 +2574,9 @@ complete-length = ( 1*DIGIT / "*" )</pre>
         <li data-md>
          <p>Let <var>internalRequest</var> be the <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-request" id="ref-for-concept-request-request②">request</a> of the result of invoking the <code class="idl"><a data-link-type="idl" href="https://fetch.spec.whatwg.org/#request" id="ref-for-request②">Request</a></code> constructor with <var>request</var>. If this throws an exception, return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-promise-rejected-with" id="ref-for-a-promise-rejected-with①">a promise rejected with</a> the exception.</p>
         <li data-md>
-         <p>If <var>internalRequest</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-mode" id="ref-for-concept-request-mode">mode</a> is "<code>no-cors</code>", then return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-promise-rejected-with" id="ref-for-a-promise-rejected-with②">a promise rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#exceptiondef-typeerror" id="ref-for-exceptiondef-typeerror③">TypeError</a></code>.</p>
+         <p>If <var>internalRequest</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-mode" id="ref-for-concept-request-mode①">mode</a> is "<code>no-cors</code>", then return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-promise-rejected-with" id="ref-for-a-promise-rejected-with②">a promise rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#exceptiondef-typeerror" id="ref-for-exceptiondef-typeerror③">TypeError</a></code>.</p>
         <li data-md>
-         <p>Set <var>internalRequest</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-client" id="ref-for-concept-request-client">client</a> to null.</p>
+         <p>Set <var>internalRequest</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-client" id="ref-for-concept-request-client①">client</a> to null.</p>
         <li data-md>
          <p>Let <var>record</var> be a new <a data-link-type="dfn" href="#background-fetch-record" id="ref-for-background-fetch-record⑥">background fetch record</a>.</p>
         <li data-md>
@@ -2650,7 +2666,9 @@ complete-length = ( 1*DIGIT / "*" )</pre>
            <p><a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#resolve-promise" id="ref-for-resolve-promise②">Resolve</a> <var>promise</var> with the result of <a data-link-type="dfn" href="#get-a-backgroundfetchregistration-instance" id="ref-for-get-a-backgroundfetchregistration-instance⑤">getting a BackgroundFetchRegistration instance</a> for <var>bgFetch</var> in the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object⑥">context object</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-realm" id="ref-for-concept-relevant-realm⑤">relevant Realm</a>.</p>
          </ol>
         <li data-md>
-         <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel④">In parallel</a>, <a data-link-type="dfn" href="#perform-a-background-fetch" id="ref-for-perform-a-background-fetch①">perform a background fetch</a> with <var>bgFetch</var>.</p>
+         <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel④">In parallel</a>, <a data-link-type="dfn" href="#background-fetch-display" id="ref-for-background-fetch-display">display</a> <var>bgFetch</var> from the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object⑦">context object</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object" id="ref-for-relevant-settings-object③">relevant settings object</a>.</p>
+        <li data-md>
+         <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel⑤">In parallel</a>, <a data-link-type="dfn" href="#perform-a-background-fetch" id="ref-for-perform-a-background-fetch①">perform a background fetch</a> with <var>bgFetch</var>.</p>
        </ol>
       <li data-md>
        <p>Return <var>promise</var>.</p>
@@ -2658,10 +2676,10 @@ complete-length = ( 1*DIGIT / "*" )</pre>
     </div>
     <h4 class="heading settled" data-level="6.3.2" id="background-fetch-manager-get"><span class="secno">6.3.2. </span><span class="content"><code class="idl"><a data-link-type="idl" href="#dom-backgroundfetchmanager-get" id="ref-for-dom-backgroundfetchmanager-get①">get()</a></code></span><a class="self-link" href="#background-fetch-manager-get"></a></h4>
     <div class="algorithm" data-algorithm="get(id)">
-      The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchManager" data-dfn-type="method" data-export id="dom-backgroundfetchmanager-get"><code>get(<var>id</var>)</code></dfn> method, when invoked, must return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-new-promise" id="ref-for-a-new-promise③">a new promise</a> <var>promise</var> and run these steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel⑤">in parallel</a>: 
+      The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchManager" data-dfn-type="method" data-export id="dom-backgroundfetchmanager-get"><code>get(<var>id</var>)</code></dfn> method, when invoked, must return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-new-promise" id="ref-for-a-new-promise③">a new promise</a> <var>promise</var> and run these steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel⑥">in parallel</a>: 
      <ol>
       <li data-md>
-       <p>Let <var>registration</var> be the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object⑦">context object</a>'s associated <a data-link-type="dfn" href="#backgroundfetchmanager-service-worker-registration" id="ref-for-backgroundfetchmanager-service-worker-registration②">service worker registration</a>.</p>
+       <p>Let <var>registration</var> be the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object⑧">context object</a>'s associated <a data-link-type="dfn" href="#backgroundfetchmanager-service-worker-registration" id="ref-for-backgroundfetchmanager-service-worker-registration②">service worker registration</a>.</p>
       <li data-md>
        <p>Let <var>bgFetch</var> be <var>registration</var>’s <a data-link-type="dfn" href="#service-worker-registration-active-background-fetches" id="ref-for-service-worker-registration-active-background-fetches③">active background fetches</a>[<var>id</var>].</p>
       <li data-md>
@@ -2673,7 +2691,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
          <p><a data-link-type="dfn" href="#queue-a-bgfetch-task" id="ref-for-queue-a-bgfetch-task②">Queue a bgfetch task</a> <var>task</var> to run these steps:</p>
          <ol>
           <li data-md>
-           <p>Let <var>bgFetchRegistration</var> be the result of <a data-link-type="dfn" href="#get-a-backgroundfetchregistration-instance" id="ref-for-get-a-backgroundfetchregistration-instance⑥">getting a BackgroundFetchRegistration instance</a> for <var>bgFetch</var> in the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object⑧">context object</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-realm" id="ref-for-concept-relevant-realm⑥">relevant Realm</a>.</p>
+           <p>Let <var>bgFetchRegistration</var> be the result of <a data-link-type="dfn" href="#get-a-backgroundfetchregistration-instance" id="ref-for-get-a-backgroundfetchregistration-instance⑥">getting a BackgroundFetchRegistration instance</a> for <var>bgFetch</var> in the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object⑨">context object</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-realm" id="ref-for-concept-relevant-realm⑥">relevant Realm</a>.</p>
           <li data-md>
            <p><a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#resolve-promise" id="ref-for-resolve-promise④">Resolve</a> <var>promise</var> with <var>bgFetchRegistration</var>.</p>
          </ol>
@@ -2685,10 +2703,10 @@ complete-length = ( 1*DIGIT / "*" )</pre>
     </div>
     <h4 class="heading settled" data-level="6.3.3" id="background-fetch-manager-get-ids"><span class="secno">6.3.3. </span><span class="content"><code class="idl"><a data-link-type="idl" href="#dom-backgroundfetchmanager-getids" id="ref-for-dom-backgroundfetchmanager-getids①">getIds()</a></code></span><a class="self-link" href="#background-fetch-manager-get-ids"></a></h4>
     <div class="algorithm" data-algorithm="getIds()">
-      The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchManager" data-dfn-type="method" data-export id="dom-backgroundfetchmanager-getids"><code>getIds()</code></dfn> method, when invoked, must return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-new-promise" id="ref-for-a-new-promise④">a new promise</a> <var>promise</var> and run these steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel⑥">in parallel</a>: 
+      The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchManager" data-dfn-type="method" data-export id="dom-backgroundfetchmanager-getids"><code>getIds()</code></dfn> method, when invoked, must return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-new-promise" id="ref-for-a-new-promise④">a new promise</a> <var>promise</var> and run these steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel⑦">in parallel</a>: 
      <ol>
       <li data-md>
-       <p>Let <var>registration</var> be the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object⑨">context object</a>'s associated <a data-link-type="dfn" href="#backgroundfetchmanager-service-worker-registration" id="ref-for-backgroundfetchmanager-service-worker-registration③">service worker registration</a>.</p>
+       <p>Let <var>registration</var> be the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object①⓪">context object</a>'s associated <a data-link-type="dfn" href="#backgroundfetchmanager-service-worker-registration" id="ref-for-backgroundfetchmanager-service-worker-registration③">service worker registration</a>.</p>
       <li data-md>
        <p><a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#resolve-promise" id="ref-for-resolve-promise⑤">Resolve</a> <var>promise</var> with the result of <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#map-getting-the-keys" id="ref-for-map-getting-the-keys">getting the keys</a> of <var>registration</var>’s <a data-link-type="dfn" href="#service-worker-registration-active-background-fetches" id="ref-for-service-worker-registration-active-background-fetches④">active background fetches</a>.</p>
      </ol>
@@ -2697,7 +2715,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
    <h3 class="heading settled" data-level="6.4" id="background-fetch-registration"><span class="secno">6.4. </span><span class="content"><code class="idl"><a data-link-type="idl" href="#backgroundfetchregistration" id="ref-for-backgroundfetchregistration⑦">BackgroundFetchRegistration</a></code></span><a class="self-link" href="#background-fetch-registration"></a></h3>
 <pre class="idl highlight def">[<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed①"><c- g>Exposed</c-></a>=(<c- n>Window</c->,<c- n>Worker</c->)]
 <c- b>interface</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="backgroundfetchregistration"><code><c- g>BackgroundFetchRegistration</c-></code></dfn> : <a class="n" data-link-type="idl-name" href="https://dom.spec.whatwg.org/#eventtarget" id="ref-for-eventtarget"><c- n>EventTarget</c-></a> {
-  <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString⑦"><c- b>DOMString</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="DOMString" href="#dom-backgroundfetchregistration-id" id="ref-for-dom-backgroundfetchregistration-id"><c- g>id</c-></a>;
+  <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString④"><c- b>DOMString</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="DOMString" href="#dom-backgroundfetchregistration-id" id="ref-for-dom-backgroundfetchregistration-id"><c- g>id</c-></a>;
   <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long①"><c- b>unsigned</c-> <c- b>long</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="unsigned long long" href="#dom-backgroundfetchregistration-uploadtotal" id="ref-for-dom-backgroundfetchregistration-uploadtotal"><c- g>uploadTotal</c-></a>;
   <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long②"><c- b>unsigned</c-> <c- b>long</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="unsigned long long" href="#dom-backgroundfetchregistration-uploaded" id="ref-for-dom-backgroundfetchregistration-uploaded"><c- g>uploaded</c-></a>;
   <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long③"><c- b>unsigned</c-> <c- b>long</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="unsigned long long" href="#dom-backgroundfetchregistration-downloadtotal" id="ref-for-dom-backgroundfetchregistration-downloadtotal"><c- g>downloadTotal</c-></a>;
@@ -2751,22 +2769,22 @@ complete-length = ( 1*DIGIT / "*" )</pre>
       <p>A <dfn class="dfn-paneled" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="dfn" data-noexport id="backgroundfetchregistration-download-total">download total</dfn> (a number), a copy of <a data-link-type="dfn" href="#backgroundfetchregistration-background-fetch" id="ref-for-backgroundfetchregistration-background-fetch⑨">background fetch</a>'s <a data-link-type="dfn" href="#background-fetch-download-total" id="ref-for-background-fetch-download-total④">download total</a>.</p>
     </ul>
     <p class="note" role="note"><span>Note:</span> The above values are copied so they’re available synchronously.</p>
-    <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="attribute" data-export id="dom-backgroundfetchregistration-id"><code>id</code></dfn> attribute’s getter must return the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object①⓪">context object</a>'s <a data-link-type="dfn" href="#backgroundfetchregistration-id" id="ref-for-backgroundfetchregistration-id">id</a>.</p>
-    <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="attribute" data-export id="dom-backgroundfetchregistration-uploadtotal"><code>uploadTotal</code></dfn> attribute’s getter must return the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object①①">context object</a>'s <a data-link-type="dfn" href="#backgroundfetchregistration-upload-total" id="ref-for-backgroundfetchregistration-upload-total">upload total</a>.</p>
-    <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="attribute" data-export id="dom-backgroundfetchregistration-downloadtotal"><code>downloadTotal</code></dfn> attribute’s getter must return the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object①②">context object</a>'s <a data-link-type="dfn" href="#backgroundfetchregistration-download-total" id="ref-for-backgroundfetchregistration-download-total">download total</a>.</p>
-    <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="attribute" data-export id="dom-backgroundfetchregistration-uploaded"><code>uploaded</code></dfn> attribute’s getter must return the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object①③">context object</a>'s <a data-link-type="dfn" href="#backgroundfetchregistration-uploaded" id="ref-for-backgroundfetchregistration-uploaded①">uploaded</a>.</p>
-    <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="attribute" data-export id="dom-backgroundfetchregistration-downloaded"><code>downloaded</code></dfn> attribute’s getter must return the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object①④">context object</a>'s <a data-link-type="dfn" href="#backgroundfetchregistration-downloaded" id="ref-for-backgroundfetchregistration-downloaded①">downloaded</a>.</p>
-    <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="attribute" data-export id="dom-backgroundfetchregistration-state"><code>state</code></dfn> attribute’s getter must return the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object①⑤">context object</a>'s <a data-link-type="dfn" href="#backgroundfetchregistration-state" id="ref-for-backgroundfetchregistration-state②">state</a>.</p>
-    <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="attribute" data-export id="dom-backgroundfetchregistration-failurereason"><code>failureReason</code></dfn> attribute’s getter must return the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object①⑥">context object</a>'s <a data-link-type="dfn" href="#backgroundfetchregistration-failure-reason" id="ref-for-backgroundfetchregistration-failure-reason②">failure reason</a>.</p>
+    <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="attribute" data-export id="dom-backgroundfetchregistration-id"><code>id</code></dfn> attribute’s getter must return the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object①①">context object</a>'s <a data-link-type="dfn" href="#backgroundfetchregistration-id" id="ref-for-backgroundfetchregistration-id">id</a>.</p>
+    <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="attribute" data-export id="dom-backgroundfetchregistration-uploadtotal"><code>uploadTotal</code></dfn> attribute’s getter must return the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object①②">context object</a>'s <a data-link-type="dfn" href="#backgroundfetchregistration-upload-total" id="ref-for-backgroundfetchregistration-upload-total">upload total</a>.</p>
+    <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="attribute" data-export id="dom-backgroundfetchregistration-downloadtotal"><code>downloadTotal</code></dfn> attribute’s getter must return the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object①③">context object</a>'s <a data-link-type="dfn" href="#backgroundfetchregistration-download-total" id="ref-for-backgroundfetchregistration-download-total">download total</a>.</p>
+    <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="attribute" data-export id="dom-backgroundfetchregistration-uploaded"><code>uploaded</code></dfn> attribute’s getter must return the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object①④">context object</a>'s <a data-link-type="dfn" href="#backgroundfetchregistration-uploaded" id="ref-for-backgroundfetchregistration-uploaded①">uploaded</a>.</p>
+    <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="attribute" data-export id="dom-backgroundfetchregistration-downloaded"><code>downloaded</code></dfn> attribute’s getter must return the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object①⑤">context object</a>'s <a data-link-type="dfn" href="#backgroundfetchregistration-downloaded" id="ref-for-backgroundfetchregistration-downloaded①">downloaded</a>.</p>
+    <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="attribute" data-export id="dom-backgroundfetchregistration-state"><code>state</code></dfn> attribute’s getter must return the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object①⑥">context object</a>'s <a data-link-type="dfn" href="#backgroundfetchregistration-state" id="ref-for-backgroundfetchregistration-state②">state</a>.</p>
+    <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="attribute" data-export id="dom-backgroundfetchregistration-failurereason"><code>failureReason</code></dfn> attribute’s getter must return the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object①⑦">context object</a>'s <a data-link-type="dfn" href="#backgroundfetchregistration-failure-reason" id="ref-for-backgroundfetchregistration-failure-reason②">failure reason</a>.</p>
     <h4 class="heading settled" data-level="6.4.1" id="background-fetch-registration-events"><span class="secno">6.4.1. </span><span class="content">Events</span><a class="self-link" href="#background-fetch-registration-events"></a></h4>
     <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="attribute" data-export id="dom-backgroundfetchregistration-onprogress"><code>onprogress</code></dfn> <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#event-handlers" id="ref-for-event-handlers②">event handler</a> has the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#event-handler-event-type" id="ref-for-event-handler-event-type②">event handler event type</a> of <code class="idl"><a class="idl-code" data-link-type="event" href="#eventdef-backgroundfetchregistration-progress" id="ref-for-eventdef-backgroundfetchregistration-progress①">progress</a></code>.</p>
     <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="event" data-export id="eventdef-backgroundfetchregistration-progress"><code>progress</code></dfn> event uses the <code class="idl"><a data-link-type="idl" href="https://dom.spec.whatwg.org/#event" id="ref-for-event">Event</a></code> interface.</p>
     <h4 class="heading settled" data-level="6.4.2" id="background-fetch-registration-abort"><span class="secno">6.4.2. </span><span class="content"><code class="idl"><a data-link-type="idl" href="#dom-backgroundfetchregistration-abort" id="ref-for-dom-backgroundfetchregistration-abort③">abort()</a></code></span><a class="self-link" href="#background-fetch-registration-abort"></a></h4>
     <div class="algorithm" data-algorithm="abort()">
-      The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="method" data-export id="dom-backgroundfetchregistration-abort"><code>abort()</code></dfn> method, when invoked, must return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-new-promise" id="ref-for-a-new-promise⑤">a new promise</a> <var>promise</var> and run these steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel⑦">in parallel</a>: 
+      The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="method" data-export id="dom-backgroundfetchregistration-abort"><code>abort()</code></dfn> method, when invoked, must return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-new-promise" id="ref-for-a-new-promise⑤">a new promise</a> <var>promise</var> and run these steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel⑧">in parallel</a>: 
      <ol>
       <li data-md>
-       <p>Let <var>bgFetch</var> be the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object①⑦">context object</a>'s associated <a data-link-type="dfn" href="#backgroundfetchregistration-background-fetch" id="ref-for-backgroundfetchregistration-background-fetch①⓪">background fetch</a>.</p>
+       <p>Let <var>bgFetch</var> be the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object①⑧">context object</a>'s associated <a data-link-type="dfn" href="#backgroundfetchregistration-background-fetch" id="ref-for-backgroundfetchregistration-background-fetch①⓪">background fetch</a>.</p>
       <li data-md>
        <p>Let <var>swRegistration</var> be <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-service-worker-registration" id="ref-for-background-fetch-service-worker-registration④">service worker registration</a>.</p>
       <li data-md>
@@ -2800,18 +2818,18 @@ complete-length = ( 1*DIGIT / "*" )</pre>
     </div>
     <h4 class="heading settled" data-level="6.4.4" id="background-fetch-registration-match-all"><span class="secno">6.4.4. </span><span class="content"><code class="idl"><a data-link-type="idl" href="#dom-backgroundfetchregistration-matchall" id="ref-for-dom-backgroundfetchregistration-matchall③">matchAll()</a></code></span><a class="self-link" href="#background-fetch-registration-match-all"></a></h4>
     <div class="algorithm" data-algorithm="matchAll(request, options)">
-      The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="method" data-export data-lt="matchAll(request, options)|matchAll(request)|matchAll()" id="dom-backgroundfetchregistration-matchall"><code>matchAll(<var>request</var>, <var>options</var>)</code></dfn> method, when invoked, must return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-new-promise" id="ref-for-a-new-promise⑥">a new promise</a> <var>promise</var> and run these steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel⑧">in parallel</a>: 
+      The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="method" data-export data-lt="matchAll(request, options)|matchAll(request)|matchAll()" id="dom-backgroundfetchregistration-matchall"><code>matchAll(<var>request</var>, <var>options</var>)</code></dfn> method, when invoked, must return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-new-promise" id="ref-for-a-new-promise⑥">a new promise</a> <var>promise</var> and run these steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel⑨">in parallel</a>: 
      <ol>
       <li data-md>
        <p>Let <var>matchingRecords</var> be an empty <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list" id="ref-for-list⑤">list</a>.</p>
       <li data-md>
-       <p>For each <var>record</var> of <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object①⑧">context object</a>'s <a data-link-type="dfn" href="#backgroundfetchregistration-background-fetch" id="ref-for-backgroundfetchregistration-background-fetch①①">background fetch</a>'s <a data-link-type="dfn" href="#background-fetch-records" id="ref-for-background-fetch-records⑤">records</a>:</p>
+       <p>For each <var>record</var> of <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object①⑨">context object</a>'s <a data-link-type="dfn" href="#backgroundfetchregistration-background-fetch" id="ref-for-backgroundfetchregistration-background-fetch①①">background fetch</a>'s <a data-link-type="dfn" href="#background-fetch-records" id="ref-for-background-fetch-records⑤">records</a>:</p>
        <ol>
         <li data-md>
          <p>If <a data-link-type="dfn">request matches cached item</a> for <var>request</var>, <var>record</var>’s <a data-link-type="dfn" href="#background-fetch-record-request" id="ref-for-background-fetch-record-request④">request</a>, <var>record</var>’s <a data-link-type="dfn" href="#background-fetch-record-response-data" id="ref-for-background-fetch-record-response-data⑤">response data</a>'s <a data-link-type="dfn" href="#background-fetch-response-response" id="ref-for-background-fetch-response-response⑤">response</a>, and <var>options</var> returns true, then <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-append" id="ref-for-list-append②">append</a> <var>record</var> to <var>matchingRecords</var>.</p>
        </ol>
       <li data-md>
-       <p><a data-link-type="dfn" href="#queue-a-bgfetch-task" id="ref-for-queue-a-bgfetch-task③">Queue a bgfetch task</a> to <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#resolve-promise" id="ref-for-resolve-promise⑧">resolve</a> <var>promise</var> with the result of <a data-link-type="dfn" href="#create-record-objects" id="ref-for-create-record-objects②">creating record objects</a> from <var>matchingRecords</var> in <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object①⑨">context object</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-realm" id="ref-for-concept-relevant-realm⑦">relevant Realm</a>.</p>
+       <p><a data-link-type="dfn" href="#queue-a-bgfetch-task" id="ref-for-queue-a-bgfetch-task③">Queue a bgfetch task</a> to <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#resolve-promise" id="ref-for-resolve-promise⑧">resolve</a> <var>promise</var> with the result of <a data-link-type="dfn" href="#create-record-objects" id="ref-for-create-record-objects②">creating record objects</a> from <var>matchingRecords</var> in <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object②⓪">context object</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-realm" id="ref-for-concept-relevant-realm⑦">relevant Realm</a>.</p>
      </ol>
     </div>
    </div>
@@ -2827,15 +2845,15 @@ complete-length = ( 1*DIGIT / "*" )</pre>
      A <code class="idl"><a data-link-type="idl" href="#backgroundfetchrecord" id="ref-for-backgroundfetchrecord④">BackgroundFetchRecord</a></code> has: 
     <ul>
      <li data-md>
-      <p>A <dfn class="dfn-paneled" data-dfn-for="BackgroundFetchRecord" data-dfn-type="dfn" data-noexport id="backgroundfetchrecord-request">request</dfn> (a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request" id="ref-for-concept-request①">request</a>).</p>
+      <p>A <dfn class="dfn-paneled" data-dfn-for="BackgroundFetchRecord" data-dfn-type="dfn" data-noexport id="backgroundfetchrecord-request">request</dfn> (a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request" id="ref-for-concept-request②">request</a>).</p>
      <li data-md>
       <p>A <dfn class="dfn-paneled" data-dfn-for="BackgroundFetchRecord" data-dfn-type="dfn" data-noexport id="backgroundfetchrecord-response-promise">response promise</dfn> (a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#idl-promise" id="ref-for-idl-promise">Promise</a></code> for a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response" id="ref-for-concept-response⑤">response</a>).</p>
     </ul>
-    <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchRecord" data-dfn-type="attribute" data-export id="dom-backgroundfetchrecord-request"><code>request</code></dfn> attribute’s getter must return the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object②⓪">context object</a>'s <a data-link-type="dfn" href="#backgroundfetchrecord-request" id="ref-for-backgroundfetchrecord-request">request</a>.</p>
-    <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchRecord" data-dfn-type="attribute" data-export id="dom-backgroundfetchrecord-responseready"><code>responseReady</code></dfn> attribute’s getter must return the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object②①">context object</a>'s <a data-link-type="dfn" href="#backgroundfetchrecord-response-promise" id="ref-for-backgroundfetchrecord-response-promise">response promise</a>.</p>
+    <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchRecord" data-dfn-type="attribute" data-export id="dom-backgroundfetchrecord-request"><code>request</code></dfn> attribute’s getter must return the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object②①">context object</a>'s <a data-link-type="dfn" href="#backgroundfetchrecord-request" id="ref-for-backgroundfetchrecord-request">request</a>.</p>
+    <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchRecord" data-dfn-type="attribute" data-export id="dom-backgroundfetchrecord-responseready"><code>responseReady</code></dfn> attribute’s getter must return the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object②②">context object</a>'s <a data-link-type="dfn" href="#backgroundfetchrecord-response-promise" id="ref-for-backgroundfetchrecord-response-promise">response promise</a>.</p>
    </div>
    <h3 class="heading settled" data-level="6.6" id="background-fetch-event"><span class="secno">6.6. </span><span class="content"><code class="idl"><a data-link-type="idl" href="#backgroundfetchevent" id="ref-for-backgroundfetchevent③">BackgroundFetchEvent</a></code></span><a class="self-link" href="#background-fetch-event"></a></h3>
-<pre class="idl highlight def">[<dfn class="idl-code" data-dfn-for="BackgroundFetchEvent" data-dfn-type="constructor" data-export data-lt="BackgroundFetchEvent(type, init)" id="dom-backgroundfetchevent-backgroundfetchevent"><code><c- g>Constructor</c-></code><a class="self-link" href="#dom-backgroundfetchevent-backgroundfetchevent"></a></dfn>(<a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString⑧"><c- b>DOMString</c-></a> <dfn class="idl-code" data-dfn-for="BackgroundFetchEvent/BackgroundFetchEvent(type, init)" data-dfn-type="argument" data-export id="dom-backgroundfetchevent-backgroundfetchevent-type-init-type"><code><c- g>type</c-></code><a class="self-link" href="#dom-backgroundfetchevent-backgroundfetchevent-type-init-type"></a></dfn>, <a class="n" data-link-type="idl-name" href="#dictdef-backgroundfetcheventinit" id="ref-for-dictdef-backgroundfetcheventinit"><c- n>BackgroundFetchEventInit</c-></a> <dfn class="idl-code" data-dfn-for="BackgroundFetchEvent/BackgroundFetchEvent(type, init)" data-dfn-type="argument" data-export id="dom-backgroundfetchevent-backgroundfetchevent-type-init-init"><code><c- g>init</c-></code><a class="self-link" href="#dom-backgroundfetchevent-backgroundfetchevent-type-init-init"></a></dfn>), <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed③"><c- g>Exposed</c-></a>=<c- n>ServiceWorker</c->]
+<pre class="idl highlight def">[<dfn class="idl-code" data-dfn-for="BackgroundFetchEvent" data-dfn-type="constructor" data-export data-lt="BackgroundFetchEvent(type, init)" id="dom-backgroundfetchevent-backgroundfetchevent"><code><c- g>Constructor</c-></code><a class="self-link" href="#dom-backgroundfetchevent-backgroundfetchevent"></a></dfn>(<a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString⑤"><c- b>DOMString</c-></a> <dfn class="idl-code" data-dfn-for="BackgroundFetchEvent/BackgroundFetchEvent(type, init)" data-dfn-type="argument" data-export id="dom-backgroundfetchevent-backgroundfetchevent-type-init-type"><code><c- g>type</c-></code><a class="self-link" href="#dom-backgroundfetchevent-backgroundfetchevent-type-init-type"></a></dfn>, <a class="n" data-link-type="idl-name" href="#dictdef-backgroundfetcheventinit" id="ref-for-dictdef-backgroundfetcheventinit"><c- n>BackgroundFetchEventInit</c-></a> <dfn class="idl-code" data-dfn-for="BackgroundFetchEvent/BackgroundFetchEvent(type, init)" data-dfn-type="argument" data-export id="dom-backgroundfetchevent-backgroundfetchevent-type-init-init"><code><c- g>init</c-></code><a class="self-link" href="#dom-backgroundfetchevent-backgroundfetchevent-type-init-init"></a></dfn>), <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed③"><c- g>Exposed</c-></a>=<c- n>ServiceWorker</c->]
 <c- b>interface</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="backgroundfetchevent"><code><c- g>BackgroundFetchEvent</c-></code></dfn> : <a class="n" data-link-type="idl-name" href="https://w3c.github.io/ServiceWorker/#extendableevent" id="ref-for-extendableevent"><c- n>ExtendableEvent</c-></a> {
   <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="#backgroundfetchregistration" id="ref-for-backgroundfetchregistration⑨"><c- n>BackgroundFetchRegistration</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="BackgroundFetchRegistration" href="#dom-backgroundfetchevent-registration" id="ref-for-dom-backgroundfetchevent-registration③"><c- g>registration</c-></a>;
 };
@@ -2849,14 +2867,14 @@ complete-length = ( 1*DIGIT / "*" )</pre>
     <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchEvent" data-dfn-type="attribute" data-export id="dom-backgroundfetchevent-registration"><code>registration</code></dfn> attribute must return the value it was initialized to.</p>
    </div>
    <h3 class="heading settled" data-level="6.7" id="background-fetch-update-ui-event"><span class="secno">6.7. </span><span class="content"><code class="idl"><a data-link-type="idl" href="#backgroundfetchupdateuievent" id="ref-for-backgroundfetchupdateuievent④">BackgroundFetchUpdateUIEvent</a></code></span><a class="self-link" href="#background-fetch-update-ui-event"></a></h3>
-<pre class="idl highlight def">[<dfn class="idl-code" data-dfn-for="BackgroundFetchUpdateUIEvent" data-dfn-type="constructor" data-export data-lt="BackgroundFetchUpdateUIEvent(type, init)" id="dom-backgroundfetchupdateuievent-backgroundfetchupdateuievent"><code><c- g>Constructor</c-></code><a class="self-link" href="#dom-backgroundfetchupdateuievent-backgroundfetchupdateuievent"></a></dfn>(<a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString⑨"><c- b>DOMString</c-></a> <dfn class="idl-code" data-dfn-for="BackgroundFetchUpdateUIEvent/BackgroundFetchUpdateUIEvent(type, init)" data-dfn-type="argument" data-export id="dom-backgroundfetchupdateuievent-backgroundfetchupdateuievent-type-init-type"><code><c- g>type</c-></code><a class="self-link" href="#dom-backgroundfetchupdateuievent-backgroundfetchupdateuievent-type-init-type"></a></dfn>, <a class="n" data-link-type="idl-name" href="#dictdef-backgroundfetcheventinit" id="ref-for-dictdef-backgroundfetcheventinit①"><c- n>BackgroundFetchEventInit</c-></a> <dfn class="idl-code" data-dfn-for="BackgroundFetchUpdateUIEvent/BackgroundFetchUpdateUIEvent(type, init)" data-dfn-type="argument" data-export id="dom-backgroundfetchupdateuievent-backgroundfetchupdateuievent-type-init-init"><code><c- g>init</c-></code><a class="self-link" href="#dom-backgroundfetchupdateuievent-backgroundfetchupdateuievent-type-init-init"></a></dfn>), <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed④"><c- g>Exposed</c-></a>=<c- n>ServiceWorker</c->]
+<pre class="idl highlight def">[<dfn class="idl-code" data-dfn-for="BackgroundFetchUpdateUIEvent" data-dfn-type="constructor" data-export data-lt="BackgroundFetchUpdateUIEvent(type, init)" id="dom-backgroundfetchupdateuievent-backgroundfetchupdateuievent"><code><c- g>Constructor</c-></code><a class="self-link" href="#dom-backgroundfetchupdateuievent-backgroundfetchupdateuievent"></a></dfn>(<a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString⑥"><c- b>DOMString</c-></a> <dfn class="idl-code" data-dfn-for="BackgroundFetchUpdateUIEvent/BackgroundFetchUpdateUIEvent(type, init)" data-dfn-type="argument" data-export id="dom-backgroundfetchupdateuievent-backgroundfetchupdateuievent-type-init-type"><code><c- g>type</c-></code><a class="self-link" href="#dom-backgroundfetchupdateuievent-backgroundfetchupdateuievent-type-init-type"></a></dfn>, <a class="n" data-link-type="idl-name" href="#dictdef-backgroundfetcheventinit" id="ref-for-dictdef-backgroundfetcheventinit①"><c- n>BackgroundFetchEventInit</c-></a> <dfn class="idl-code" data-dfn-for="BackgroundFetchUpdateUIEvent/BackgroundFetchUpdateUIEvent(type, init)" data-dfn-type="argument" data-export id="dom-backgroundfetchupdateuievent-backgroundfetchupdateuievent-type-init-init"><code><c- g>init</c-></code><a class="self-link" href="#dom-backgroundfetchupdateuievent-backgroundfetchupdateuievent-type-init-init"></a></dfn>), <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed④"><c- g>Exposed</c-></a>=<c- n>ServiceWorker</c->]
 <c- b>interface</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="backgroundfetchupdateuievent"><code><c- g>BackgroundFetchUpdateUIEvent</c-></code></dfn> : <a class="n" data-link-type="idl-name" href="#backgroundfetchevent" id="ref-for-backgroundfetchevent⑤"><c- n>BackgroundFetchEvent</c-></a> {
   <c- b>Promise</c->&lt;<c- b>void</c->> <a class="idl-code" data-link-type="method" href="#dom-backgroundfetchupdateuievent-updateui" id="ref-for-dom-backgroundfetchupdateuievent-updateui"><c- g>updateUI</c-></a>(<c- b>optional</c-> <a class="n" data-link-type="idl-name" href="#dictdef-backgroundfetchuioptions" id="ref-for-dictdef-backgroundfetchuioptions①"><c- n>BackgroundFetchUIOptions</c-></a> <dfn class="idl-code" data-dfn-for="BackgroundFetchUpdateUIEvent/updateUI(options), BackgroundFetchUpdateUIEvent/updateUI()" data-dfn-type="argument" data-export id="dom-backgroundfetchupdateuievent-updateui-options-options"><code><c- g>options</c-></code><a class="self-link" href="#dom-backgroundfetchupdateuievent-updateui-options-options"></a></dfn>);
 };
 </pre>
    <div>
     <div class="algorithm" data-algorithm="updateUI(options)">
-      The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchUpdateUIEvent" data-dfn-type="method" data-export data-lt="updateUI(options)|updateUI()" id="dom-backgroundfetchupdateuievent-updateui"><code>updateUI(<var>options</var>)</code></dfn> method, when invoked, must return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-new-promise" id="ref-for-a-new-promise⑦">a new promise</a> <var>promise</var> and run these steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel⑨">in parallel</a>: 
+      The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchUpdateUIEvent" data-dfn-type="method" data-export data-lt="updateUI(options)|updateUI()" id="dom-backgroundfetchupdateuievent-updateui"><code>updateUI(<var>options</var>)</code></dfn> method, when invoked, must return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-new-promise" id="ref-for-a-new-promise⑦">a new promise</a> <var>promise</var> and run these steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel①⓪">in parallel</a>: 
      <ol>
       <li data-md>
        <p>TODO</p>
@@ -3098,7 +3116,6 @@ complete-length = ( 1*DIGIT / "*" )</pre>
    <li><a href="#dom-backgroundfetchmanager-getids">getIds()</a><span>, in §6.3.3</span>
    <li><a href="#get-a-backgroundfetchregistration-instance">getting a BackgroundFetchRegistration instance</a><span>, in §4.4</span>
    <li><a href="#header-equality">header equality</a><span>, in §4.7</span>
-   <li><a href="#dictdef-icondefinition">IconDefinition</a><span>, in §6.3</span>
    <li><a href="#dom-backgroundfetchuioptions-icons">icons</a><span>, in §6.3</span>
    <li><a href="#background-fetch-icons">Icons</a><span>, in §3.2</span>
    <li>
@@ -3155,8 +3172,6 @@ complete-length = ( 1*DIGIT / "*" )</pre>
      <li><a href="#background-fetch-service-worker-registration">dfn for background fetch</a><span>, in §3.2</span>
     </ul>
    <li><a href="#single-byte-content-range">single byte content-range</a><span>, in §5</span>
-   <li><a href="#dom-icondefinition-sizes">sizes</a><span>, in §6.3</span>
-   <li><a href="#dom-icondefinition-src">src</a><span>, in §6.3</span>
    <li>
     state
     <ul>
@@ -3173,7 +3188,6 @@ complete-length = ( 1*DIGIT / "*" )</pre>
      <li><a href="#dom-backgroundfetchuioptions-title">dict-member for BackgroundFetchUIOptions</a><span>, in §6.3</span>
     </ul>
    <li><a href="#dom-backgroundfetchfailurereason-total-download-exceeded">"total-download-exceeded"</a><span>, in §6.4</span>
-   <li><a href="#dom-icondefinition-type">type</a><span>, in §6.3</span>
    <li><a href="#dom-backgroundfetchupdateuievent-updateui">updateUI()</a><span>, in §6.7</span>
    <li><a href="#dom-backgroundfetchupdateuievent-updateui">updateUI(options)</a><span>, in §6.7</span>
    <li>
@@ -3210,13 +3224,13 @@ complete-length = ( 1*DIGIT / "*" )</pre>
     <li><a href="#ref-for-context-object">2. Realms</a>
     <li><a href="#ref-for-context-object①">3. Infrastructure</a>
     <li><a href="#ref-for-context-object②">6.2. Extensions to ServiceWorkerRegistration</a> <a href="#ref-for-context-object③">(2)</a>
-    <li><a href="#ref-for-context-object④">6.3.1. fetch()</a> <a href="#ref-for-context-object⑤">(2)</a> <a href="#ref-for-context-object⑥">(3)</a>
-    <li><a href="#ref-for-context-object⑦">6.3.2. get()</a> <a href="#ref-for-context-object⑧">(2)</a>
-    <li><a href="#ref-for-context-object⑨">6.3.3. getIds()</a>
-    <li><a href="#ref-for-context-object①⓪">6.4. BackgroundFetchRegistration</a> <a href="#ref-for-context-object①①">(2)</a> <a href="#ref-for-context-object①②">(3)</a> <a href="#ref-for-context-object①③">(4)</a> <a href="#ref-for-context-object①④">(5)</a> <a href="#ref-for-context-object①⑤">(6)</a> <a href="#ref-for-context-object①⑥">(7)</a>
-    <li><a href="#ref-for-context-object①⑦">6.4.2. abort()</a>
-    <li><a href="#ref-for-context-object①⑧">6.4.4. matchAll()</a> <a href="#ref-for-context-object①⑨">(2)</a>
-    <li><a href="#ref-for-context-object②⓪">6.5. BackgroundFetchRecord</a> <a href="#ref-for-context-object②①">(2)</a>
+    <li><a href="#ref-for-context-object④">6.3.1. fetch()</a> <a href="#ref-for-context-object⑤">(2)</a> <a href="#ref-for-context-object⑥">(3)</a> <a href="#ref-for-context-object⑦">(4)</a>
+    <li><a href="#ref-for-context-object⑧">6.3.2. get()</a> <a href="#ref-for-context-object⑨">(2)</a>
+    <li><a href="#ref-for-context-object①⓪">6.3.3. getIds()</a>
+    <li><a href="#ref-for-context-object①①">6.4. BackgroundFetchRegistration</a> <a href="#ref-for-context-object①②">(2)</a> <a href="#ref-for-context-object①③">(3)</a> <a href="#ref-for-context-object①④">(4)</a> <a href="#ref-for-context-object①⑤">(5)</a> <a href="#ref-for-context-object①⑥">(6)</a> <a href="#ref-for-context-object①⑦">(7)</a>
+    <li><a href="#ref-for-context-object①⑧">6.4.2. abort()</a>
+    <li><a href="#ref-for-context-object①⑨">6.4.4. matchAll()</a> <a href="#ref-for-context-object②⓪">(2)</a>
+    <li><a href="#ref-for-context-object②①">6.5. BackgroundFetchRecord</a> <a href="#ref-for-context-object②②">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-concept-event-fire">
@@ -3295,7 +3309,8 @@ complete-length = ( 1*DIGIT / "*" )</pre>
   <aside class="dfn-panel" data-for="term-for-concept-request-client">
    <a href="https://fetch.spec.whatwg.org/#concept-request-client">https://fetch.spec.whatwg.org/#concept-request-client</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-concept-request-client">6.3.1. fetch()</a>
+    <li><a href="#ref-for-concept-request-client">3.2. Background fetch</a>
+    <li><a href="#ref-for-concept-request-client①">6.3.1. fetch()</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-concept-readablestream-closed">
@@ -3312,10 +3327,22 @@ complete-length = ( 1*DIGIT / "*" )</pre>
     <li><a href="#ref-for-header-list-contains③">4.7. Header equality</a> <a href="#ref-for-header-list-contains④">(2)</a> <a href="#ref-for-header-list-contains⑤">(3)</a> <a href="#ref-for-header-list-contains⑥">(4)</a>
    </ul>
   </aside>
+  <aside class="dfn-panel" data-for="term-for-concept-request-credentials-mode">
+   <a href="https://fetch.spec.whatwg.org/#concept-request-credentials-mode">https://fetch.spec.whatwg.org/#concept-request-credentials-mode</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-concept-request-credentials-mode">3.2. Background fetch</a>
+   </ul>
+  </aside>
   <aside class="dfn-panel" data-for="term-for-concept-header-list-delete">
    <a href="https://fetch.spec.whatwg.org/#concept-header-list-delete">https://fetch.spec.whatwg.org/#concept-header-list-delete</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-concept-header-list-delete">4.8. Create record objects</a> <a href="#ref-for-concept-header-list-delete①">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-concept-request-destination">
+   <a href="https://fetch.spec.whatwg.org/#concept-request-destination">https://fetch.spec.whatwg.org/#concept-request-destination</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-concept-request-destination">3.2. Background fetch</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-concept-enqueue-readablestream">
@@ -3336,7 +3363,8 @@ complete-length = ( 1*DIGIT / "*" )</pre>
    <a href="https://fetch.spec.whatwg.org/#concept-fetch">https://fetch.spec.whatwg.org/#concept-fetch</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-concept-fetch">1. Introduction</a> <a href="#ref-for-concept-fetch①">(2)</a> <a href="#ref-for-concept-fetch②">(3)</a> <a href="#ref-for-concept-fetch③">(4)</a>
-    <li><a href="#ref-for-concept-fetch④">4.2. Complete a record</a>
+    <li><a href="#ref-for-concept-fetch④">3.2. Background fetch</a>
+    <li><a href="#ref-for-concept-fetch⑤">4.2. Complete a record</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-concept-header">
@@ -3363,7 +3391,8 @@ complete-length = ( 1*DIGIT / "*" )</pre>
   <aside class="dfn-panel" data-for="term-for-request-keepalive-flag">
    <a href="https://fetch.spec.whatwg.org/#request-keepalive-flag">https://fetch.spec.whatwg.org/#request-keepalive-flag</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-request-keepalive-flag">4.2. Complete a record</a>
+    <li><a href="#ref-for-request-keepalive-flag">3.2. Background fetch</a>
+    <li><a href="#ref-for-request-keepalive-flag①">4.2. Complete a record</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-concept-request-method">
@@ -3376,7 +3405,8 @@ complete-length = ( 1*DIGIT / "*" )</pre>
   <aside class="dfn-panel" data-for="term-for-concept-request-mode">
    <a href="https://fetch.spec.whatwg.org/#concept-request-mode">https://fetch.spec.whatwg.org/#concept-request-mode</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-concept-request-mode">6.3.1. fetch()</a>
+    <li><a href="#ref-for-concept-request-mode">3.2. Background fetch</a>
+    <li><a href="#ref-for-concept-request-mode①">6.3.1. fetch()</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-concept-header-name">
@@ -3429,6 +3459,13 @@ complete-length = ( 1*DIGIT / "*" )</pre>
     <li><a href="#ref-for-concept-response-response">4.8. Create record objects</a> <a href="#ref-for-concept-response-response①">(2)</a>
    </ul>
   </aside>
+  <aside class="dfn-panel" data-for="term-for-request-service-workers-mode">
+   <a href="https://fetch.spec.whatwg.org/#request-service-workers-mode">https://fetch.spec.whatwg.org/#request-service-workers-mode</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-request-service-workers-mode">3.2. Background fetch</a>
+    <li><a href="#ref-for-request-service-workers-mode①">4.2. Complete a record</a>
+   </ul>
+  </aside>
   <aside class="dfn-panel" data-for="term-for-concept-response-status">
    <a href="https://fetch.spec.whatwg.org/#concept-response-status">https://fetch.spec.whatwg.org/#concept-response-status</a><b>Referenced in:</b>
    <ul>
@@ -3461,6 +3498,12 @@ complete-length = ( 1*DIGIT / "*" )</pre>
    <a href="https://fetch.spec.whatwg.org/#concept-body-transmitted">https://fetch.spec.whatwg.org/#concept-body-transmitted</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-concept-body-transmitted">4.2. Complete a record</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-concept-request-url">
+   <a href="https://fetch.spec.whatwg.org/#concept-request-url">https://fetch.spec.whatwg.org/#concept-request-url</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-concept-request-url">3.2. Background fetch</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-concept-header-value">
@@ -3496,7 +3539,8 @@ complete-length = ( 1*DIGIT / "*" )</pre>
   <aside class="dfn-panel" data-for="term-for-environment-settings-object">
    <a href="https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object">https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-environment-settings-object">4.3. Report progress for background fetch</a>
+    <li><a href="#ref-for-environment-settings-object">3.2. Background fetch</a>
+    <li><a href="#ref-for-environment-settings-object①">4.3. Report progress for background fetch</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-event-handlers">
@@ -3530,12 +3574,12 @@ complete-length = ( 1*DIGIT / "*" )</pre>
    <ul>
     <li><a href="#ref-for-in-parallel">4.1. Perform a background fetch</a>
     <li><a href="#ref-for-in-parallel①">4.8. Create record objects</a> <a href="#ref-for-in-parallel②">(2)</a>
-    <li><a href="#ref-for-in-parallel③">6.3.1. fetch()</a> <a href="#ref-for-in-parallel④">(2)</a>
-    <li><a href="#ref-for-in-parallel⑤">6.3.2. get()</a>
-    <li><a href="#ref-for-in-parallel⑥">6.3.3. getIds()</a>
-    <li><a href="#ref-for-in-parallel⑦">6.4.2. abort()</a>
-    <li><a href="#ref-for-in-parallel⑧">6.4.4. matchAll()</a>
-    <li><a href="#ref-for-in-parallel⑨">6.7. BackgroundFetchUpdateUIEvent</a>
+    <li><a href="#ref-for-in-parallel③">6.3.1. fetch()</a> <a href="#ref-for-in-parallel④">(2)</a> <a href="#ref-for-in-parallel⑤">(3)</a>
+    <li><a href="#ref-for-in-parallel⑥">6.3.2. get()</a>
+    <li><a href="#ref-for-in-parallel⑦">6.3.3. getIds()</a>
+    <li><a href="#ref-for-in-parallel⑧">6.4.2. abort()</a>
+    <li><a href="#ref-for-in-parallel⑨">6.4.4. matchAll()</a>
+    <li><a href="#ref-for-in-parallel①⓪">6.7. BackgroundFetchUpdateUIEvent</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-networking-task-source">
@@ -3580,6 +3624,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
    <ul>
     <li><a href="#ref-for-relevant-settings-object">3. Infrastructure</a>
     <li><a href="#ref-for-relevant-settings-object①">4.8. Create record objects</a> <a href="#ref-for-relevant-settings-object②">(2)</a>
+    <li><a href="#ref-for-relevant-settings-object③">6.3.1. fetch()</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-responsible-event-loop">
@@ -3853,10 +3898,10 @@ complete-length = ( 1*DIGIT / "*" )</pre>
   <aside class="dfn-panel" data-for="term-for-idl-DOMString">
    <a href="https://heycam.github.io/webidl/#idl-DOMString">https://heycam.github.io/webidl/#idl-DOMString</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-idl-DOMString">6.3. BackgroundFetchManager</a> <a href="#ref-for-idl-DOMString①">(2)</a> <a href="#ref-for-idl-DOMString②">(3)</a> <a href="#ref-for-idl-DOMString③">(4)</a> <a href="#ref-for-idl-DOMString④">(5)</a> <a href="#ref-for-idl-DOMString⑤">(6)</a> <a href="#ref-for-idl-DOMString⑥">(7)</a>
-    <li><a href="#ref-for-idl-DOMString⑦">6.4. BackgroundFetchRegistration</a>
-    <li><a href="#ref-for-idl-DOMString⑧">6.6. BackgroundFetchEvent</a>
-    <li><a href="#ref-for-idl-DOMString⑨">6.7. BackgroundFetchUpdateUIEvent</a>
+    <li><a href="#ref-for-idl-DOMString">6.3. BackgroundFetchManager</a> <a href="#ref-for-idl-DOMString①">(2)</a> <a href="#ref-for-idl-DOMString②">(3)</a> <a href="#ref-for-idl-DOMString③">(4)</a>
+    <li><a href="#ref-for-idl-DOMString④">6.4. BackgroundFetchRegistration</a>
+    <li><a href="#ref-for-idl-DOMString⑤">6.6. BackgroundFetchEvent</a>
+    <li><a href="#ref-for-idl-DOMString⑥">6.7. BackgroundFetchUpdateUIEvent</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-Exposed">
@@ -3937,7 +3982,9 @@ complete-length = ( 1*DIGIT / "*" )</pre>
      <li><span class="dfn-paneled" id="term-for-concept-request-client" style="color:initial">client</span>
      <li><span class="dfn-paneled" id="term-for-concept-readablestream-closed" style="color:initial">closed</span>
      <li><span class="dfn-paneled" id="term-for-header-list-contains" style="color:initial">contains</span>
+     <li><span class="dfn-paneled" id="term-for-concept-request-credentials-mode" style="color:initial">credentials mode</span>
      <li><span class="dfn-paneled" id="term-for-concept-header-list-delete" style="color:initial">delete</span>
+     <li><span class="dfn-paneled" id="term-for-concept-request-destination" style="color:initial">destination</span>
      <li><span class="dfn-paneled" id="term-for-concept-enqueue-readablestream" style="color:initial">enqueue</span>
      <li><span class="dfn-paneled" id="term-for-concept-readablestream-errored" style="color:initial">errored</span>
      <li><span class="dfn-paneled" id="term-for-concept-fetch" style="color:initial">fetch</span>
@@ -3955,11 +4002,13 @@ complete-length = ( 1*DIGIT / "*" )</pre>
      <li><span class="dfn-paneled" id="term-for-concept-readablestream-readable" style="color:initial">readable</span>
      <li><span class="dfn-paneled" id="term-for-concept-request-request" style="color:initial">request <small>(for Request)</small></span>
      <li><span class="dfn-paneled" id="term-for-concept-response-response" style="color:initial">response <small>(for Response)</small></span>
+     <li><span class="dfn-paneled" id="term-for-request-service-workers-mode" style="color:initial">service-workers mode</span>
      <li><span class="dfn-paneled" id="term-for-concept-response-status" style="color:initial">status</span>
      <li><span class="dfn-paneled" id="term-for-concept-body-stream" style="color:initial">stream</span>
      <li><span class="dfn-paneled" id="term-for-concept-fetch-terminate" style="color:initial">terminated</span>
      <li><span class="dfn-paneled" id="term-for-concept-body-total-bytes" style="color:initial">total bytes</span>
      <li><span class="dfn-paneled" id="term-for-concept-body-transmitted" style="color:initial">transmitted bytes</span>
+     <li><span class="dfn-paneled" id="term-for-concept-request-url" style="color:initial">url</span>
      <li><span class="dfn-paneled" id="term-for-concept-header-value" style="color:initial">value</span>
      <li><span class="dfn-paneled" id="term-for-concept-body-wait" style="color:initial">wait</span>
     </ul>
@@ -4086,14 +4135,14 @@ complete-length = ( 1*DIGIT / "*" )</pre>
 
 [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed⑤"><c- g>Exposed</c-></a>=(<c- n>Window</c->,<c- n>Worker</c->)]
 <c- b>interface</c-> <a href="#backgroundfetchmanager"><code><c- g>BackgroundFetchManager</c-></code></a> {
-  <c- b>Promise</c->&lt;<a class="n" data-link-type="idl-name" href="#backgroundfetchregistration" id="ref-for-backgroundfetchregistration③①"><c- n>BackgroundFetchRegistration</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-backgroundfetchmanager-fetch" id="ref-for-dom-backgroundfetchmanager-fetch②"><c- g>fetch</c-></a>(<a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString①⓪"><c- b>DOMString</c-></a> <a href="#dom-backgroundfetchmanager-fetch-id-requests-options-id"><code><c- g>id</c-></code></a>, (<a class="n" data-link-type="idl-name" href="https://fetch.spec.whatwg.org/#requestinfo" id="ref-for-requestinfo⑤"><c- n>RequestInfo</c-></a> <c- b>or</c-> <c- b>sequence</c->&lt;<a class="n" data-link-type="idl-name" href="https://fetch.spec.whatwg.org/#requestinfo" id="ref-for-requestinfo①①"><c- n>RequestInfo</c-></a>>) <a href="#dom-backgroundfetchmanager-fetch-id-requests-options-requests"><code><c- g>requests</c-></code></a>, <c- b>optional</c-> <a class="n" data-link-type="idl-name" href="#dictdef-backgroundfetchoptions" id="ref-for-dictdef-backgroundfetchoptions①"><c- n>BackgroundFetchOptions</c-></a> <a href="#dom-backgroundfetchmanager-fetch-id-requests-options-options"><code><c- g>options</c-></code></a>);
+  <c- b>Promise</c->&lt;<a class="n" data-link-type="idl-name" href="#backgroundfetchregistration" id="ref-for-backgroundfetchregistration③①"><c- n>BackgroundFetchRegistration</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-backgroundfetchmanager-fetch" id="ref-for-dom-backgroundfetchmanager-fetch②"><c- g>fetch</c-></a>(<a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString⑦"><c- b>DOMString</c-></a> <a href="#dom-backgroundfetchmanager-fetch-id-requests-options-id"><code><c- g>id</c-></code></a>, (<a class="n" data-link-type="idl-name" href="https://fetch.spec.whatwg.org/#requestinfo" id="ref-for-requestinfo⑤"><c- n>RequestInfo</c-></a> <c- b>or</c-> <c- b>sequence</c->&lt;<a class="n" data-link-type="idl-name" href="https://fetch.spec.whatwg.org/#requestinfo" id="ref-for-requestinfo①①"><c- n>RequestInfo</c-></a>>) <a href="#dom-backgroundfetchmanager-fetch-id-requests-options-requests"><code><c- g>requests</c-></code></a>, <c- b>optional</c-> <a class="n" data-link-type="idl-name" href="#dictdef-backgroundfetchoptions" id="ref-for-dictdef-backgroundfetchoptions①"><c- n>BackgroundFetchOptions</c-></a> <a href="#dom-backgroundfetchmanager-fetch-id-requests-options-options"><code><c- g>options</c-></code></a>);
   <c- b>Promise</c->&lt;<a class="n" data-link-type="idl-name" href="#backgroundfetchregistration" id="ref-for-backgroundfetchregistration④①"><c- n>BackgroundFetchRegistration</c-></a>?> <a class="idl-code" data-link-type="method" href="#dom-backgroundfetchmanager-get" id="ref-for-dom-backgroundfetchmanager-get②"><c- g>get</c-></a>(<a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString①①"><c- b>DOMString</c-></a> <a href="#dom-backgroundfetchmanager-get-id-id"><code><c- g>id</c-></code></a>);
   <c- b>Promise</c->&lt;<c- b>sequence</c->&lt;<a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString②①"><c- b>DOMString</c-></a>>> <a class="idl-code" data-link-type="method" href="#dom-backgroundfetchmanager-getids" id="ref-for-dom-backgroundfetchmanager-getids②"><c- g>getIds</c-></a>();
   // TODO: in future this should become an async iterator for BackgroundFetchRegistration objects
 };
 
 <c- b>dictionary</c-> <a href="#dictdef-backgroundfetchuioptions"><code><c- g>BackgroundFetchUIOptions</c-></code></a> {
-  <c- b>sequence</c->&lt;<a class="n" data-link-type="idl-name" href="#dictdef-icondefinition" id="ref-for-dictdef-icondefinition①①"><c- n>IconDefinition</c-></a>> <a data-default="None" data-type="sequence<IconDefinition> " href="#dom-backgroundfetchuioptions-icons"><code><c- g>icons</c-></code></a> = [];
+  <c- b>sequence</c->&lt;<a class="n" data-link-type="idl-name"><c- n>ImageResource</c-></a>> <a data-default="None" data-type="sequence<ImageResource> " href="#dom-backgroundfetchuioptions-icons"><code><c- g>icons</c-></code></a> = [];
   <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString③①"><c- b>DOMString</c-></a> <a data-default="&quot;&quot;" data-type="DOMString " href="#dom-backgroundfetchuioptions-title"><code><c- g>title</c-></code></a> = "";
 };
 
@@ -4101,17 +4150,9 @@ complete-length = ( 1*DIGIT / "*" )</pre>
   <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long⑤"><c- b>unsigned</c-> <c- b>long</c-> <c- b>long</c-></a> <a data-default="0" data-type="unsigned long long " href="#dom-backgroundfetchoptions-downloadtotal"><code><c- g>downloadTotal</c-></code></a> = 0;
 };
 
-// This is taken from https://w3c.github.io/manifest/#icons-member.
-// This definition should probably be moved somewhere more general.
-<c- b>dictionary</c-> <a href="#dictdef-icondefinition"><code><c- g>IconDefinition</c-></code></a> {
-  <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString④①"><c- b>DOMString</c-></a> <a data-type="DOMString " href="#dom-icondefinition-src"><code><c- g>src</c-></code></a>;
-  <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString⑤①"><c- b>DOMString</c-></a> <a data-default="&quot;&quot;" data-type="DOMString " href="#dom-icondefinition-sizes"><code><c- g>sizes</c-></code></a> = "";
-  <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString⑥①"><c- b>DOMString</c-></a> <a data-default="&quot;&quot;" data-type="DOMString " href="#dom-icondefinition-type"><code><c- g>type</c-></code></a> = "";
-};
-
 [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed①①"><c- g>Exposed</c-></a>=(<c- n>Window</c->,<c- n>Worker</c->)]
 <c- b>interface</c-> <a href="#backgroundfetchregistration"><code><c- g>BackgroundFetchRegistration</c-></code></a> : <a class="n" data-link-type="idl-name" href="https://dom.spec.whatwg.org/#eventtarget" id="ref-for-eventtarget①"><c- n>EventTarget</c-></a> {
-  <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString⑦①"><c- b>DOMString</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="DOMString" href="#dom-backgroundfetchregistration-id" id="ref-for-dom-backgroundfetchregistration-id①"><c- g>id</c-></a>;
+  <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString④①"><c- b>DOMString</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="DOMString" href="#dom-backgroundfetchregistration-id" id="ref-for-dom-backgroundfetchregistration-id①"><c- g>id</c-></a>;
   <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long①①"><c- b>unsigned</c-> <c- b>long</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="unsigned long long" href="#dom-backgroundfetchregistration-uploadtotal" id="ref-for-dom-backgroundfetchregistration-uploadtotal①"><c- g>uploadTotal</c-></a>;
   <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long②①"><c- b>unsigned</c-> <c- b>long</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="unsigned long long" href="#dom-backgroundfetchregistration-uploaded" id="ref-for-dom-backgroundfetchregistration-uploaded①"><c- g>uploaded</c-></a>;
   <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-unsigned-long-long" id="ref-for-idl-unsigned-long-long③①"><c- b>unsigned</c-> <c- b>long</c-> <c- b>long</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="unsigned long long" href="#dom-backgroundfetchregistration-downloadtotal" id="ref-for-dom-backgroundfetchregistration-downloadtotal①"><c- g>downloadTotal</c-></a>;
@@ -4150,7 +4191,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
   // TODO: In future this will include a fetch observer
 };
 
-[<a href="#dom-backgroundfetchevent-backgroundfetchevent"><code><c- g>Constructor</c-></code></a>(<a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString⑧①"><c- b>DOMString</c-></a> <a href="#dom-backgroundfetchevent-backgroundfetchevent-type-init-type"><code><c- g>type</c-></code></a>, <a class="n" data-link-type="idl-name" href="#dictdef-backgroundfetcheventinit" id="ref-for-dictdef-backgroundfetcheventinit②"><c- n>BackgroundFetchEventInit</c-></a> <a href="#dom-backgroundfetchevent-backgroundfetchevent-type-init-init"><code><c- g>init</c-></code></a>), <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed③①"><c- g>Exposed</c-></a>=<c- n>ServiceWorker</c->]
+[<a href="#dom-backgroundfetchevent-backgroundfetchevent"><code><c- g>Constructor</c-></code></a>(<a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString⑤①"><c- b>DOMString</c-></a> <a href="#dom-backgroundfetchevent-backgroundfetchevent-type-init-type"><code><c- g>type</c-></code></a>, <a class="n" data-link-type="idl-name" href="#dictdef-backgroundfetcheventinit" id="ref-for-dictdef-backgroundfetcheventinit②"><c- n>BackgroundFetchEventInit</c-></a> <a href="#dom-backgroundfetchevent-backgroundfetchevent-type-init-init"><code><c- g>init</c-></code></a>), <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed③①"><c- g>Exposed</c-></a>=<c- n>ServiceWorker</c->]
 <c- b>interface</c-> <a href="#backgroundfetchevent"><code><c- g>BackgroundFetchEvent</c-></code></a> : <a class="n" data-link-type="idl-name" href="https://w3c.github.io/ServiceWorker/#extendableevent" id="ref-for-extendableevent①"><c- n>ExtendableEvent</c-></a> {
   <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="#backgroundfetchregistration" id="ref-for-backgroundfetchregistration⑨①"><c- n>BackgroundFetchRegistration</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="BackgroundFetchRegistration" href="#dom-backgroundfetchevent-registration" id="ref-for-dom-backgroundfetchevent-registration③①"><c- g>registration</c-></a>;
 };
@@ -4159,7 +4200,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
   <c- b>required</c-> <a class="n" data-link-type="idl-name" href="#backgroundfetchregistration" id="ref-for-backgroundfetchregistration①⓪①"><c- n>BackgroundFetchRegistration</c-></a> <a data-type="BackgroundFetchRegistration " href="#dom-backgroundfetcheventinit-registration"><code><c- g>registration</c-></code></a>;
 };
 
-[<a href="#dom-backgroundfetchupdateuievent-backgroundfetchupdateuievent"><code><c- g>Constructor</c-></code></a>(<a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString⑨①"><c- b>DOMString</c-></a> <a href="#dom-backgroundfetchupdateuievent-backgroundfetchupdateuievent-type-init-type"><code><c- g>type</c-></code></a>, <a class="n" data-link-type="idl-name" href="#dictdef-backgroundfetcheventinit" id="ref-for-dictdef-backgroundfetcheventinit①①"><c- n>BackgroundFetchEventInit</c-></a> <a href="#dom-backgroundfetchupdateuievent-backgroundfetchupdateuievent-type-init-init"><code><c- g>init</c-></code></a>), <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed④①"><c- g>Exposed</c-></a>=<c- n>ServiceWorker</c->]
+[<a href="#dom-backgroundfetchupdateuievent-backgroundfetchupdateuievent"><code><c- g>Constructor</c-></code></a>(<a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString⑥①"><c- b>DOMString</c-></a> <a href="#dom-backgroundfetchupdateuievent-backgroundfetchupdateuievent-type-init-type"><code><c- g>type</c-></code></a>, <a class="n" data-link-type="idl-name" href="#dictdef-backgroundfetcheventinit" id="ref-for-dictdef-backgroundfetcheventinit①①"><c- n>BackgroundFetchEventInit</c-></a> <a href="#dom-backgroundfetchupdateuievent-backgroundfetchupdateuievent-type-init-init"><code><c- g>init</c-></code></a>), <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed④①"><c- g>Exposed</c-></a>=<c- n>ServiceWorker</c->]
 <c- b>interface</c-> <a href="#backgroundfetchupdateuievent"><code><c- g>BackgroundFetchUpdateUIEvent</c-></code></a> : <a class="n" data-link-type="idl-name" href="#backgroundfetchevent" id="ref-for-backgroundfetchevent⑤①"><c- n>BackgroundFetchEvent</c-></a> {
   <c- b>Promise</c->&lt;<c- b>void</c->> <a class="idl-code" data-link-type="method" href="#dom-backgroundfetchupdateuievent-updateui" id="ref-for-dom-backgroundfetchupdateuievent-updateui①"><c- g>updateUI</c-></a>(<c- b>optional</c-> <a class="n" data-link-type="idl-name" href="#dictdef-backgroundfetchuioptions" id="ref-for-dictdef-backgroundfetchuioptions①①"><c- n>BackgroundFetchUIOptions</c-></a> <a href="#dom-backgroundfetchupdateuievent-updateui-options-options"><code><c- g>options</c-></code></a>);
 };
@@ -4167,6 +4208,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
 </pre>
   <h2 class="no-num no-ref heading settled" id="issues-index"><span class="content">Issues Index</span><a class="self-link" href="#issues-index"></a></h2>
   <div style="counter-reset:issue">
+   <div class="issue"> <a href="https://github.com/w3c/manifest/pull/710">manifest/pull/710</a>.<a href="#issue-20b63876"> ↵ </a></div>
    <div class="issue"> The remainder of this step uses fetch "callbacks" which currently queue tasks. This isn’t desirable or possible here, so let’s pretend that tasks aren’t queued. (<a href="https://github.com/whatwg/fetch/issues/536#issuecomment-330184276">issue</a>)<a href="#issue-775cdb79"> ↵ </a></div>
    <div class="issue"> Is "user agent is offline" hand-waving too much? Also discussed in <a href="https://github.com/whatwg/fetch/issues/526#issuecomment-380686368">fetch/526</a>.<a href="#issue-6a6d7250"> ↵ </a></div>
    <div class="issue"> I need to debounce this similar to how mouse move events work.<a href="#issue-f0a2dc23"> ↵ </a></div>
@@ -4370,7 +4412,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
   <aside class="dfn-panel" data-for="background-fetch-display">
    <b><a href="#background-fetch-display">#background-fetch-display</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-background-fetch-display">4.1. Perform a background fetch</a>
+    <li><a href="#ref-for-background-fetch-display">6.3.1. fetch()</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="background-fetch-record">
@@ -4564,13 +4606,6 @@ complete-length = ( 1*DIGIT / "*" )</pre>
    <b><a href="#dictdef-backgroundfetchoptions">#dictdef-backgroundfetchoptions</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dictdef-backgroundfetchoptions">6.3. BackgroundFetchManager</a>
-   </ul>
-  </aside>
-  <aside class="dfn-panel" data-for="dictdef-icondefinition">
-   <b><a href="#dictdef-icondefinition">#dictdef-icondefinition</a></b><b>Referenced in:</b>
-   <ul>
-    <li><a href="#ref-for-dictdef-icondefinition">3.2. Background fetch</a>
-    <li><a href="#ref-for-dictdef-icondefinition①">6.3. BackgroundFetchManager</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="backgroundfetchmanager-backgroundfetchregistration-instances">
