@@ -148,9 +148,9 @@ A <dfn>background fetch</dfn> consists of:
 
       Issue: [manifest/pull/710](https://github.com/w3c/manifest/pull/710).
 
-    * The UI may use |bgFetch|'s [=background fetch/download total=], [=background fetch/upload total=], [=background fetch/last reported download=], and [=background fetch/paused flag=] to present the progress of the fetch. TODO what about bytes uploaded? TODO how can I tell when the operation is complete?
+    * The UI may use |bgFetch|'s [=background fetch/download total=], [=background fetch/upload total=], [=background fetch/stored body bytes total=], [=background fetch/uploaded=], [=background fetch/paused flag=], and [=background fetch/state=] to present the progress of the fetch.
     * The UI must provide a way for the user to abort the |bgFetch| by setting |bgFetch|'s [=background fetch/abort all flag=].
-    * If every [=background fetch record/request=] in |beFetch|'s [=background fetch/records=] has a [=request/method=] of \``GET`\`, the UI may provide a way to toggle |bgFetch|'s [=background fetch/paused flag=].
+    * If every [=background fetch record/request=] in |beFetch|'s [=background fetch/records=] has the [=request/method=] \``GET`\`, the UI may provide a way to toggle |bgFetch|'s [=background fetch/paused flag=].
 
       Note: If a [=request/method=] is not \``GET`\`, reissuing the request may have unwanted side effects.
 
