@@ -154,7 +154,7 @@ A <dfn>background fetch</dfn> consists of:
 
       Note: If a [=request/method=] is not \``GET`\`, reissuing the request may have unwanted side effects.
 
-    * The UI may be activated (for example, by clicking), in which case it must TODO hook this up to the event.
+    * The UI may be activated (for example, by clicking), in which case [=fire a background fetch click event=].
     * The UI may remain once the operation is complete, in which case it can still be activated.
 
     The user agent may set |bgFetch|'s [=background fetch/paused flag=] at the beginning of this algorithm, allowing the user to either accept the background fetch (unsetting |bgFetch|'s [=background fetch/paused flag=]), or refuse the background fetch (setting |bgFetch|'s [=background fetch/abort all flag=]).
@@ -355,6 +355,14 @@ Note: This algorithm manages the fetching of a [=/background fetch record=]. One
     1. [=Fire an event=] named "`progress`" at |bgFetchRegistration|.
 
     Issue: I need to debounce this similar to how mouse move events work.
+</div>
+
+## [=Fire a background fetch click event=] ## {#fire-a-background-fetch-click-event}
+
+<div algorithm>
+  To <dfn>fire a background fetch click event</dfn> for a |bgFetch| (a [=/background fetch=]), [=fire a functional event=] named "`backgroundfetchclick`" using {{BackgroundFetchEvent}} on |bgFetch|'s [=background fetch/service worker registration=] with the following properties:
+      : {{BackgroundFetchEvent/registration}}
+      :: The result of [=getting a BackgroundFetchRegistration instance=] for |bgFetch| in the event object's [=relevant Realm=].
 </div>
 
 ## [=Get a BackgroundFetchRegistration instance=] ## {#get-a-backgroundfetchregistration-instance-algorithm}
