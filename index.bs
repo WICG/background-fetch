@@ -293,7 +293,7 @@ Note: This algorithm manages the fetching of a [=/background fetch record=]. One
       1. Whenever one or more bytes are transmitted from |stream|, let |bytes| be the transmitted bytes and run these steps:
         1. If |bgFetch|'s [=background fetch/stored body bytes total=] plus the size of |bytes| is greater than |downloadTotal|, then:
           1. [=ReadableStream/Cancel=] |stream|.
-          1. Set |responseData|'s [=background fetch response/result=] to `"total-download-exceeded"`, |fetchAttemptComplete| to true, and abort these steps.
+          1. Set |responseData|'s [=background fetch response/result=] to `"download-total-exceeded"`, |fetchAttemptComplete| to true, and abort these steps.
         1. Append |bytes| to |responseData|'s [=background fetch response/bytes=].
         1. If the previous step fails due to exceeding a quota limit, set |responseData|'s [=background fetch response/result=] to `"quota-exceeded"`, |fetchAttemptComplete| to true, and abort these steps.
         1. [=Report progress for background fetch=] |bgFetch|.
@@ -752,7 +752,7 @@ enum BackgroundFetchFailureReason {
   // Storage quota was reached during the operation.
   "quota-exceeded",
   // The provided downloadTotal was exceeded.
-  "total-download-exceeded"
+  "download-total-exceeded"
 };
 </script>
 
