@@ -107,9 +107,10 @@ A <dfn>background fetch</dfn> consists of:
   * A <dfn>uploaded</dfn> (a number), initially 0.
   * A <dfn>result</dfn> (a {{BackgroundFetchResult}}), initially the empty string.
   * A <dfn>failure reason</dfn> (a {{BackgroundFetchFailureReason}}), initially the empty string.
+  * A <dfn>records available flag</dfn> initially set.
   * <dfn>Icons</dfn> (a [=list=] of {{ImageResource}}s).
   * A <dfn>service worker registration</dfn> (a [=/service worker registration=]).
-  * A <dfn>progress handling queue</dfn> (a [=parallel queue=]), initially the result of [=starting a new parallel queue=].
+  * A <dfn>update handling queue</dfn> (a [=parallel queue=]), initially the result of [=starting a new parallel queue=].
   * A <dfn>paused flag</dfn>, initially unset.
   * A <dfn>abort all flag</dfn>, initially unset.
 
@@ -220,16 +221,31 @@ Note: This is the algorithm that manages the 'background' parts of a background 
       1. Set |bgFetch|'s [=background fetch/result=] to `"failure"`.
       1. Set |bgFetch|'s [=background fetch/failure reason=] to |failureReason|.
     1. Otherwise, set |bgFetch|'s [=background fetch/result=] to `"success"`.
-    1. [=Report progress for background fetch=] |bgFetch|.
-    1. If |failureReason| is `"aborted"`, then [=fire a functional event=] named "`backgroundfetchabort`" using {{BackgroundFetchEvent}} on |swRegistration| with the following properties:
+    1. [=Update background fetch instances=] for |bgFetch|.
+    1. Let |eventName| be the empty string.
+    1. Let |eventConstructor| be null.
+    1. If |failureReason| is `"aborted"`, then:
+      1. Set |eventName| to "`backgroundfetchabort`".
+      1. Set |eventConstructor| to {{BackgroundFetchEvent}}.
+    1. Otherwise, if |failureReason| is not the empty string, then:
+      1. Set |eventName| to "`backgroundfetchfail`".
+      1. Set |eventConstructor| to {{BackgroundFetchUpdateUIEvent}}.
+    1. Otherwise:
+      1. Set |eventName| to "`backgroundfetchsuccess`".
+      1. Set |eventConstructor| to {{BackgroundFetchUpdateUIEvent}}.
+
+    1. [=Fire a functional event=] named |eventName| using |eventConstructor| on |swRegistration| with the following properties:
       : {{BackgroundFetchEvent/registration}}
       :: The result of [=getting a BackgroundFetchRegistration instance=] for |bgFetch| in the event object's [=relevant Realm=].
-    1. Otherwise, if |failureReason| is not the empty string, then [=fire a functional event=] named "`backgroundfetchfail`" using {{BackgroundFetchUpdateUIEvent}} on |swRegistration| with the following properties:
-      : {{BackgroundFetchEvent/registration}}
-      :: The result of [=getting a BackgroundFetchRegistration instance=] for |bgFetch| in the event object's [=relevant Realm=].
-    1. Otherwise, [=fire a functional event=] named "`backgroundfetchsuccess`" using {{BackgroundFetchUpdateUIEvent}} on |swRegistration| with the following properties:
-      : {{BackgroundFetchEvent/registration}}
-      :: The result of [=getting a BackgroundFetchRegistration instance=] for |bgFetch| in the event object's [=relevant Realm=].
+
+      Then run these steps with |dispatchedEvent| [=in parallel=]:
+
+      1. Wait until |dispatchedEvent| is not {{ExtendableEvent/active}}.
+
+        Issue: [ServiceWorker/1348](https://github.com/w3c/ServiceWorker/pull/1348).
+
+      1. Unset |bgFetch|'s [=background fetch/records available flag=].
+      1. [=Update background fetch instances=] for |bgFetch|.
 </div>
 
 ## [=Complete a record=] ## {#complete-a-record-algorithm}
@@ -260,7 +276,7 @@ Note: This algorithm manages the fetching of a [=/background fetch record=]. One
       1. Let |transmittedSize| be |request|'s [=request/body=]'s [=body/transmitted bytes=].
       1. Increment |bgFetch|'s [=background fetch/uploaded=] by |transmittedSize| minus |lastTransmittedSize|.
       1. Set |lastTransmittedSize| to |transmittedSize|.
-      1. [=Report progress for background fetch=] |bgFetch|.
+      1. [=Update background fetch instances=] for |bgFetch|.
 
     To [=process response=] for |response|, run these steps:
       1. If |response| is a [=network error=], then:
@@ -284,7 +300,7 @@ Note: This algorithm manages the fetching of a [=/background fetch record=]. One
 
           Note: The [=create record objects=] algorithm may hold a reference to the previous [=background fetch response=].
 
-        1. [=Report progress for background fetch=] |bgFetch|.
+        1. [=Update background fetch instances=] for |bgFetch|.
       1. If |rangeStart| is 0 or |response|'s [=response/status=] is not `206`, then set |responseData|'s [=background fetch response/response=] to a copy of |response| except for its [=response/body=].
       1. Let |stream| be the |response| [=response/body=]'s [=body/stream=].
       1. Whenever one or more bytes are transmitted from |stream|, let |bytes| be the transmitted bytes and run these steps:
@@ -293,7 +309,7 @@ Note: This algorithm manages the fetching of a [=/background fetch record=]. One
           1. Set |responseData|'s [=background fetch response/result=] to `"download-total-exceeded"`, |fetchAttemptComplete| to true, and abort these steps.
         1. Append |bytes| to |responseData|'s [=background fetch response/bytes=].
         1. If the previous step fails due to exceeding a quota limit, set |responseData|'s [=background fetch response/result=] to `"quota-exceeded"`, |fetchAttemptComplete| to true, and abort these steps.
-        1. [=Report progress for background fetch=] |bgFetch|.
+        1. [=Update background fetch instances=] for |bgFetch|.
       1. If at any point the bytes transmission for |stream| is done normally, then:
         1. If |response|'s [=response/status=] is `206`, then:
           1. Let |firstBytePos|, |lastBytePos|, and |completeLength| be the result of [=extracting content-range values=] from |response|.
@@ -322,21 +338,23 @@ Note: This algorithm manages the fetching of a [=/background fetch record=]. One
   1. If |result| is the empty string, then [=complete a record=] for |bgFetch| and |record|.
 </div>
 
-## [=Report progress for background fetch=] ## {#report-progress-for-background-fetch-algorithm}
+## [=Update background fetch instances=] ## {#update-background-fetch-instance}
 
 <div algorithm>
-  To <dfn>report progress for background fetch</dfn> |bgFetch| (a [=/background fetch=]), [=enqueue the following steps=] to |bgFetch|'s [=background fetch/progress handling queue=]:
+  To <dfn>update background fetch instances</dfn> for |bgFetch| (a [=/background fetch=]), [=enqueue the following steps=] to |bgFetch|'s [=background fetch/update handling queue=]:
 
   1. Let |downloaded| be |bgFetch|'s [=background fetch/stored body bytes total=].
   1. Let |uploaded| be |bgFetch|'s [=background fetch/uploaded=].
   1. Let |result| be |bgFetch|'s [=background fetch/result=].
   1. Let |failureReason| be |bgFetch|'s [=background fetch/failure reason=].
+  1. Let |recordsAvailable| be true if |bgFetch|'s [=background fetch/records available flag=] is set, otherwise false.
   1. For each [=environment settings object=] |env| whose [=environment settings object/origin=] is equal to |bgFetch|'s [=background fetch/service worker registration=]'s [=service worker registration/scope URL=]'s [=url/origin=], [=queue a bgfetch task=] on |env|'s [=environment settings object/responsible event loop=] to run these steps:
     1. Let |bgFetchRegistration| be the instance of {{BackgroundFetchRegistration}} within the [=relevant realm=] whose [=BackgroundFetchRegistration/background fetch=] is equal to |bgFetch|, or null if none exists.
 
       Note: There will be at most one per environment, due to the [=get a BackgroundFetchRegistration instance=] algorithm.
 
     1. If |bgFetchRegistration| is null, then abort these steps.
+    1. If |recordsAvailable| is false and |bgFetchRegistration|'s [=BackgroundFetchRegistration/records available flag=] is set, then unset |bgFetchRegistration|'s [=BackgroundFetchRegistration/records available flag=].
     1. If |bgFetchRegistration|'s [=BackgroundFetchRegistration/result=] is not the empty string, then abort these steps.
 
       Note: This prevents progress being reported after the background fetch has settled. This is possible when the operation has aborted, but some fetches haven't yet terminated.
@@ -698,7 +716,7 @@ dictionary BackgroundFetchOptions : BackgroundFetchUIOptions {
     1. Let |registration| be the [=context object=]'s associated [=BackgroundFetchManager/service worker registration=].
     1. Let |bgFetch| be |registration|'s [=active background fetches=][|id|].
     1. If |bgFetch| is undefined, then [=resolve=] |promise| with undefined and abort these steps.
-    1. [=Enqueue the following steps=] to |bgFetch|'s [=background fetch/progress handling queue=]:
+    1. [=Enqueue the following steps=] to |bgFetch|'s [=background fetch/update handling queue=]:
       1. [=Queue a bgfetch task=] |task| to run these steps:
         1. Let |bgFetchRegistration| be the result of [=getting a BackgroundFetchRegistration instance=] for |bgFetch| in the [=context object=]'s [=relevant Realm=].
         1. [=Resolve=] |promise| with |bgFetchRegistration|.
@@ -729,6 +747,7 @@ interface BackgroundFetchRegistration : EventTarget {
   readonly attribute unsigned long long downloaded;
   readonly attribute BackgroundFetchResult result;
   readonly attribute BackgroundFetchFailureReason failureReason;
+  readonly attribute boolean recordsAvailable;
 
   attribute EventHandler onprogress;
 
@@ -768,6 +787,7 @@ enum BackgroundFetchFailureReason {
   * An <dfn>id</dfn> (a number), a copy of [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/id=].
   * An <dfn>upload total</dfn> (a number), a copy of [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/upload total=].
   * A <dfn>download total</dfn> (a number), a copy of [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/download total=].
+  * A <dfn>records available flag</dfn> initially set if [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/records available flag=] is set, otherwise unset.
 
   Note: The above values are copied so they're available synchronously.
 
@@ -784,6 +804,8 @@ enum BackgroundFetchFailureReason {
   The <dfn attribute>result</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchRegistration/result=].
 
   The <dfn attribute>failureReason</dfn> attribute's getter must return the [=context object=]'s [=BackgroundFetchRegistration/failure reason=].
+
+  The <dfn attribute>recordsAvailable</dfn> attribute's getter must return true if the [=context object=]'s [=BackgroundFetchRegistration/records available flag=] is set, otherwise false.
 
   ### Events ### {#background-fetch-registration-events}
 
@@ -821,12 +843,16 @@ enum BackgroundFetchFailureReason {
   ### {{BackgroundFetchRegistration/matchAll()}} ### {#background-fetch-registration-match-all}
 
   <div algorithm>
-    The <dfn method>matchAll(|request|, |options|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run these steps [=in parallel=]:
+    The <dfn method>matchAll(|request|, |options|)</dfn> method, when invoked, must run these steps:
 
-    1. Let |matchingRecords| be an empty [=list=].
-    1. For each |record| of [=context object=]'s [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/records=]:
-      1. If [=request matches cached item=] for |request|, |record|'s [=background fetch record/request=], |record|'s [=background fetch record/response data=]'s [=background fetch response/response=], and |options| returns true, then [=list/append=] |record| to |matchingRecords|.
-    1. [=Queue a bgfetch task=] to [=resolve=] |promise| with the result of [=creating record objects=] from |matchingRecords| in [=context object=]'s [=relevant Realm=].
+    1. If the [=context object=]'s [=BackgroundFetchRegistration/records available flag=] is unset, return [=a promise rejected with=] an {{InvalidStateError}} {{DOMException}}.
+    1. Let |promise| be [=a new promise=].
+    1. Run these steps [=in parallel=]:
+      1. Let |matchingRecords| be an empty [=list=].
+      1. For each |record| of [=context object=]'s [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/records=]:
+        1. If [=request matches cached item=] for |request|, |record|'s [=background fetch record/request=], |record|'s [=background fetch record/response data=]'s [=background fetch response/response=], and |options| returns true, then [=list/append=] |record| to |matchingRecords|.
+      1. [=Queue a bgfetch task=] to [=resolve=] |promise| with the result of [=creating record objects=] from |matchingRecords| in the [=context object=]'s [=relevant Realm=].
+    1. Return |promise|.
   </div>
 </div>
 
