@@ -105,10 +105,7 @@ A <dfn>background fetch</dfn> consists of:
   * A <dfn>download total</dfn> (a number).
   * An <dfn>upload total</dfn> (a number).
   * A <dfn>uploaded</dfn> (a number), initially 0.
-  * A <dfn>last reported upload</dfn> (a number), initially 0.
-  * A <dfn>last reported download</dfn> (a number), initially 0.
   * A <dfn>result</dfn> (a {{BackgroundFetchResult}}), initially the empty string.
-  * A <dfn>reported settled flag</dfn> initially unset.
   * A <dfn>failure reason</dfn> (a {{BackgroundFetchFailureReason}}), initially the empty string.
   * <dfn>Icons</dfn> (a [=list=] of {{ImageResource}}s).
   * A <dfn>service worker registration</dfn> (a [=/service worker registration=]).
@@ -330,31 +327,34 @@ Note: This algorithm manages the fetching of a [=/background fetch record=]. One
 <div algorithm>
   To <dfn>report progress for background fetch</dfn> |bgFetch| (a [=/background fetch=]), [=enqueue the following steps=] to |bgFetch|'s [=background fetch/progress handling queue=]:
 
-  1. If |bgFetch|'s [=background fetch/reported settled flag=] is set, then abort these steps.
-
-    Note: This prevents progress being reported after the background fetch has settled. This is possible when the operation has aborted, but some fetches haven't yet terminated.
-
   1. Let |downloaded| be |bgFetch|'s [=background fetch/stored body bytes total=].
   1. Let |uploaded| be |bgFetch|'s [=background fetch/uploaded=].
   1. Let |result| be |bgFetch|'s [=background fetch/result=].
   1. Let |failureReason| be |bgFetch|'s [=background fetch/failure reason=].
-  1. If |uploaded| is equal to |bgFetch|'s [=background fetch/last reported upload=] and |downloaded| is equal to |bgFetch|'s [=background fetch/last reported download=] and |result| is the empty string, then abort these steps.
-  1. Set |bgFetch|'s [=background fetch/last reported upload=] to |uploaded|.
-  1. Set |bgFetch|'s [=background fetch/last reported download=] to |downloaded|.
-  1. If |result| is not the empty string, then set |bgFetch|'s [=background fetch/reported settled flag=].
   1. For each [=environment settings object=] |env| whose [=environment settings object/origin=] is equal to |bgFetch|'s [=background fetch/service worker registration=]'s [=service worker registration/scope URL=]'s [=url/origin=], [=queue a bgfetch task=] on |env|'s [=environment settings object/responsible event loop=] to run these steps:
     1. Let |bgFetchRegistration| be the instance of {{BackgroundFetchRegistration}} within the [=relevant realm=] whose [=BackgroundFetchRegistration/background fetch=] is equal to |bgFetch|, or null if none exists.
 
       Note: There will be at most one per environment, due to the [=get a BackgroundFetchRegistration instance=] algorithm.
 
     1. If |bgFetchRegistration| is null, then abort these steps.
+    1. If |bgFetchRegistration|'s [=BackgroundFetchRegistration/result=] is not the empty string, then abort these steps.
+
+      Note: This prevents progress being reported after the background fetch has settled. This is possible when the operation has aborted, but some fetches haven't yet terminated.
+
+    1. If all of the following are true:
+      * |bgFetchRegistration|'s [=BackgroundFetchRegistration/downloaded=] is equal to |downloaded|.
+      * |bgFetchRegistration|'s [=BackgroundFetchRegistration/uploaded=] is equal to |uploaded|.
+      * |bgFetchRegistration|'s [=BackgroundFetchRegistration/result=] is equal to |result|.
+      * |bgFetchRegistration|'s [=BackgroundFetchRegistration/failure reason=] is equal to |failureReason|.
+
+      Then abort these steps.
     1. Set |bgFetchRegistration|'s [=BackgroundFetchRegistration/downloaded=] to |downloaded|.
     1. Set |bgFetchRegistration|'s [=BackgroundFetchRegistration/uploaded=] to |uploaded|.
     1. Set |bgFetchRegistration|'s [=BackgroundFetchRegistration/result=] to |result|.
     1. Set |bgFetchRegistration|'s [=BackgroundFetchRegistration/failure reason=] to |failureReason|.
     1. [=Fire an event=] named "`progress`" at |bgFetchRegistration|.
 
-    Issue: I need to debounce this similar to how mouse move events work.
+    Issue: I need to debounce this similar to how mouse move events debounce.
 </div>
 
 ## [=Fire a background fetch click event=] ## {#fire-a-background-fetch-click-event}
@@ -761,10 +761,10 @@ enum BackgroundFetchFailureReason {
   A {{BackgroundFetchRegistration}} instance has:
 
   * A <dfn>background fetch</dfn> (a [=/background fetch=]).
-  * A <dfn>downloaded</dfn> (a number), initially a copy of [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/last reported download=].
-  * A <dfn>uploaded</dfn> (a number), initially a copy of [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/last reported upload=].
-  * A <dfn>result</dfn> (a {{BackgroundFetchResult}}), the empty string if [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/reported settled flag=] is unset, otherwise a copy of [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/result=].
-  * A <dfn>failure reason</dfn> (a {{BackgroundFetchFailureReason}}), the empty string if [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/reported settled flag=] is unset, otherwise a copy of [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/failure reason=].
+  * A <dfn>downloaded</dfn> (a number), initially a copy of [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/stored body bytes total=].
+  * A <dfn>uploaded</dfn> (a number), initially a copy of [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/uploaded=].
+  * A <dfn>result</dfn> (a {{BackgroundFetchResult}}), initially a copy of [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/result=].
+  * A <dfn>failure reason</dfn> (a {{BackgroundFetchFailureReason}}), initially a copy of [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/failure reason=].
   * An <dfn>id</dfn> (a number), a copy of [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/id=].
   * An <dfn>upload total</dfn> (a number), a copy of [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/upload total=].
   * A <dfn>download total</dfn> (a number), a copy of [=BackgroundFetchRegistration/background fetch=]'s [=background fetch/download total=].
