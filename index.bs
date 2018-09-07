@@ -471,7 +471,7 @@ Note: This algorithm creates platform objects for [=background fetch records=]. 
       :: A new {{Headers}} object associated with this {{Request}}'s [=Request/request=]'s [=request/header list=].
     1. Set |recordObject|'s {{BackgroundFetchRecord/request}} to |requestObject|.
     1. Let |transmittedBytes| be 0.
-    1. Let |stream| be a new {{ReadableStream}} object with a pull action that returns [=a new promise=] |promise| and runs these steps [=in parallel=]:
+    1. Let |stream| be [=construct a ReadableStream object|a new readable stream=] with a pull action that returns [=a new promise=] |promise| and runs these steps [=in parallel=]:
       1. Wait for the [=byte sequence/length=] of |responseData|'s [=background fetch response/bytes=] to be greater than |transmittedBytes|, or |responseData|'s [=background fetch response/result=] not to be the empty string.
       1. Let |bytes| be null.
       1. If the [=byte sequence/length=] of |responseData|'s [=background fetch response/bytes=] is greater than |transmittedBytes| and |responseData| may be [=background fetch response/exposed=], then:

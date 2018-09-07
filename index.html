@@ -1214,7 +1214,7 @@ Possible extra rowspan handling
 </style>
   <meta content="Bikeshed version d0d8d87ffe296a92b247fe143aae4c1411ba5f79" name="generator">
   <link href="https://wicg.github.io/background-fetch/" rel="canonical">
-  <meta content="4bb799b48ca800b5c6da78c450b244146b8219f5" name="document-revision">
+  <meta content="e760d0980bbc317a688bf4ec098a71c04e223eb7" name="document-revision">
 <style>
   .algorithm dl {
     overflow: hidden;
@@ -1492,7 +1492,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">Background Fetch</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Editor’s Draft, <time class="dt-updated" datetime="2018-09-06">6 September 2018</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Editor’s Draft, <time class="dt-updated" datetime="2018-09-07">7 September 2018</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -2232,7 +2232,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
        <li data-md>
         <p>Let <var>transmittedBytes</var> be 0.</p>
        <li data-md>
-        <p>Let <var>stream</var> be a new <code class="idl"><a data-link-type="idl" href="https://fetch.spec.whatwg.org/#concept-readablestream" id="ref-for-concept-readablestream">ReadableStream</a></code> object with a pull action that returns <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-new-promise" id="ref-for-a-new-promise①">a new promise</a> <var>promise</var> and runs these steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel②">in parallel</a>:</p>
+        <p>Let <var>stream</var> be <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-construct-readablestream" id="ref-for-concept-construct-readablestream">a new readable stream</a> with a pull action that returns <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-new-promise" id="ref-for-a-new-promise①">a new promise</a> <var>promise</var> and runs these steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel②">in parallel</a>:</p>
         <ol>
          <li data-md>
           <p>Wait for the <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#byte-sequence-length" id="ref-for-byte-sequence-length③">length</a> of <var>responseData</var>’s <a data-link-type="dfn" href="#background-fetch-response-bytes" id="ref-for-background-fetch-response-bytes⑤">bytes</a> to be greater than <var>transmittedBytes</var>, or <var>responseData</var>’s <a data-link-type="dfn" href="#background-fetch-response-result" id="ref-for-background-fetch-response-result①④">result</a> not to be the empty string.</p>
@@ -3346,12 +3346,6 @@ complete-length = ( 1*DIGIT / "*" )</pre>
     <li><a href="#ref-for-headers">4.9. Create record objects</a> <a href="#ref-for-headers①">(2)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-concept-readablestream">
-   <a href="https://fetch.spec.whatwg.org/#concept-readablestream">https://fetch.spec.whatwg.org/#concept-readablestream</a><b>Referenced in:</b>
-   <ul>
-    <li><a href="#ref-for-concept-readablestream">4.9. Create record objects</a>
-   </ul>
-  </aside>
   <aside class="dfn-panel" data-for="term-for-request">
    <a href="https://fetch.spec.whatwg.org/#request">https://fetch.spec.whatwg.org/#request</a><b>Referenced in:</b>
    <ul>
@@ -3411,6 +3405,12 @@ complete-length = ( 1*DIGIT / "*" )</pre>
    <a href="https://fetch.spec.whatwg.org/#concept-readablestream-closed">https://fetch.spec.whatwg.org/#concept-readablestream-closed</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-concept-readablestream-closed">4.9. Create record objects</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-concept-construct-readablestream">
+   <a href="https://fetch.spec.whatwg.org/#concept-construct-readablestream">https://fetch.spec.whatwg.org/#concept-construct-readablestream</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-concept-construct-readablestream">4.9. Create record objects</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-header-list-contains">
@@ -4078,7 +4078,6 @@ complete-length = ( 1*DIGIT / "*" )</pre>
     <a data-link-type="biblio">[FETCH]</a> defines the following terms:
     <ul>
      <li><span class="dfn-paneled" id="term-for-headers" style="color:initial">Headers</span>
-     <li><span class="dfn-paneled" id="term-for-concept-readablestream" style="color:initial">ReadableStream</span>
      <li><span class="dfn-paneled" id="term-for-request" style="color:initial">Request</span>
      <li><span class="dfn-paneled" id="term-for-requestinfo" style="color:initial">RequestInfo</span>
      <li><span class="dfn-paneled" id="term-for-response" style="color:initial">Response</span>
@@ -4088,6 +4087,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
      <li><span class="dfn-paneled" id="term-for-concept-cancel-readablestream" style="color:initial">cancel</span>
      <li><span class="dfn-paneled" id="term-for-concept-request-client" style="color:initial">client</span>
      <li><span class="dfn-paneled" id="term-for-concept-readablestream-closed" style="color:initial">closed</span>
+     <li><span class="dfn-paneled" id="term-for-concept-construct-readablestream" style="color:initial">construct a readablestream object</span>
      <li><span class="dfn-paneled" id="term-for-header-list-contains" style="color:initial">contains</span>
      <li><span class="dfn-paneled" id="term-for-concept-request-credentials-mode" style="color:initial">credentials mode</span>
      <li><span class="dfn-paneled" id="term-for-concept-header-list-delete" style="color:initial">delete</span>
