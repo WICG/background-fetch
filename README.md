@@ -21,7 +21,7 @@ These are eventual goals, some features be missing from "v1".
 
 # API Design
 
-**OUT OF DATE**. I'm working on the spec right now, and will update this once changes settle.
+**OUT OF DATE**. The rest of this doc is out of date. I'm working on the spec right now, and will update this once changes settle. The spec however, is up-to-date.
 
 ## Starting a background fetch
 
