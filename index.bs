@@ -627,8 +627,8 @@ interface BackgroundFetchManager {
 };
 
 dictionary BackgroundFetchUIOptions {
-  sequence<ImageResource> icons = [];
-  DOMString title = "";
+  sequence<ImageResource> icons;
+  DOMString title;
 };
 
 dictionary BackgroundFetchOptions : BackgroundFetchUIOptions {
@@ -690,14 +690,14 @@ dictionary BackgroundFetchOptions : BackgroundFetchUIOptions {
         :: |id|.
         : [=background fetch/records=]
         :: |records|.
-        : [=background fetch/download total=]
+       m  : [=background fetch/download total=]
         :: |options|' `downloadTotal` member.
         : [=background fetch/upload total=]
         :: |uploadTotal|.
         : [=background fetch/icons=]
-        :: |options|' `icons` member.
+        :: |options|' `icons` member if present, otherwise an empty [=/list=].
         : [=background fetch/title=]
-        :: |options|' `title` member.
+        :: |options|' `title` member if present, otherwise the empty string.
         : [=background fetch/service worker registration=]
         :: |registration|.
       1. Set |bgFetchMap|[|id|] to |bgFetch|.
@@ -928,6 +928,7 @@ interface BackgroundFetchUpdateUIEvent : BackgroundFetchEvent {
     1. Let |bgFetch| be the [=context object=]'s [=BackgroundFetchEvent/background fetch=].
     1. If |option|'s {{BackgroundFetchUIOptions/icons}} member is present, set |bgFetch|'s [=background fetch/icons=] to |option|'s {{BackgroundFetchUIOptions/icons}}.
     1. If |option|'s {{BackgroundFetchUIOptions/title}} member is present, set |bgFetch|'s [=background fetch/title=] to |option|'s {{BackgroundFetchUIOptions/title}}.
+    1. [=Resolve=] |promise|.
   </div>
 </div>
 
