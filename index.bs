@@ -193,22 +193,17 @@ Note: This is the algorithm that manages the 'background' parts of a background 
 
   1. Let |swRegistration| be |bgFetch|'s [=background fetch/service worker registration=].
   1. Let |downloadTotal| be |bgFetch|'s [=background fetch/download total=] if it is not 0, otherwise infinity.
-  1. Let |successfulFetches| be 0.
+  1. Let |settledFetches| be 0.
   1. Let |abandoned| be false.
   1. Let |failureReason| be the empty string.
   1. [=list/For each=] |record| in |bgFetch|'s [=background fetch/records=], run these steps [=in parallel=]:
     1. [=Complete a record=] for |bgFetch| and |record|.
     1. Let |result| be |record|'s [=background fetch record/response data=]'s [=background fetch response/result=].
-    1. If |result| is `"success"`, then increment |successfulFetches| by 1.
-    1. Otherwise, if |failureReason| is not the empty string:
+    1. If |failureReason| is not the empty string:
       1. Assert: |result| is not `"redundant"`.
       1. Set |failureReason| to |result|.
-  1. Wait for either |failureReason| to be something other than the empty string, or |successfulFetches| to be |bgFetch|'s [=background fetch/records=]'s [=list/size=].
-  1. Let |operationAborted| be true if |aborted|.
-  1. If |failureReason| is not the empty string, set |bgFetch|'s [=background fetch/abort all flag=].
-
-    Note: The [=complete a record=] algorithm listens to this flag and terminates its fetch if it's set.
-
+    1. Increment |settledFetches| by 1.
+  1. Wait for |settledFetches| to be |bgFetch|'s [=background fetch/records=]'s [=list/size=].
   1. [=Enqueue the following steps=] to |swRegistration|'s [=active background fetches edit queue=]:
     1. Let |activeBgFetches| be |swRegistration|'s [=active background fetches=].
     1. Let |id| be |bgFetch|'s [=background fetch/id=].
