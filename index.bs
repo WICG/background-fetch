@@ -148,7 +148,7 @@ A <dfn>background fetch</dfn> consists of:
 
     * The UI may use |bgFetch|'s [=background fetch/download total=], [=background fetch/upload total=], [=background fetch/stored body bytes total=], [=background fetch/uploaded=], [=background fetch/paused flag=], and [=background fetch/result=] to present the progress of the fetch.
     * The UI must provide a way for the user to abort the |bgFetch| by setting |bgFetch|'s [=background fetch/abort all flag=].
-    * If every [=background fetch record/request=] in |beFetch|'s [=background fetch/records=] has the [=request/method=] \``GET`\`, the UI may provide a way to toggle |bgFetch|'s [=background fetch/paused flag=].
+    * If every [=background fetch record/request=] in |bgFetch|'s [=background fetch/records=] has the [=request/method=] \``GET`\`, the UI may provide a way to toggle |bgFetch|'s [=background fetch/paused flag=].
 
       Note: If a [=request/method=] is not \``GET`\`, reissuing the request may have unwanted side effects.
 
@@ -170,7 +170,7 @@ A <dfn>background fetch record</dfn> consists of:
   * A <dfn>response data</dfn> (a [=background fetch response=]), initially a new [=background fetch response=].
 </div>
 
-## Background fetch response ## {#background-fetch-response}
+## Background fetch response ## {#background-fetch-response-concept}
 
 A <dfn>Background fetch response</dfn> consists of:
 
@@ -192,9 +192,7 @@ Note: This is the algorithm that manages the 'background' parts of a background 
   To <dfn>perform a background fetch</dfn> for |bgFetch| (a [=/background fetch=]), run these steps:
 
   1. Let |swRegistration| be |bgFetch|'s [=background fetch/service worker registration=].
-  1. Let |downloadTotal| be |bgFetch|'s [=background fetch/download total=] if it is not 0, otherwise infinity.
   1. Let |settledFetches| be 0.
-  1. Let |abandoned| be false.
   1. Let |failureReason| be the empty string.
   1. [=list/For each=] |record| in |bgFetch|'s [=background fetch/records=], run these steps [=in parallel=]:
     1. [=Complete a record=] for |bgFetch| and |record|.
@@ -257,7 +255,7 @@ Note: This algorithm manages the fetching of a [=/background fetch record=]. One
   1. Set |request|'s [=request/keepalive flag=].
   1. Set |request|'s [=request/service-workers mode=] to "`none`".
   1. Let |rangeStart| be the [=byte sequence/length=] of |responseData|'s [=background fetch response/bytes=].
-  1. If |rangeStart| is not 0, then [=request/add a range header=] to |request| with |currentLength|.
+  1. If |rangeStart| is not 0, then [=request/add a range header=] to |request| with |rangeStart|.
 
     Note: If the |rangeStart| is 0, a normal request is made. This allows the initial request to make use of content encoding, since `Accept-Encoding: identity` is added to requests with a range header.
 
@@ -307,7 +305,7 @@ Note: This algorithm manages the fetching of a [=/background fetch record=]. One
         1. [=Update background fetch instances=] for |bgFetch|.
       1. If at any point the bytes transmission for |stream| is done normally, then:
         1. If |response|'s [=response/status=] is `206`, then:
-          1. Let |firstBytePos|, |lastBytePos|, and |completeLength| be the result of [=extracting content-range values=] from |response|.
+          1. Let <var ignore>firstBytePos</var>, <var ignore>lastBytePos</var>, and |completeLength| be the result of [=extracting content-range values=] from |response|.
           1. If |completeLength| is not null, and equal to the [=byte sequence/length=] of |responseData|'s [=background fetch response/bytes=], set |responseData|'s [=background fetch response/result=] to `"success"`.
 
             Note: Although we ask for the whole resource, or the remainder of the resource, the server may not have returned the remainder, in which case we need to make an additional request.
@@ -333,7 +331,7 @@ Note: This algorithm manages the fetching of a [=/background fetch record=]. One
   1. If |result| is the empty string, then [=complete a record=] for |bgFetch| and |record|.
 </div>
 
-## [=Update background fetch instances=] ## {#update-background-fetch-instance}
+## [=Update background fetch instances=] ## {#update-background-fetch-instance-algorithm}
 
 <div algorithm>
   To <dfn>update background fetch instances</dfn> for |bgFetch| (a [=/background fetch=]), [=enqueue the following steps=] to |bgFetch|'s [=background fetch/update handling queue=]:
@@ -370,7 +368,7 @@ Note: This algorithm manages the fetching of a [=/background fetch record=]. One
     Issue: I need to debounce this similar to how mouse move events debounce.
 </div>
 
-## [=Fire a background fetch click event=] ## {#fire-a-background-fetch-click-event}
+## [=Fire a background fetch click event=] ## {#fire-a-background-fetch-click-event-algorithm}
 
 <div algorithm>
   To <dfn>fire a background fetch click event</dfn> for a |bgFetch| (a [=/background fetch=]), [=fire a functional event=] named "`backgroundfetchclick`" using {{BackgroundFetchEvent}} on |bgFetch|'s [=background fetch/service worker registration=] with the following properties:
@@ -400,13 +398,13 @@ Note: This algorithm checks if a partial response reasonably matches what was re
   To <dfn>validate a partial response</dfn> for an |expectedRangeStart| (a number), a |partialResponse| (a [=/response=]), and an optional |previousResponse| (a [=/response=] or null, null unless otherwise specified), run these steps:
 
   1. Assert: |partialResponse|'s [=response/status=] is `206`.
-  1. Let |responseFirstBytePos|, |responseLastBytePos|, and |responseCompleteLength| be the result of [=extracting content-range values=] from |partialResponse|. If this fails, then return invalid.
-  1. If |requestFirstBytePos| does not equal |expectedRangeStart|, then return invalid.
+  1. Let |responseFirstBytePos|, <var ignore>responseLastBytePos</var>, and |responseCompleteLength| be the result of [=extracting content-range values=] from |partialResponse|. If this fails, then return invalid.
+  1. If |responseFirstBytePos| does not equal |expectedRangeStart|, then return invalid.
   1. If |previousResponse| is not null, then:
     1. If |previousResponse|'s [=response/header list=] [=header list/contains=] \``ETag`\`, and [=header equality=] for \``ETag`\`, |previousResponse|'s [=response/header list=], and |partialResponse|'s [=response/header list=] is false, then return invalid.
     1. If |previousResponse|'s [=response/header list=] [=header list/contains=] \``Last-Modified`\`, and [=header equality=] for \``Last-Modified`\`, |previousResponse|'s [=response/header list=], and |partialResponse|'s [=response/header list=] is false, then return invalid.
     1. If |previousResponse|'s [=response/status=] is `206`, then:
-      1. Let |previousResponseFirstBytePos|, |previousResponseLastBytePos|, and |previousResponseCompleteLength| be the result of [=extracting content-range values=] from |previousResponse|. If this fails, then return invalid.
+      1. Let <var ignore>previousResponseFirstBytePos</var>, <var ignore>previousResponseLastBytePos</var>, and |previousResponseCompleteLength| be the result of [=extracting content-range values=] from |previousResponse|. If this fails, then return invalid.
       1. If |previousResponseCompleteLength| is not null, and |responseCompleteLength| does not equal |previousResponseCompleteLength|, then return invalid.
   1. Return valid.
 </div>
@@ -646,7 +644,6 @@ dictionary BackgroundFetchOptions : BackgroundFetchUIOptions {
     The <dfn method>fetch(|id|, |requests|, |options|)</dfn> method, when invoked, run these steps:
 
     1. Let |registration| be the [=context object=]'s [=BackgroundFetchManager/service worker registration=].
-    1. Let |bgFetchInstances| be [=context object=]'s [=BackgroundFetchRegistration instances=].
     1. Let |records| be a new [=list=].
     1. Let |uploadTotal| be 0.
     1. If |requests| is a {{RequestInfo}}, set |requests| to « |requests| ».
@@ -656,7 +653,7 @@ dictionary BackgroundFetchOptions : BackgroundFetchUIOptions {
       1. If |internalRequest|'s [=request/mode=] is "`no-cors`", then return [=a promise rejected with=] a {{TypeError}}.
       1. Set |internalRequest|'s [=request/client=] to null.
       1. Let |record| be a new [=background fetch record=].
-      1. Set |record|'s [=background fetch record/request=] to |internalReqeust|.
+      1. Set |record|'s [=background fetch record/request=] to |internalRequest|.
       1. [=list/Append=] |record| to |records|.
     1. Let |promise| be [=a new promise=].
     1. [=Enqueue the following steps=] to |registration|'s [=active background fetches edit queue=]:
@@ -851,7 +848,7 @@ enum BackgroundFetchFailureReason {
   </div>
 </div>
 
-## {{BackgroundFetchRecord}} ## {#background-fetch-record}
+## {{BackgroundFetchRecord}} ## {#background-fetch-record-interface}
 
 <script type="idl">
 [Exposed=(Window,Worker)]
@@ -919,10 +916,10 @@ interface BackgroundFetchUpdateUIEvent : BackgroundFetchEvent {
       Throw an {{InvalidStateError}} {{DOMException}}.
 
     1. Set the [=context object=]'s [=BackgroundFetchUpdateUIEvent/UI updated flag=].
-    1. If |option| is null, return.
+    1. If |options| is null, return.
     1. Let |bgFetch| be the [=context object=]'s [=BackgroundFetchEvent/background fetch=].
-    1. If |option|'s {{BackgroundFetchUIOptions/icons}} member is present, set |bgFetch|'s [=background fetch/icons=] to |option|'s {{BackgroundFetchUIOptions/icons}}.
-    1. If |option|'s {{BackgroundFetchUIOptions/title}} member is present, set |bgFetch|'s [=background fetch/title=] to |option|'s {{BackgroundFetchUIOptions/title}}.
+    1. If |options|'s {{BackgroundFetchUIOptions/icons}} member is present, set |bgFetch|'s [=background fetch/icons=] to |options|'s {{BackgroundFetchUIOptions/icons}}.
+    1. If |options|'s {{BackgroundFetchUIOptions/title}} member is present, set |bgFetch|'s [=background fetch/title=] to |options|'s {{BackgroundFetchUIOptions/title}}.
     1. [=Resolve=] |promise|.
   </div>
 </div>
