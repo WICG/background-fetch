@@ -175,8 +175,8 @@ A <dfn>background fetch record</dfn> consists of:
 A <dfn>Background fetch response</dfn> consists of:
 
 <div dfn-for="background fetch response">
-  * A <dfn>response</dfn> (a [=/response=]), initially null.
-  * <dfn>Bytes</dfn> (a [=byte sequence=]), initially empty.
+  * A <dfn>response</dfn> (a [=/response=] or null), initially null.
+  * <dfn>Bytes</dfn> (a [=byte sequence=]), initially an empty [=byte sequence=].
   * A <dfn>result</dfn>, (any {{BackgroundFetchFailureReason}}, `"success"`, or `"redundant"`), initially the empty string.
 
   The [=background fetch response/response=] can be <dfn>exposed</dfn> if the [=background fetch response/result=] is the empty string, `"success"`, or `"bad-status"`.

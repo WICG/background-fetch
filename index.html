@@ -1212,9 +1212,9 @@ Possible extra rowspan handling
 		}
 	}
 </style>
-  <meta content="Bikeshed version d0d8d87ffe296a92b247fe143aae4c1411ba5f79" name="generator">
+  <meta content="Bikeshed version 090ef96cbce74475c89e94394cc8fa4fbc08b477" name="generator">
   <link href="https://wicg.github.io/background-fetch/" rel="canonical">
-  <meta content="25435ea142980ee9ccdf1e0f7874c06a76092873" name="document-revision">
+  <meta content="e16007fbbdd6ec79f69ea35df93eba6a36632a98" name="document-revision">
 <style>
   .algorithm dl {
     overflow: hidden;
@@ -1765,9 +1765,9 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
    <div>
     <ul>
      <li data-md>
-      <p>A <dfn class="dfn-paneled" data-dfn-for="background fetch response" data-dfn-type="dfn" data-noexport id="background-fetch-response-response">response</dfn> (a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response" id="ref-for-concept-response">response</a>), initially null.</p>
+      <p>A <dfn class="dfn-paneled" data-dfn-for="background fetch response" data-dfn-type="dfn" data-noexport id="background-fetch-response-response">response</dfn> (a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response" id="ref-for-concept-response">response</a> or null), initially null.</p>
      <li data-md>
-      <p><dfn class="dfn-paneled" data-dfn-for="background fetch response" data-dfn-type="dfn" data-noexport id="background-fetch-response-bytes">Bytes</dfn> (a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#byte-sequence" id="ref-for-byte-sequence">byte sequence</a>), initially empty.</p>
+      <p><dfn class="dfn-paneled" data-dfn-for="background fetch response" data-dfn-type="dfn" data-noexport id="background-fetch-response-bytes">Bytes</dfn> (a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#byte-sequence" id="ref-for-byte-sequence">byte sequence</a>), initially an empty <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#byte-sequence" id="ref-for-byte-sequence①">byte sequence</a>.</p>
      <li data-md>
       <p>A <dfn class="dfn-paneled" data-dfn-for="background fetch response" data-dfn-type="dfn" data-noexport id="background-fetch-response-result">result</dfn>, (any <code class="idl"><a data-link-type="idl" href="#enumdef-backgroundfetchfailurereason" id="ref-for-enumdef-backgroundfetchfailurereason①">BackgroundFetchFailureReason</a></code>, <code>"success"</code>, or <code>"redundant"</code>), initially the empty string.</p>
     </ul>
@@ -2173,7 +2173,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
    <h3 class="heading settled" data-level="4.8" id="header-equality-algorithm"><span class="secno">4.8. </span><span class="content"><a data-link-type="dfn" href="#header-equality" id="ref-for-header-equality②">Header equality</a></span><a class="self-link" href="#header-equality-algorithm"></a></h3>
    <p class="note" role="note"><span>Note:</span> This algorithm returns true if two <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list" id="ref-for-concept-header-list">header lists</a> contain the same value for a given header name, or neither has a header of that name.</p>
    <div class="algorithm" data-algorithm="header equality">
-     To determine <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="header-equality">header equality</dfn> for a <var>headerName</var> (a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#byte-sequence" id="ref-for-byte-sequence①">byte sequence</a>), in <var>headerList1</var> (a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list" id="ref-for-concept-header-list①">header list</a>), and <var>headerList2</var> (a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list" id="ref-for-concept-header-list②">header list</a>), run these steps: 
+     To determine <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="header-equality">header equality</dfn> for a <var>headerName</var> (a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#byte-sequence" id="ref-for-byte-sequence②">byte sequence</a>), in <var>headerList1</var> (a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list" id="ref-for-concept-header-list①">header list</a>), and <var>headerList2</var> (a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list" id="ref-for-concept-header-list②">header list</a>), run these steps: 
     <ol>
      <li data-md>
       <p>If <var>headerList1</var> does not <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#header-list-contains" id="ref-for-header-list-contains③">contain</a> <var>headerName</var>, and <var>headerList2</var> does not <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#header-list-contains" id="ref-for-header-list-contains④">contain</a> <var>headerName</var>, then return true.</p>
@@ -3752,8 +3752,8 @@ complete-length = ( 1*DIGIT / "*" )</pre>
   <aside class="dfn-panel" data-for="term-for-byte-sequence">
    <a href="https://infra.spec.whatwg.org/#byte-sequence">https://infra.spec.whatwg.org/#byte-sequence</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-byte-sequence">3.4. Background fetch response</a>
-    <li><a href="#ref-for-byte-sequence①">4.8. Header equality</a>
+    <li><a href="#ref-for-byte-sequence">3.4. Background fetch response</a> <a href="#ref-for-byte-sequence①">(2)</a>
+    <li><a href="#ref-for-byte-sequence②">4.8. Header equality</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-byte-case-insensitive">
