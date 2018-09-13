@@ -222,10 +222,10 @@ Note: This is the algorithm that manages the 'background' parts of a background 
       1. Set |eventConstructor| to {{BackgroundFetchEvent}}.
     1. Otherwise, if |failureReason| is not the empty string, then:
       1. Set |eventName| to "`backgroundfetchfail`".
-      1. Set |eventConstructor| to {{BackgroundFetchUpdateUIEvent}}.
+      1. Set |eventConstructor| to {{BackgroundFetchUpdateEvent}}.
     1. Otherwise:
       1. Set |eventName| to "`backgroundfetchsuccess`".
-      1. Set |eventConstructor| to {{BackgroundFetchUpdateUIEvent}}.
+      1. Set |eventConstructor| to {{BackgroundFetchUpdateEvent}}.
 
     1. [=Fire a functional event=] named |eventName| using |eventConstructor| on |swRegistration| with the following properties:
       : {{BackgroundFetchEvent/registration}}
@@ -574,12 +574,12 @@ The following is the <a>event handler</a> (and its corresponding <a>event handle
     <tr>
       <td><dfn>backgroundfetchsuccess</dfn></td>
       <td>{{ServiceWorkerGlobalScope/onbackgroundfetchsuccess}}</td>
-      <td>{{BackgroundFetchUpdateUIEvent}}</td>
+      <td>{{BackgroundFetchUpdateEvent}}</td>
     </tr>
     <tr>
       <td><dfn>backgroundfetchfail</dfn></td>
       <td>{{ServiceWorkerGlobalScope/onbackgroundfetchfail}}</td>
-      <td>{{BackgroundFetchUpdateUIEvent}}</td>
+      <td>{{BackgroundFetchUpdateEvent}}</td>
     </tr>
     <tr>
       <td><dfn>backgroundfetchabort</dfn></td>
@@ -619,12 +619,12 @@ interface BackgroundFetchManager {
   Promise<sequence<DOMString>> getIds();
 };
 
-dictionary BackgroundFetchUIOptions {
+dictionary BackgroundFetchUpdatableOptions {
   sequence<ImageResource> icons;
   DOMString title;
 };
 
-dictionary BackgroundFetchOptions : BackgroundFetchUIOptions {
+dictionary BackgroundFetchOptions : BackgroundFetchUpdatableOptions {
   unsigned long long downloadTotal = 0;
 };
 </script>
@@ -888,38 +888,38 @@ dictionary BackgroundFetchEventInit : ExtendableEventInit {
   The <dfn attribute>registration</dfn> attribute must return the value it was initialized to.
 </div>
 
-## {{BackgroundFetchUpdateUIEvent}} ## {#background-fetch-update-ui-event}
+## {{BackgroundFetchUpdateEvent}} ## {#background-fetch-update-event}
 
 <script type="idl">
 [Constructor(DOMString type, BackgroundFetchEventInit init), Exposed=ServiceWorker]
-interface BackgroundFetchUpdateUIEvent : BackgroundFetchEvent {
-  Promise<void> updateUI(optional BackgroundFetchUIOptions options);
+interface BackgroundFetchUpdateEvent : BackgroundFetchEvent {
+  Promise<void> update(optional BackgroundFetchUpdatableOptions options);
 };
 </script>
 
-<div dfn-for="BackgroundFetchUpdateUIEvent">
+<div dfn-for="BackgroundFetchUpdateEvent">
 
-  A {{BackgroundFetchUpdateUIEvent}} has an <dfn>UI updated flag</dfn> which is initially unset.
+  A {{BackgroundFetchUpdateEvent}} has an <dfn>updated flag</dfn> which is initially unset.
 
-  ### {{BackgroundFetchUpdateUIEvent/updateUI()}} ### {#background-fetch-update-ui-event-update-ui}
+  ### {{BackgroundFetchUpdateEvent/update()}} ### {#background-fetch-update-event-update}
 
   <div algorithm>
-    The <dfn method>updateUI(|options|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run these steps [=in parallel=]:
+    The <dfn method>update(|options|)</dfn> method, when invoked, must return [=a new promise=] |promise| and run these steps [=in parallel=]:
 
     1. If any of the following is true:
       * The [=context object=]'s {{Event/isTrusted}} attribute is false.
-      * The [=context object=]'s [=BackgroundFetchUpdateUIEvent/UI updated flag=] is set.
+      * The [=context object=]'s [=BackgroundFetchUpdateEvent/updated flag=] is set.
       * The [=context object=] is not [=ExtendableEvent/active=].
 
         Issue: [ServiceWorker/1348](https://github.com/w3c/ServiceWorker/pull/1348).
 
       Throw an {{InvalidStateError}} {{DOMException}}.
 
-    1. Set the [=context object=]'s [=BackgroundFetchUpdateUIEvent/UI updated flag=].
+    1. Set the [=context object=]'s [=BackgroundFetchUpdateEvent/updated flag=].
     1. If |options| is null, return.
     1. Let |bgFetch| be the [=context object=]'s [=BackgroundFetchEvent/background fetch=].
-    1. If |options|'s {{BackgroundFetchUIOptions/icons}} member is present, set |bgFetch|'s [=background fetch/icons=] to |options|'s {{BackgroundFetchUIOptions/icons}}.
-    1. If |options|'s {{BackgroundFetchUIOptions/title}} member is present, set |bgFetch|'s [=background fetch/title=] to |options|'s {{BackgroundFetchUIOptions/title}}.
+    1. If |options|'s {{BackgroundFetchUpdatableOptions/icons}} member is present, set |bgFetch|'s [=background fetch/icons=] to |options|'s {{BackgroundFetchUpdatableOptions/icons}}.
+    1. If |options|'s {{BackgroundFetchUpdatableOptions/title}} member is present, set |bgFetch|'s [=background fetch/title=] to |options|'s {{BackgroundFetchUpdatableOptions/title}}.
     1. [=Resolve=] |promise|.
   </div>
 </div>
