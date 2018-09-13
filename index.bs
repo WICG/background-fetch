@@ -685,7 +685,7 @@ dictionary BackgroundFetchOptions : BackgroundFetchUIOptions {
         :: |id|.
         : [=background fetch/records=]
         :: |records|.
-       m  : [=background fetch/download total=]
+        : [=background fetch/download total=]
         :: |options|' `downloadTotal` member.
         : [=background fetch/upload total=]
         :: |uploadTotal|.
