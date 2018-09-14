@@ -193,6 +193,7 @@ Note: This is the algorithm that manages the 'background' parts of a background 
 
   1. Let |swRegistration| be |bgFetch|'s [=background fetch/service worker registration=].
   1. Let |settledFetches| be 0.
+  1. Let |immediateFailure| be false.
   1. Let |failureReason| be the empty string.
   1. [=list/For each=] |record| in |bgFetch|'s [=background fetch/records=], run these steps [=in parallel=]:
     1. [=Complete a record=] for |bgFetch| and |record|.
@@ -201,7 +202,12 @@ Note: This is the algorithm that manages the 'background' parts of a background 
       1. Assert: |result| is not `"redundant"`.
       1. Set |failureReason| to |result|.
     1. Increment |settledFetches| by 1.
-  1. Wait for |settledFetches| to be |bgFetch|'s [=background fetch/records=]'s [=list/size=].
+    1. If |result| is `"download-total-exceeded"`, then set |immediateFailure| to true.
+  1. Wait for |settledFetches| to be |bgFetch|'s [=background fetch/records=]'s [=list/size=], or |immediateFailure| to be true.
+  1. If |immediateFailure| is true, set |bgFetch|'s [=background fetch/abort all flag=].
+
+    Note: The [=complete a record=] algorithm listens to this flag and terminates the fetch when set.
+
   1. [=Enqueue the following steps=] to |swRegistration|'s [=active background fetches edit queue=]:
     1. Let |activeBgFetches| be |swRegistration|'s [=active background fetches=].
     1. Let |id| be |bgFetch|'s [=background fetch/id=].
