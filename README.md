@@ -4,42 +4,34 @@ This is a proposal for a background-fetching API, to handle large upload/downloa
 
 A service worker is capable of fetching and caching assets, the size of which is restricted only by [origin storage](https://storage.spec.whatwg.org/#usage-and-quota). However, if the user navigates away from the site or closes the browser, the service worker is likely to be killed. This can happen even if there's a pending promise passed to `extendableEvent.waitUntil` - if it hasn't resolved within a few minutes the browser may consider it an abuse of service worker and kill the process.
 
-This makes it difficult to download and cache large assets such as podcasts and movies, and upload video and images. Even if the service worker isn't killed, having to keep the service worker in memory during this potentially long operation is wasteful.
+This is excellent for battery and privacy, but it makes it difficult to download and cache large assets such as podcasts and movies, and upload video and images.
+
+This spec aims to solve the long-running fetch case, without impacting battery live or privacy beyond that of a long-running download.
 
 # Features
 
-* Allow fetches (requests & responses) to continue even if the user closes all windows & worker to the origin.
+* Allow fetches (requests & responses) to continue even if the user closes all windows & workers to the origin.
 * Allow a single job to involve many requests, as defined by the app.
-* Allow the browser/OS to show UI to indicate the progress of the fetch, and allow the user to pause/abort.
-* Allow the browser/OS to deal with poor connectivity by pausing/resuming the download/upload (may be tricky with uploads, as ranged uploads aren't standardized)
-* Allow the app to react to success/failure of the background fetch group, perhaps by caching the results.
+* Allow the browser/OS to show UI to indicate the progress of that job, and allow the user to pause/abort.
+* Allow the browser/OS to deal with poor connectivity by pausing/resuming the download.
+* Allow the app to react to success/failure of the job, perhaps by caching the results.
 * Allow access to background-fetched resources as they fetch.
-* Allow the app to display progress information about a background fetch.
-* Allow the app to suggest which connection types the fetch should be restricted to.
-
-These are eventual goals, some features be missing from "v1".
 
 # API Design
-
-**OUT OF DATE**. The rest of this doc is out of date. I'm working on the spec right now, and will update this once changes settle. The spec however, is up-to-date.
 
 ## Starting a background fetch
 
 ```js
 const registration = await navigator.serviceWorker.ready;
-const bgFetchJob = await registration.backgroundFetch.fetch(id, requests, options);
+const bgFetchReg = await registration.backgroundFetch.fetch(id, requests, options);
 ```
 
-* `id` - a unique identifier for this job.
+* `id` - a unique identifier for this background fetch.
 * `requests` - a sequence of URLs or `Request` objects.
 * `options` - an object containing any of:
-  * `icons` - A sequence of icon definitions, similar to [`icons` in the manifest spec](https://w3c.github.io/manifest/#icons-member).
+  * `icons` - A sequence of icon definitions.
   * `title` - Something descriptive to show in UI, such as "Uploading 'Holiday in Rome'" or "Downloading 'Catastrophe season 2 episode 1'".
-  * `downloadTotal` - A hint for the UI, so it can display progress before receiving all `Content-Length` headers, or if any are missing. This is in bytes, before transport compression. This is only a hint, the browser will disregard the value if/once it's found to be incorrect.
-  * `networkType` - "auto" or "avoid-cellular", defaults to "auto".
-  * `powerStatus` - "auto" or "avoid-draining", defaults to "auto".
-
-`networkType`/`powerStatus` are unlikely to be in "v1". The naming here is also difficult, I took them from [background sync](https://github.com/WICG/BackgroundSync/issues/35).
+  * `downloadTotal` - The total unencoded download size. This allows the UI to tell the user how big the total of the resources is. If omitted, the UI will be in a non-determinate state.
 
 `backgroundFetch.fetch` will reject if:
 
@@ -49,84 +41,94 @@ const bgFetchJob = await registration.backgroundFetch.fetch(id, requests, option
 * The browser fails to store the requests and their bodies.
 * `downloadTotal` suggests there isn't enough quota to complete the job.
 
+The operation will later fail if:
+
+* A fetch with a non-`GET` request fails. There's no HTTP mechanism to resume uploads.
+* Fetch rejects when the user isn't offline. As in, CORS failure, MIX issues, CSP issue etc etc.
+* The unencoded download size exceeds the provided `downloadTotal`.
+* The server provides an unexpected partial response.
+* Quota is exceeded.
+* A response does not have an ok status.
+
+If `downloadTotal` is exceeded, the operation fails immediately. Otherwise, the other fetches will be given a chance to settle. This means if the user is uploading 100 photos, 99 won't be aborted just because one fails. The operation as a whole will still be considered a failure, but the app can communicate what happened to the user.
+
+`bgFetchReg` has the following:
+
+* `id` - identifier string.
+* `uploadTotal` - total bytes to send.
+* `uploaded` - bytes sent so far.
+* `downloadTotal` - as provided.
+* `downloaded` - bytes stored so far.
+* `result` -  `""`, `"success"`, `"failure"`.
+* `failureReason` - `""`, `"aborted"`, `"bad-status"`, `"fetch-error"`, `"quota-exceeded"`, `"download-total-exceeded"`.
+* `recordsAvailable` - Does the underlying request/response data still exist? It's removed once the operation is complete.
+* `activeFetches` - provides access to the in-progress fetches.
+* `onprogress` - Event when the above properties change.
+* `abort()` - abort the whole background fetch job. This returns a promise that resolves with a boolean, which is true if the operation successfully aborted.
+* `match(request, options)` - Access one of the fetch records.
+* `matchAll(request, options)` - Access some of the fetch records.
+
+
 ## Getting an instance of a background fetch
 
 ```js
 const registration = await navigator.serviceWorker.ready;
-const bgFetchJob = await registration.backgroundFetch.get(id);
+const bgFetchReg = await registration.backgroundFetch.get(id);
 ```
 
-`bgFetchJob` has the following members:
-
-* `id` - identifier string.
-* `uploadTotal` - total bytes to send.
-* `uploadProgress` - bytes sent so far.
-* `downloadTotal` - as provided.
-* `downloadProgress` - bytes received so far.
-* `activeFetches` - provides access to the in-progress fetches.
-* `abort()` - abort the whole background fetch job. This returns a promise that resolves with a boolean, which is true if the operation successfully aborted.
-* `onprogress` - Event when `downloadProgress` or `uploadProgress` update.
-
-`BackgroundFetch` objects will also include [fetch controller/observer objects](https://github.com/whatwg/fetch/issues/447) as they land.
-
 If no job with the identifier `id` exists, `get` resolves with undefined.
-
-I don't like the naming of `responseReady` above. Ideas?
 
 ## Getting all background fetches
 
 ```js
 const registration = await navigator.serviceWorker.ready;
-const identifiers = await registration.backgroundFetch.getIdentifiers();
+const ids = await registration.backgroundFetch.getIds();
 ```
 
-…where `identifiers` is a sequence of unique identifier strings.
+…where `ids` is a sequence of unique identifier strings.
 
-Eventually, `registration.backgroundFetch` will become an async iterator, allowing:
+## Background fetch records
 
 ```js
-for await (const bgFetchJob of registration.backgroundFetch) {
-  // …
-}
+const bgFetchReg = await registration.backgroundFetch.get(id);
+const record = bgFetchReg.match(request);
 ```
 
-## Reacting to 'success'
+`record` has the following:
 
-Fires if all responses in a background fetch were successfully & fully read, and all status codes were [ok](https://fetch.spec.whatwg.org/#ok-status).
+* `request`. A Request.
+* `responseReady`. A promise for a Response. This will reject if the fetch fails.
+
+## Reacting to success
+
+Fires in the service worker if all responses in a background fetch were successfully & fully read, and all status codes were [ok](https://fetch.spec.whatwg.org/#ok-status).
 
 ```js
-addEventListener('backgroundfetched', bgFetchEvent => {
+addEventListener('backgroundfetchsuccess', bgFetchEvent => {
   // …
 });
 ```
 
 `bgFetchEvent` extends [`ExtendableEvent`](https://w3c.github.io/ServiceWorker/#extendableevent), with the following additional members:
 
-* `id` - identifier of the background fetch job.
-* `fetches` - provides access to the fetches.
-* `updateUI(title)` - update the title, eg "Uploaded 'Holiday in Rome'", "Downloaded 'Catastrophe season 2 episode 1'", or "Level 5 ready to play!". If this isn't called, the browser may update the title itself.
+* `registration` - The background fetch registration.
+* `updateUI({ title, icons})` - update the UI, eg "Uploaded 'Holiday in Rome'", "Downloaded 'Catastrophe season 2 episode 1'", or "Level 5 ready to play!".
 
 Once this event is fired, the background fetch job is no longer stored against the registration, so `backgroundFetch.get(bgFetchEvent.id)` will resolve with undefined.
 
+Once this has completed (including promises passed to `waitUntil`), `recordsAvailable` becomes false, and the requests/responses can no longer be accessed.
+
 ## Reacting to failure
 
-As `backgroundfetched`, but one or more of the fetches encountered an error.
+As `backgroundfetchsuccess`, but one or more of the fetches encountered an error.
 
 ```js
-addEventListener('backgroundfetchfail', bgFetchFailEvent => {
+addEventListener('backgroundfetchfail', bgFetchEvent => {
   // …
 });
 ```
 
-`bgFetchFailEvent` extends `bgFetchEvent`, with the following additional members:
-
-* `fetches` - provides access to the fetches.
-
-Again, once this event is fired, the background fetch job is no longer stored against the registration, so `backgroundFetch.get(bgFetchEvent.id)` will resolve with undefined.
-
-In an earlier draft, this event and `backgroundfetched` were the same thing, including a property that indicated success/failure. It felt wrong when writing examples, so I split them out.
-
-This event should fire after all fetches have completed or been abandoned. As in, this event *doesn't* fire as soon as a single request fails.
+Aside from the event name, the details are the same as `backgroundfetchsuccess`.
 
 ## Reacting to abort
 
@@ -140,9 +142,9 @@ addEventListener('backgroundfetchabort', bgFetchAbortEvent => {
 
 `bgFetchAbortEvent` extends [`ExtendableEvent`](https://w3c.github.io/ServiceWorker/#extendableevent), with the following additional members:
 
-* `id` - identifier of the background fetch job.
+* `registration` - The background fetch registration.
 
-Again, once this event is fired, the background fetch job is no longer stored against the registration, so `backgroundFetch.get(bgFetchAbortEvent.id)` will resolve with undefined.
+The rest is as `backgroundfetchsuccess`.
 
 ## Reacting to click
 
@@ -154,10 +156,11 @@ addEventListener('backgroundfetchclick', bgFetchClickEvent => {
 });
 ```
 
-* `id` - identifier of the background fetch job.
-* `state` - "pending", "succeeded" or "failed".
+* `registration` - The background fetch registration.
 
-Since this is a user interaction event, developers can call `clients.openWindow` in response. If a window isn't created/focused, the browser may open a related URL (the root of the origin, or a `start_url` from a related manifest).
+Since this is a user interaction event, developers can call `clients.openWindow` in response.
+
+The rest is as `backgroundfetchsuccess`.
 
 # Possible UI
 
@@ -174,48 +177,11 @@ If aborted by the user, the notification is likely to disappear immediately. If 
 
 Once ended, the progress bar will be replaced with an indication of how much data was transferred. The button to pause/abort the job will no longer be there. The notification will no longer be sticky.
 
-If the job has ended, clicking the notification may close/hide it.
-
-# Retrying
-
-The browser may retry particular requests in response to network failures. Range requests may be used to resume particular requests.
-
-We need to think about which cases are "retryable", and which indicate terminal failure. Eg, a POST that results in a network failure may be "retryable", but a POST that results in a 403 may not. We also need to define how often a "retryable" request can be retried before failing, and any kind of delay before retrying.
-
-Range requests probably don't make sense for non-GET requests.
-
-Eventually we'd like uploads to be resumable, but there's no standard for that.
+If the job has ended, clicking the notification may also close/hide it (in addition to firing the event).
 
 # Quota usage
 
-The background fetch job, including its requests & in-progress responses, can be accessed at any time until the `backgroundfetched`, `backgroundfetchfail`, or `backgroundfetchabort` event fires, so they count against origin quota. After the point, the event receives the requests and responses (except in the case of abort) for the final time, once these copies are drained, they're gone.
-
-A requirement is to avoid doubling quota usage when transferring background-fetched items into the cache, unless clones exist.
-
-```js
-addEventListener('backgroundfetched', event => {
-  event.waitUntil(async function() {
-    const cache = await caches.open('my-cache');
-    const fetches = await event.fetches.values();
-    const promises = fetches.map(({request, response}) => {
-      if (response && response.ok) {
-        return cache.put(request, response);
-      }
-    });
-
-    await Promise.all(promises);
-  }());
-});
-```
-
-A user agent could implement this using streams. Given a response body can only be read once, it can drain it from background fetch storage, whilst feeding it into the cache.
-
-# Differences to fetch
-
-Background fetch will behave like `fetch()` (including in terms of CSP), with the following exceptions:
-
-* The [keepalive flag](https://fetch.spec.whatwg.org/#request-keepalive-flag) will be set.
-* The browser may, for GET requests, download the resource in chunks using range requests, and use them to build a single response. We need to define how this happens.
+The background fetch requests & in-progress responses can be accessed at any time until the `backgroundfetchsuccess`, `backgroundfetchfail`, or `backgroundfetchabort` event end, so they count against origin quota.
 
 # Lifecycle
 
@@ -227,9 +193,7 @@ This means the feature may be used in "private browsing modes" that use a tempor
 
 [Some browsers can already start downloads without user interaction](http://output.jsbin.com/fimukur/quiet), but they're easily abortable. We're following the same pattern here.
 
-Background fetch may happen as the result of other background operations, such as push messages, but the download notification will be visible, even after completion. Ideally this will let the user know if a particular origin is behaving badly.
-
-Given that background fetches are pausable and abortable, a browser may choose to start a background fetch in a paused state, and present UI to the user asking if they'd like to continue.
+Background fetch may happen as the result of other background operations, such as push messages. In this case the background fetch may start in a paused state, effectively asking the user permission to continue.
 
 The icon and title of the background fetch are controllable by the origin. Hopefully the UI can make clear which parts are under the site's control, and which parts are under the browser's control (origin, data used, abort/pause). There's some prior art here with notifications.
 
@@ -241,216 +205,183 @@ Background-fetch is intended to be very user-visible, via OS-level UI such as a 
 
 # Examples
 
-## Downloading a podcast in reaction to a push message
+## Downloading a movie
+
+Movies are either one large file (+ extra things like metadata and artwork), or 1000s of chunks.
+
+In the page:
 
 ```js
-// in the service worker:
-addEventListener('push', event => {
-  if (event.data.text() == 'new-podcasts') {
-    event.waitUntil(async function() {
-      const podcasts = await getNewPodcasts();
-      await addPodcastsToDatabase(podcasts);
+downloadButton.addEventListener('click', async () => {
+  try {
+    const movieData = getMovieDataSomehow();
+    const reg = await navigator.serviceWorker.ready;
+    const bgFetch = await reg.backgroundFetch.fetch(`movie-${movieData.id}`, movieData.urls, {
+      icons: movieData.icons,
+      title: `Downloading ${movieData.title}`,
+      downloadTotal: movieData.downloadTotal
+    });
+    // Update the UI.
 
-      try {
-        // Each podcast should be a separate background download, but each podcast
-        // may contain multiple resources, eg mp3 & artwork.
-        const promises = podcasts.map(podcast => {
-          return self.registration.backgroundFetch.fetch(`podcast-${podcast.id}`, podcast.urls, {
-            icons: podcast.icons,
-            title: `Downloading ${podcast.showName} - ${podcast.episodeName}`,
-            downloadTotal: podcast.downloadTotal
-          });
-        });
-
-        await Promise.all(promises);
-      }
-      catch (err) {
-        // Can't fetch urls or background download, just tell the user
-        // there are new podcasts
-        self.registration.showNotification("New podcasts ready to download!");
-      }
-    }());
-  }
-});
-
-// Success!
-addEventListener('backgroundfetched', event => {
-  if (event.id.startsWith('podcast-')) {
-    event.waitUntil(async function() {
-      // Get podcast by ID
-      const podcast = await getPodcast(/podcast-(.*)$/.exec(event.id)[0]);
-
-
-      // Cache podcasts
-      const cache = await caches.open(event.id);
-      const fetches = await event.fetches.values();
-      const promises = event.fetches.map(({request, response}) => {
-        return cache.put(request, response);
-      });
-
-      await Promise.all(promises);
-      event.updateUI(`Downloaded ${podcast.showName} - ${podcast.episodeName}`);
-    }());
-  }
-});
-
-// Failed!
-addEventListener('backgroundfetchfail', event => {
-  if (event.id.startsWith('podcast-')) {
-    event.waitUntil(async function() {
-      // Get podcast by ID
-      const podcast = await getPodcast(/podcast-(.*)$/.exec(event.id)[0]);
-      // Aww.
-      event.updateUI(`Failed to download ${podcast.showName} - ${podcast.episodeName}`);
-    }());
-  }
-});
-
-// Clicked!
-addEventListener('backgroundfetchclick', event => {
-  if (event.id.startsWith('podcast-')) {
-    event.waitUntil(async function() {
-      // Get podcast by ID
-      const podcast = await getPodcast(/podcast-(.*)$/.exec(event.id)[0]);
-
-      // Happy to open this url no matter what the state is.
-      clients.openWindow(podcast.pageUrl);
-    }());
+    bgFetch.addEventListener('progress', () => {
+      // Update the UI some more.
+    });
+  } catch (err) {
+    // Display an error to the user
   }
 });
 ```
 
-## Playing a podcast as it's background-fetching
+In the service worker:
 
 ```js
-addEventListener('fetch', event => {
-  if (isPodcastAudioRequest(event.request)) {
-    const podcastId = getPodcastId(event.request);
+addEventListener('backgroundfetchsuccess', (event) => {
+  event.waitUntil(async function() {
+    // Copy the fetches into a cache:
+    try {
+      const cache = await caches.open(event.registration.id);
+      const records = await event.registration.matchAll();
+      const promises = records.map(async (record) => {
+        const response = await record.responseReady;
+        await cache.put(record.request, response);
+      });
+      await promises;
+      const movieData = await getMovieDataSomehow(event.registration.id);
+      await event.updateUI({ title: `${movieData.title} downloaded!` });
+    } catch (err) {
+      event.updateUI({ title: `Movie download failed` });
+    }
+  }());
+});
 
+// There's a lot of this that's copied from 'backgroundfetchsuccess', but I've avoided
+// abstracting it for this example.
+addEventListener('backgroundfetchfail', (event) => {
+  event.waitUntil(async function() {
+    // Store everything successful, maybe we can just refetch the bits that failed
+    try {
+      const cache = await caches.open(event.registration.id);
+      const records = await event.registration.matchAll();
+      const promises = records.map(async (record) => {
+        const response = await record.responseReady.catch(() => undefined);
+        if (response && response.ok) {
+          await cache.put(record.request, response);
+        }
+      });
+      await promises;
+    } finally {
+      const movieData = await getMovieDataSomehow(event.registration.id);
+      await event.updateUI({ title: `${movieData.title} download failed.` });
+    }
+  }());
+});
+
+addEventListener('backgroundfetchclick', (event) => {
+  event.waitUntil(async function() {
+    const movieData = await getMovieDataSomehow(event.registration.id);
+    clients.openWindow(movieData.pageUrl);
+  }());
+});
+
+// Allow the data to be fetched while it's being downloaded:
+addEventListener('fetch', (event) => {
+  if (isMovieFetch(event)) {
     event.respondWith(async function() {
-      const bgFetchJob = await self.registration.backgroundFetch.get(`podcast-${podcastId}`);
+      const cachedResponse = await caches.match(event.request);
+      if (cachedResponse) return cachedResponse;
 
-      if (bgFetchJob) {
-        // Look for response in fetches
-        const activeFetch = await bgFetchJob.activeFetches.match(event.request);
-        if (activeFetch) return activeFetch.responseDone;
+      // Maybe it's mid-download?
+      const movieData = getMovieDataSomehow(event.request);
+      const bgFetch = await registration.backgroundFetch.get(`movie-${movieData.id}`);
+
+      if (bgFetch) {
+        const record = await bgFetch.match(event.request);
+        if (record) return record.responseReady;
       }
 
-      // Else fall back to cache or network
-      const response = await caches.match(event.request);
-      return response || fetch(event.request);
+      return fetch(event.request);
     }());
   }
+  // …
 });
 ```
 
-## Downloading a level of a game
+## Uploading photos
+
+In the page:
 
 ```js
-// in the page:
-(async function() {
-  const response = await fetch('/level-20-assets.json');
-  const data = await response.json();
-  const id = 'level-20';
-
-  const reg = await navigator.serviceWorker.ready;
-
+uploadButton.addEventListener('click', async () => {
   try {
-    await self.registration.backgroundFetch.fetch(id, data.urls, {
-      icons: data.icons,
-      title: "Download level 20",
-      downloadTotal: data.downloadTotal
-    });
-  }
-  catch {
-    // Can't background fetch? Fallback to downloading from the page:
-    const cache = await caches.open(id);
-    await cache.addAll(data.urls);
-    showInPageNotification('Level 20 ready to play!');
-  }
-}());
-```
+    // Create the requests:
+    const galleryId = createGalleryIdSomehow();
+    const photos = getPhotoFilesSomehow();
+    const requests = photos.map((photo) => {
+      const body = new FormData();
+      body.set('gallery', galleryId);
+      body.set('photo', photo);
 
-```js
-// in the service worker:
-self.addEventListener('backgroundfetched', event => {
-  if (event.id.startsWith('level-')) {
-    const level = /^level-(.*)$/.exec(event.id)[1];
-
-    event.waitUntil(async function() {
-      const cache = await caches.open(event.id);
-      const fetches = await event.fetches.values();
-      const promises = event.fetches.map(({request, response}) => {
-        return cache.put(request, response);
+      return new Request('/upload-photo', {
+        body,
+        method: 'POST',
+        credentials: 'include',
       });
-
-      await Promise.all(promises);
-
-      event.updateUI(`Level ${level} ready to play!`);
-    }());
-  }
-});
-
-addEventListener('backgroundfetchfail', event => {
-  if (event.id.startsWith('level-')) {
-    const level = /^level-(.*)$/.exec(event.id)[1];
-    event.updateUI(`Failed to download level ${level}`);
-  }
-});
-
-addEventListener('backgroundfetchclick', event => {
-  if (event.id.startsWith('level-')) {
-    clients.openWindow(`/`);
-  }
-});
-```
-
-## Uploading a video in the background
-
-```js
-// in the page:
-form.addEventListener('submit', async event => {
-  event.preventDefault();
-  const body = new FormData(form);
-  const videoName = body.get('video').name;
-  const id = 'video-upload-' + videoName;
-  const request = new Request('/upload-video', { body, method: 'POST' });
-
-  const reg = await navigator.serviceWorker.ready;
-
-  try {
-    await reg.backgroundFetch.fetch(id, request, {
-      title: "Uploading video"
     });
-  }
-  catch () {
-    // Failed, try and upload from the page.
-    // First store the video in IDB in case the user closes the tab
-    await storeInIDB(body);
-    const response = await fetch('/upload-video', { body, method: 'POST' });
-    if (response.ok) showUploadAsComplete();
+
+    const reg = await navigator.serviceWorker.ready;
+    const bgFetch = await reg.backgroundFetch.fetch(`photo-upload-${galleryId}`, requests, {
+      icons: getAppIconsSomehow(),
+      title: `Uploading photos`,
+    });
+
+    // Update the UI.
+
+    bgFetch.addEventListener('progress', () => {
+      // Update the UI some more.
+    });
+  } catch (err) {
+    // Display an error to the user
   }
 });
 ```
 
+In the service worker:
+
 ```js
-// in the service worker:
-addEventListener('backgroundfetched', event => {
-  if (event.id.startsWith('video-upload-')) {
-    event.updateUI("Video uploaded!");
-  }
+addEventListener('backgroundfetchsuccess', (event) => {
+  event.waitUntil(async function() {
+    const galleryId = getGalleryIdSomehow(event.registration.id);
+    await event.updateUI({ title: `Photos uploaded` });
+
+    // The gallery is complete, so we can show it to the user's friends:
+    await fetch('/enable-gallery', {
+      method: 'POST',
+      body: new URLSearchParams({ id: galleryId }),
+    })
+  }());
 });
 
-addEventListener('backgroundfetchfail', event => {
-  if (event.id.startsWith('video-upload-')) {
-    event.updateUI("Upload failed");
+addEventListener('backgroundfetchfail', (event) => {
+  event.waitUntil(async function() {
+    const records = await event.registration.matchAll();
+    let failed = 0;
 
-    // Store the data in IDB so it isn't lost:
-    event.waitUntil(async function() {
-      const fetches = await event.fetches.values();
-      const formData = fetches[0].request.formData();
-      await storeInIDB(formData);
-    }());
-  }
+    for (const record of records) {
+      const response = await record.responseReady.catch(() => undefined);
+      if (response && response.ok) continue;
+      failed++;
+    }
+
+    if (successful) {
+      event.updateUI({ title: `${failed}/${records.length} uploads failed` });
+    }
+  }());
+});
+
+addEventListener('backgroundfetchclick', (event) => {
+  event.waitUntil(async function() {
+    const galleryId = getGalleryIdSomehow(event.registration.id);
+    clients.openWindow(`/galleries/${galleryId}`);
+  }());
 });
 ```
