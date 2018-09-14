@@ -155,9 +155,9 @@ A <dfn>background fetch</dfn> consists of:
     * The UI may be activated (for example, by clicking), in which case [=fire a background fetch click event=].
     * The UI may remain once the operation is complete, in which case it can still be activated.
 
-    The user agent may set |bgFetch|'s [=background fetch/paused flag=] at the beginning of this algorithm, allowing the user to either accept the background fetch (unsetting |bgFetch|'s [=background fetch/paused flag=]), or refuse the background fetch (setting |bgFetch|'s [=background fetch/abort all flag=]).
+    Let |permission| be the [=permission state=] for a {{PermissionDescriptor}} with {{PermissionDescriptor/name}} `"background-fetch"` and |environment|. If |permission| is `"prompt"`, then the user agent may set |bgFetch|'s [=background fetch/paused flag=] at the beginning of this algorithm. The user agent should allow the user to either accept the background fetch (unsetting |bgFetch|'s [=background fetch/paused flag=]), or refuse the background fetch (setting |bgFetch|'s [=background fetch/abort all flag=]). The user agent may also provide always-allow and alway-deny options, which can be used as [=new information about the user's intent=] for this permission.
 
-    Note: The user agent may consider initially setting |bgFetch|'s [=background fetch/paused flag=] if the user is on a metered connection, or the background fetch was started in the background.
+    The user agent may also consider initially setting |bgFetch|'s [=background fetch/paused flag=] if the user is on a metered connection, or the background fetch was started in the background.
   </div>
 </div>
 
@@ -657,6 +657,8 @@ dictionary BackgroundFetchOptions : BackgroundFetchUIOptions {
       1. [=list/Append=] |record| to |records|.
     1. Let |promise| be [=a new promise=].
     1. [=Enqueue the following steps=] to |registration|'s [=active background fetches edit queue=]:
+      1. Let |permission| be the [=permission state=] for a {{PermissionDescriptor}} with {{PermissionDescriptor/name}} `"background-fetch"`, and the [=context object=]'s [=relevant settings object=].
+      1. If |permission| is `"denied"`, then reject |promise| with a {{NotAllowedError}} {{DOMException}} and abort these steps.
       1. Let |bgFetchMap| be |registration|'s [=active background fetches=].
       1. If |registration|'s [=service worker registration/active worker=] is null, then reject |promise| with a {{TypeError}} and abort these steps.
       1. If |bgFetchMap|[|id|] [=map/exists=], [=reject=] |promise| with a {{TypeError}} and abort these steps.
