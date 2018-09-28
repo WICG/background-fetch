@@ -945,7 +945,7 @@ interface BackgroundFetchUpdateUIEvent : BackgroundFetchEvent {
   </div>
 </div>
 
-# Automation # {#automatction}
+# Automation # {#automation}
 
 For the purposes of user-agent automation and application testing, this document defines the following [=extension command=] for the [[WebDriver]] specification.
 
