@@ -1214,7 +1214,7 @@ Possible extra rowspan handling
 </style>
   <meta content="Bikeshed version dff342f4b23fb230b71436fb31b55f5f169715bd" name="generator">
   <link href="https://wicg.github.io/background-fetch/" rel="canonical">
-  <meta content="3cd08be47d0917aa3128fbcc30611fd3bb99e433" name="document-revision">
+  <meta content="80155298a987e90ad4a64716428851b589ef3d96" name="document-revision">
 <style>
   .algorithm dl {
     overflow: hidden;
@@ -1629,6 +1629,13 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
    <h2 class="heading settled" data-level="2" id="realms"><span class="secno">2. </span><span class="content">Realms</span><a class="self-link" href="#realms"></a></h2>
    <p>All platform objects are created in the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object">context object</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-realm" id="ref-for-concept-relevant-realm">relevant Realm</a> unless otherwise specified.</p>
    <h2 class="heading settled" data-level="3" id="infrastructure"><span class="secno">3. </span><span class="content">Infrastructure</span><a class="self-link" href="#infrastructure"></a></h2>
+   <p>A resource is considered <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="temporarily-unavailable">temporarily unavailable</dfn> if the user agent believes the resource may soon become available. Reasons may include:</p>
+   <ul>
+    <li data-md>
+     <p>The user agent is offline.</p>
+    <li data-md>
+     <p>The user agent is behind a captive portal.</p>
+   </ul>
    <p>The <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="background-fetch-task-source">background fetch task source</dfn> is a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#task-source" id="ref-for-task-source">task source</a>.</p>
    <div class="algorithm" data-algorithm="queue a bgfetch task"> To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="queue-a-bgfetch-task">queue a bgfetch task</dfn> on an optional <var>eventLoop</var> (an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#event-loop" id="ref-for-event-loop">event loop</a>, defaulting to the caller’s <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object①">context object</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object" id="ref-for-relevant-settings-object">relevant settings object</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#responsible-event-loop" id="ref-for-responsible-event-loop">responsible event loop</a>) with <var>steps</var> (steps), <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task">queue a task</a> on <var>eventLoop</var> using the <a data-link-type="dfn" href="#background-fetch-task-source" id="ref-for-background-fetch-task-source">background fetch task source</a> to run <var>steps</var>. </div>
    <h3 class="heading settled" data-level="3.1" id="service-worker-registration-concept-extensions"><span class="secno">3.1. </span><span class="content">Extensions to service worker registration</span><a class="self-link" href="#service-worker-registration-concept-extensions"></a></h3>
@@ -1931,8 +1938,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
         <p>If <var>response</var> is a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-network-error" id="ref-for-concept-network-error">network error</a>, then:</p>
         <ol>
          <li data-md>
-          <p>If the user agent is offline and <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-method" id="ref-for-concept-request-method②">method</a> is `<code>GET</code>`, then wait until the user agent is not offline then set <var>fetchAttemptComplete</var> to true and abort these steps.</p>
-          <p class="issue" id="issue-6a6d7250"><a class="self-link" href="#issue-6a6d7250"></a> Is "user agent is offline" hand-waving too much? Also discussed in <a href="https://github.com/whatwg/fetch/issues/526#issuecomment-380686368">fetch/526</a>.</p>
+          <p>If the resource is <a data-link-type="dfn" href="#temporarily-unavailable" id="ref-for-temporarily-unavailable">temporarily unavailable</a> and <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-method" id="ref-for-concept-request-method②">method</a> is `<code>GET</code>`, then wait until the resource is not <a data-link-type="dfn" href="#temporarily-unavailable" id="ref-for-temporarily-unavailable①">temporarily unavailable</a>, then set <var>fetchAttemptComplete</var> to true and abort these steps.</p>
           <p class="note" role="note"><span>Note:</span> If <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-method" id="ref-for-concept-request-method③">method</a> is not `<code>GET</code>`, reissuing the request may have unwanted side effects. If a standard method to resume requests becomes available, it’ll be adopted here.</p>
          <li data-md>
           <p>If <var>response</var> is an <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-aborted-network-error" id="ref-for-concept-aborted-network-error">aborted network error</a>, then set <var>responseData</var>’s <a data-link-type="dfn" href="#background-fetch-response-result" id="ref-for-background-fetch-response-result②">result</a> to <code>"aborted"</code>, otherwise <code>"fetch-error"</code>.</p>
@@ -2011,7 +2017,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
         <p>If at any point <var>stream</var> becomes <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-readablestream-errored" id="ref-for-concept-readablestream-errored">errored</a>, then:</p>
         <ol>
          <li data-md>
-          <p>If the user agent is offline and <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-method" id="ref-for-concept-request-method④">method</a> is `<code>GET</code>`, then wait until the user agent is not offline, then set <var>fetchAttemptComplete</var> to true.</p>
+          <p>If the resource is <a data-link-type="dfn" href="#temporarily-unavailable" id="ref-for-temporarily-unavailable②">temporarily unavailable</a> and <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-method" id="ref-for-concept-request-method④">method</a> is `<code>GET</code>`, then   wait until the resource is not <a data-link-type="dfn" href="#temporarily-unavailable" id="ref-for-temporarily-unavailable③">temporarily unavailable</a>, then set <var>fetchAttemptComplete</var> to true.</p>
          <li data-md>
           <p>Otherwise, set <var>responseData</var>’s <a data-link-type="dfn" href="#background-fetch-response-result" id="ref-for-background-fetch-response-result①⓪">result</a> to <code>"fetch-error"</code> and <var>fetchAttemptComplete</var> to true.</p>
         </ol>
@@ -3303,6 +3309,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
    <li><a href="#single-byte-content-range">single byte content-range</a><span>, in §5</span>
    <li><a href="#background-fetch-stored-body-bytes-total">stored body bytes total</a><span>, in §3.2</span>
    <li><a href="#dom-backgroundfetchresult-success">"success"</a><span>, in §6.4</span>
+   <li><a href="#temporarily-unavailable">temporarily unavailable</a><span>, in §3</span>
    <li>
     title
     <ul>
@@ -4514,11 +4521,16 @@ complete-length = ( 1*DIGIT / "*" )</pre>
    <div class="issue"> <a href="https://github.com/w3c/manifest/pull/710">manifest/pull/710</a>.<a href="#issue-20b63876"> ↵ </a></div>
    <div class="issue"> <a href="https://github.com/w3c/ServiceWorker/pull/1348">ServiceWorker/1348</a>.<a href="#issue-b420dc4f"> ↵ </a></div>
    <div class="issue"> The remainder of this step uses fetch "callbacks" which currently queue tasks. This isn’t desirable or possible here, so let’s pretend that tasks aren’t queued. (<a href="https://github.com/whatwg/fetch/issues/536#issuecomment-330184276">issue</a>)<a href="#issue-775cdb79"> ↵ </a></div>
-   <div class="issue"> Is "user agent is offline" hand-waving too much? Also discussed in <a href="https://github.com/whatwg/fetch/issues/526#issuecomment-380686368">fetch/526</a>.<a href="#issue-6a6d7250"> ↵ </a></div>
    <div class="issue"> I need to debounce this similar to how mouse move events debounce.<a href="#issue-20ad71fa"> ↵ </a></div>
    <div class="issue"> Parsing as an integer <a href="https://github.com/whatwg/infra/issues/189">infra/189</a>.<a href="#issue-cddfe468"> ↵ </a></div>
    <div class="issue"> <a href="https://github.com/w3c/ServiceWorker/pull/1348">ServiceWorker/1348</a>.<a href="#issue-b420dc4f①"> ↵ </a></div>
   </div>
+  <aside class="dfn-panel" data-for="temporarily-unavailable">
+   <b><a href="#temporarily-unavailable">#temporarily-unavailable</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-temporarily-unavailable">4.2. Complete a record</a> <a href="#ref-for-temporarily-unavailable①">(2)</a> <a href="#ref-for-temporarily-unavailable②">(3)</a> <a href="#ref-for-temporarily-unavailable③">(4)</a>
+   </ul>
+  </aside>
   <aside class="dfn-panel" data-for="background-fetch-task-source">
    <b><a href="#background-fetch-task-source">#background-fetch-task-source</a></b><b>Referenced in:</b>
    <ul>
