@@ -1212,9 +1212,9 @@ Possible extra rowspan handling
 		}
 	}
 </style>
-  <meta content="Bikeshed version 090ef96cbce74475c89e94394cc8fa4fbc08b477" name="generator">
+  <meta content="Bikeshed version e11b92b98e366cc29d0c6509f84bde4ced535e53" name="generator">
   <link href="https://wicg.github.io/background-fetch/" rel="canonical">
-  <meta content="5fd3afa6b96792c846af7d4d0ec4ae64064ee0c3" name="document-revision">
+  <meta content="735ba263c243d2fb12759b6d78ed9e8e5ae9aa32" name="document-revision">
 <style>
   .algorithm dl {
     overflow: hidden;
@@ -1492,7 +1492,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">Background Fetch</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Editor’s Draft, <time class="dt-updated" datetime="2018-09-14">14 September 2018</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Editor’s Draft, <time class="dt-updated" datetime="2018-10-01">1 October 2018</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -2879,7 +2879,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
          <p>For each <var>record</var> of <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object②①">context object</a>'s <a data-link-type="dfn" href="#backgroundfetchregistration-background-fetch" id="ref-for-backgroundfetchregistration-background-fetch①①">background fetch</a>'s <a data-link-type="dfn" href="#background-fetch-records" id="ref-for-background-fetch-records⑤">records</a>:</p>
          <ol>
           <li data-md>
-           <p>If <a data-link-type="dfn">request matches cached item</a> for <var>request</var>, <var>record</var>’s <a data-link-type="dfn" href="#background-fetch-record-request" id="ref-for-background-fetch-record-request④">request</a>, <var>record</var>’s <a data-link-type="dfn" href="#background-fetch-record-response-data" id="ref-for-background-fetch-record-response-data⑤">response data</a>'s <a data-link-type="dfn" href="#background-fetch-response-response" id="ref-for-background-fetch-response-response⑤">response</a>, and <var>options</var> returns true, then <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-append" id="ref-for-list-append②">append</a> <var>record</var> to <var>matchingRecords</var>.</p>
+           <p>If <a data-link-type="dfn" href="https://w3c.github.io/ServiceWorker/#request-matches-cached-item" id="ref-for-request-matches-cached-item">request matches cached item</a> for <var>request</var>, <var>record</var>’s <a data-link-type="dfn" href="#background-fetch-record-request" id="ref-for-background-fetch-record-request④">request</a>, <var>record</var>’s <a data-link-type="dfn" href="#background-fetch-record-response-data" id="ref-for-background-fetch-record-response-data⑤">response data</a>'s <a data-link-type="dfn" href="#background-fetch-response-response" id="ref-for-background-fetch-response-response⑤">response</a>, and <var>options</var> returns true, then <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-append" id="ref-for-list-append②">append</a> <var>record</var> to <var>matchingRecords</var>.</p>
          </ol>
         <li data-md>
          <p><a data-link-type="dfn" href="#queue-a-bgfetch-task" id="ref-for-queue-a-bgfetch-task③">Queue a bgfetch task</a> to <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#resolve-promise" id="ref-for-resolve-promise⑧">resolve</a> <var>promise</var> with the result of <a data-link-type="dfn" href="#create-record-objects" id="ref-for-create-record-objects②">creating record objects</a> from <var>matchingRecords</var> in the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object②②">context object</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-realm" id="ref-for-concept-relevant-realm⑥">relevant Realm</a>.</p>
@@ -2941,7 +2941,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
         <li data-md>
          <p>The <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object②⑥">context object</a>'s <a data-link-type="dfn" href="#backgroundfetchupdateuievent-ui-updated-flag" id="ref-for-backgroundfetchupdateuievent-ui-updated-flag">UI updated flag</a> is set.</p>
         <li data-md>
-         <p>The <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object②⑦">context object</a> is not <a data-link-type="dfn">active</a>.</p>
+         <p>The <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object②⑦">context object</a> is not <a data-link-type="dfn" href="https://w3c.github.io/ServiceWorker/#extendableevent-active" id="ref-for-extendableevent-active">active</a>.</p>
          <p class="issue" id="issue-b420dc4f①"><a class="self-link" href="#issue-b420dc4f①"></a> <a href="https://github.com/w3c/ServiceWorker/pull/1348">ServiceWorker/1348</a>.</p>
        </ul>
        <p>Throw an <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#invalidstateerror" id="ref-for-invalidstateerror①">InvalidStateError</a></code> <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#idl-DOMException" id="ref-for-idl-DOMException⑥">DOMException</a></code>.</p>
@@ -3954,6 +3954,12 @@ complete-length = ( 1*DIGIT / "*" )</pre>
     <li><a href="#ref-for-serviceworkerregistration">6.2. Extensions to ServiceWorkerRegistration</a> <a href="#ref-for-serviceworkerregistration①">(2)</a> <a href="#ref-for-serviceworkerregistration②">(3)</a>
    </ul>
   </aside>
+  <aside class="dfn-panel" data-for="term-for-extendableevent-active">
+   <a href="https://w3c.github.io/ServiceWorker/#extendableevent-active">https://w3c.github.io/ServiceWorker/#extendableevent-active</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-extendableevent-active">6.7.1. updateUI()</a>
+   </ul>
+  </aside>
   <aside class="dfn-panel" data-for="term-for-dfn-active-worker">
    <a href="https://w3c.github.io/ServiceWorker/#dfn-active-worker">https://w3c.github.io/ServiceWorker/#dfn-active-worker</a><b>Referenced in:</b>
    <ul>
@@ -3965,6 +3971,12 @@ complete-length = ( 1*DIGIT / "*" )</pre>
    <ul>
     <li><a href="#ref-for-fire-functional-event">4.1. Perform a background fetch</a>
     <li><a href="#ref-for-fire-functional-event①">4.4. Fire a background fetch click event</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-request-matches-cached-item">
+   <a href="https://w3c.github.io/ServiceWorker/#request-matches-cached-item">https://w3c.github.io/ServiceWorker/#request-matches-cached-item</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-request-matches-cached-item">6.4.4. matchAll()</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-dfn-scope-url">
@@ -4212,7 +4224,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
      <li><span class="dfn-paneled" id="term-for-transforming-by" style="color:initial">transforming</span>
     </ul>
    <li>
-    <a data-link-type="biblio">[service-workers-2]</a> defines the following terms:
+    <a data-link-type="biblio">[service-workers-1]</a> defines the following terms:
     <ul>
      <li><span class="dfn-paneled" id="term-for-dictdef-cachequeryoptions" style="color:initial">CacheQueryOptions</span>
      <li><span class="dfn-paneled" id="term-for-extendableevent" style="color:initial">ExtendableEvent</span>
@@ -4220,8 +4232,10 @@ complete-length = ( 1*DIGIT / "*" )</pre>
      <li><span class="dfn-paneled" id="term-for-serviceworker" style="color:initial">ServiceWorker</span>
      <li><span class="dfn-paneled" id="term-for-serviceworkerglobalscope" style="color:initial">ServiceWorkerGlobalScope</span>
      <li><span class="dfn-paneled" id="term-for-serviceworkerregistration" style="color:initial">ServiceWorkerRegistration</span>
+     <li><span class="dfn-paneled" id="term-for-extendableevent-active" style="color:initial">active</span>
      <li><span class="dfn-paneled" id="term-for-dfn-active-worker" style="color:initial">active worker</span>
      <li><span class="dfn-paneled" id="term-for-fire-functional-event" style="color:initial">fire a functional event</span>
+     <li><span class="dfn-paneled" id="term-for-request-matches-cached-item" style="color:initial">request matches cached item</span>
      <li><span class="dfn-paneled" id="term-for-dfn-scope-url" style="color:initial">scope url</span>
      <li><span class="dfn-paneled" id="term-for-dfn-service-worker" style="color:initial">service worker</span>
      <li><span class="dfn-paneled" id="term-for-dfn-service-worker-registration" style="color:initial">service worker registration</span>
@@ -4269,8 +4283,8 @@ complete-length = ( 1*DIGIT / "*" )</pre>
    <dd>Domenic Denicola. <a href="https://www.w3.org/2001/tag/doc/promises-guide">Writing Promise-Using Specifications</a>. 16 February 2016. Finding of the W3C TAG. URL: <a href="https://www.w3.org/2001/tag/doc/promises-guide">https://www.w3.org/2001/tag/doc/promises-guide</a>
    <dt id="biblio-rfc2119">[RFC2119]
    <dd>S. Bradner. <a href="https://tools.ietf.org/html/rfc2119">Key words for use in RFCs to Indicate Requirement Levels</a>. March 1997. Best Current Practice. URL: <a href="https://tools.ietf.org/html/rfc2119">https://tools.ietf.org/html/rfc2119</a>
-   <dt id="biblio-service-workers-2">[SERVICE-WORKERS-2]
-   <dd>Service Workers URL: <a href="https://w3c.github.io/ServiceWorker/">https://w3c.github.io/ServiceWorker/</a>
+   <dt id="biblio-service-workers-1">[SERVICE-WORKERS-1]
+   <dd>Alex Russell; et al. <a href="https://www.w3.org/TR/service-workers-1/">Service Workers 1</a>. 2 November 2017. WD. URL: <a href="https://www.w3.org/TR/service-workers-1/">https://www.w3.org/TR/service-workers-1/</a>
    <dt id="biblio-url">[URL]
    <dd>Anne van Kesteren. <a href="https://url.spec.whatwg.org/">URL Standard</a>. Living Standard. URL: <a href="https://url.spec.whatwg.org/">https://url.spec.whatwg.org/</a>
    <dt id="biblio-webidl">[WebIDL]
