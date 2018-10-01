@@ -965,13 +965,13 @@ For the purposes of user-agent automation and application testing, this document
     </tbody>
   </table>
 
-  The <dfn>background fetch click</dfn> [=extension command=] simulates the user activating the [=background fetch/display=] of a [=background fetch=]. The [=remote end steps=] are:
+  The <dfn>background fetch click</dfn> [=extension command=] simulates the user activating the [=background fetch/display=] of a [=/background fetch=]. The [=remote end steps=] are:
 
   1. If the [=current top-level browsing context=] is [=no longer open=], then return a [=WebDriver error=] with [=WebDriver error code=] [=no such window=].
   1. Let |pageURL| be the [=current top-level browsing context=]'s [=active document=]'s [=Document/URL=].
   1. Let |swRegistration| be the [=Match Service Worker Registration|matching service worker registration=] for |pageURL|.
   1. If |swRegistration| is null, then return a [=WebDriver error=] with [=response/status=] `400` and JSON error code "`invalid service worker state`".
-  1. Let |bgFetch| be the newest [=background fetch=] with an [=background fetch/id=] of [=url variable=] |id| and a [=background fetch/service worker registration=] of |swRegistration|, or null if none exists.
+  1. Let |bgFetch| be the newest [=/background fetch=] with an [=background fetch/id=] of [=url variable=] |id| and a [=background fetch/service worker registration=] of |swRegistration|, or null if none exists.
   1. If |bgFetch| is null, then return a [=WebDriver error=] with [=response/status=] `404` and JSON error code "`background fetch not found`".
   1. [=Fire a background fetch click event=] for |bgFetch|.
   1. Return [=WebDriver success=].

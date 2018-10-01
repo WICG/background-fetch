@@ -1214,7 +1214,7 @@ Possible extra rowspan handling
 </style>
   <meta content="Bikeshed version e11b92b98e366cc29d0c6509f84bde4ced535e53" name="generator">
   <link href="https://wicg.github.io/background-fetch/" rel="canonical">
-  <meta content="735ba263c243d2fb12759b6d78ed9e8e5ae9aa32" name="document-revision">
+  <meta content="797ca0c207edc68abed7269b4d8fb73636624ab2" name="document-revision">
 <style>
   .algorithm dl {
     overflow: hidden;
@@ -1585,7 +1585,12 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
         <li><a href="#background-fetch-update-ui-event-update-ui"><span class="secno">6.7.1</span> <span class="content"><code class="idl"><span>updateUI()</span></code></span></a>
        </ol>
      </ol>
-    <li><a href="#privacy-and-bandwidth-use"><span class="secno">7</span> <span class="content">Privacy and bandwidth usage</span></a>
+    <li>
+     <a href="#automation"><span class="secno">7</span> <span class="content">Automation</span></a>
+     <ol class="toc">
+      <li><a href="#automation-click"><span class="secno">7.1</span> <span class="content"><span>Click</span></span></a>
+     </ol>
+    <li><a href="#privacy-and-bandwidth-use"><span class="secno">8</span> <span class="content">Privacy and bandwidth usage</span></a>
     <li><a href="#conformance"><span class="secno"></span> <span class="content"> Conformance</span></a>
     <li>
      <a href="#index"><span class="secno"></span> <span class="content">Index</span></a>
@@ -1742,7 +1747,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
        <p>If every <a data-link-type="dfn" href="#background-fetch-record-request" id="ref-for-background-fetch-record-request">request</a> in <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-records" id="ref-for-background-fetch-records①">records</a> has the <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-method" id="ref-for-concept-request-method">method</a> `<code>GET</code>`, the UI may provide a way to toggle <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-paused-flag" id="ref-for-background-fetch-paused-flag①">paused flag</a>.</p>
        <p class="note" role="note"><span>Note:</span> If a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-method" id="ref-for-concept-request-method①">method</a> is not `<code>GET</code>`, reissuing the request may have unwanted side effects.</p>
       <li data-md>
-       <p>The UI may be activated (for example, by clicking), in which case <a data-link-type="dfn" href="#fire-a-background-fetch-click-event" id="ref-for-fire-a-background-fetch-click-event">fire a background fetch click event</a>.</p>
+       <p>The UI may be activated (for example, by clicking), in which case <a data-link-type="dfn" href="#fire-a-background-fetch-click-event" id="ref-for-fire-a-background-fetch-click-event">fire a background fetch click event</a> for <var>bgFetch</var>.</p>
       <li data-md>
        <p>The UI may remain once the operation is complete, in which case it can still be activated.</p>
      </ul>
@@ -2960,11 +2965,44 @@ complete-length = ( 1*DIGIT / "*" )</pre>
      </ol>
     </div>
    </div>
-   <h2 class="heading settled" data-level="7" id="privacy-and-bandwidth-use"><span class="secno">7. </span><span class="content">Privacy and bandwidth usage</span><a class="self-link" href="#privacy-and-bandwidth-use"></a></h2>
+   <h2 class="heading settled" data-level="7" id="automation"><span class="secno">7. </span><span class="content">Automation</span><a class="self-link" href="#automation"></a></h2>
+   <p>For the purposes of user-agent automation and application testing, this document defines the following <a data-link-type="dfn" href="https://w3c.github.io/webdriver/webdriver-spec.html#dfn-extension-command" id="ref-for-dfn-extension-command">extension command</a> for the <a data-link-type="biblio" href="#biblio-webdriver">[WebDriver]</a> specification.</p>
+   <h3 class="heading settled" data-level="7.1" id="automation-click"><span class="secno">7.1. </span><span class="content"><a data-link-type="dfn" href="#background-fetch-click" id="ref-for-background-fetch-click">Click</a></span><a class="self-link" href="#automation-click"></a></h3>
+   <div class="algorithm" data-algorithm="background fetch click">
+    <table>
+     <tbody>
+      <tr>
+       <th><a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-method" id="ref-for-concept-request-method⑥">Method</a>
+       <th><a data-link-type="dfn" href="https://w3c.github.io/webdriver/webdriver-spec.html#dfn-extension-command-uri-template" id="ref-for-dfn-extension-command-uri-template">URI Template</a>
+      <tr>
+       <td>POST
+       <td>/session/{session id}/backgroundfetch/{<var>id</var>}/click
+    </table>
+    <p>The <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="background-fetch-click">background fetch click</dfn> <a data-link-type="dfn" href="https://w3c.github.io/webdriver/webdriver-spec.html#dfn-extension-command" id="ref-for-dfn-extension-command①">extension command</a> simulates the user activating the <a data-link-type="dfn" href="#background-fetch-display" id="ref-for-background-fetch-display①">display</a> of a <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch①⑥">background fetch</a>. The <a data-link-type="dfn" href="https://w3c.github.io/webdriver/webdriver-spec.html#dfn-remote-end-steps" id="ref-for-dfn-remote-end-steps">remote end steps</a> are:</p>
+    <ol>
+     <li data-md>
+      <p>If the <a data-link-type="dfn" href="https://w3c.github.io/webdriver/webdriver-spec.html#dfn-current-top-level-browsing-context" id="ref-for-dfn-current-top-level-browsing-context">current top-level browsing context</a> is <a data-link-type="dfn" href="https://w3c.github.io/webdriver/webdriver-spec.html#dfn-no-longer-open" id="ref-for-dfn-no-longer-open">no longer open</a>, then return a <a data-link-type="dfn" href="https://w3c.github.io/webdriver/webdriver-spec.html#dfn-errors" id="ref-for-dfn-errors">WebDriver error</a> with <a data-link-type="dfn" href="https://w3c.github.io/webdriver/webdriver-spec.html#dfn-error-code" id="ref-for-dfn-error-code">WebDriver error code</a> <a data-link-type="dfn" href="https://w3c.github.io/webdriver/webdriver-spec.html#dfn-no-such-window" id="ref-for-dfn-no-such-window">no such window</a>.</p>
+     <li data-md>
+      <p>Let <var>pageURL</var> be the <a data-link-type="dfn" href="https://w3c.github.io/webdriver/webdriver-spec.html#dfn-current-top-level-browsing-context" id="ref-for-dfn-current-top-level-browsing-context①">current top-level browsing context</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#active-document" id="ref-for-active-document">active document</a>'s <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-document-url" id="ref-for-concept-document-url">URL</a>.</p>
+     <li data-md>
+      <p>Let <var>swRegistration</var> be the <a data-link-type="dfn" href="https://w3c.github.io/ServiceWorker/#match-service-worker-registration" id="ref-for-match-service-worker-registration">matching service worker registration</a> for <var>pageURL</var>.</p>
+     <li data-md>
+      <p>If <var>swRegistration</var> is null, then return a <a data-link-type="dfn" href="https://w3c.github.io/webdriver/webdriver-spec.html#dfn-errors" id="ref-for-dfn-errors①">WebDriver error</a> with <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-status" id="ref-for-concept-response-status⑥">status</a> <code>400</code> and JSON error code "<code>invalid service worker state</code>".</p>
+     <li data-md>
+      <p>Let <var>bgFetch</var> be the newest <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch①⑦">background fetch</a> with an <a data-link-type="dfn" href="#background-fetch-id" id="ref-for-background-fetch-id⑤">id</a> of <a data-link-type="dfn" href="https://w3c.github.io/webdriver/webdriver-spec.html#dfn-url-variables" id="ref-for-dfn-url-variables">url variable</a> <var>id</var> and a <a data-link-type="dfn" href="#background-fetch-service-worker-registration" id="ref-for-background-fetch-service-worker-registration⑥">service worker registration</a> of <var>swRegistration</var>, or null if none exists.</p>
+     <li data-md>
+      <p>If <var>bgFetch</var> is null, then return a <a data-link-type="dfn" href="https://w3c.github.io/webdriver/webdriver-spec.html#dfn-errors" id="ref-for-dfn-errors②">WebDriver error</a> with <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-status" id="ref-for-concept-response-status⑦">status</a> <code>404</code> and JSON error code "<code>background fetch not found</code>".</p>
+     <li data-md>
+      <p><a data-link-type="dfn" href="#fire-a-background-fetch-click-event" id="ref-for-fire-a-background-fetch-click-event②">Fire a background fetch click event</a> for <var>bgFetch</var>.</p>
+     <li data-md>
+      <p>Return <a data-link-type="dfn" href="https://w3c.github.io/webdriver/webdriver-spec.html#dfn-success" id="ref-for-dfn-success">WebDriver success</a>.</p>
+    </ol>
+   </div>
+   <h2 class="heading settled" data-level="8" id="privacy-and-bandwidth-use"><span class="secno">8. </span><span class="content">Privacy and bandwidth usage</span><a class="self-link" href="#privacy-and-bandwidth-use"></a></h2>
    <p>It’s the recommendation of this standard that user agents make background fetch operations highly visible and easily abortable rather than asking permission up front. However, given that background fetches can be paused and retried, a user agent that immediately paused a background fetch and user interaction to resume would be compliant.</p>
    <p>The <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/origin.html#concept-origin" id="ref-for-concept-origin">origin</a> of a background fetch should have equal or great visibility to the developer-provided information, such as a the <a data-link-type="dfn" href="#background-fetch-icons" id="ref-for-background-fetch-icons③">icons</a> and <a data-link-type="dfn" href="#background-fetch-title" id="ref-for-background-fetch-title③">title</a>.</p>
    <p>A user agent may pause background downloads depending on network conditions or battery state. For example, a user agent may download automatically when connected to WiFi, but require user confirmation to download using mobile data. If an implementation has this restriction, the user should be able to persist granting mobile data use for the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/origin.html#concept-origin" id="ref-for-concept-origin①">origin</a>.</p>
-   <p>If the user agent provides a way for a user to abort a background fetch operation, it should <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-fetch-terminate" id="ref-for-concept-fetch-terminate②">terminate</a> all fetches associated with the <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch①⑥">background fetch</a>'s <a data-link-type="dfn" href="#background-fetch-records" id="ref-for-background-fetch-records⑥">records</a>, with the <em>abort</em> flag set.</p>
+   <p>If the user agent provides a way for a user to abort a background fetch operation, it should <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-fetch-terminate" id="ref-for-concept-fetch-terminate②">terminate</a> all fetches associated with the <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch①⑧">background fetch</a>'s <a data-link-type="dfn" href="#background-fetch-records" id="ref-for-background-fetch-records⑥">records</a>, with the <em>abort</em> flag set.</p>
    <p>A background fetch exposes the user’s external IPs to the server throughout the duration of the background fetch. An attacker could use an extremely slow background fetch as a way to persistently track the user once they’ve left the site. Good visibility into the progress of the background fetch will help the user identify unwanted use.</p>
   </main>
   <div data-fill-with="conformance">
@@ -3137,6 +3175,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
    <li><a href="#dom-serviceworkerregistration-backgroundfetch">backgroundFetch</a><span>, in §6.2</span>
    <li><a href="#eventdef-serviceworkerglobalscope-backgroundfetchabort">backgroundfetchabort</a><span>, in §6.1.1</span>
    <li><a href="#eventdef-serviceworkerglobalscope-backgroundfetchclick">backgroundfetchclick</a><span>, in §6.1.1</span>
+   <li><a href="#background-fetch-click">background fetch click</a><span>, in §7.1</span>
    <li><a href="#backgroundfetchevent">BackgroundFetchEvent</a><span>, in §6.6</span>
    <li><a href="#dictdef-backgroundfetcheventinit">BackgroundFetchEventInit</a><span>, in §6.6</span>
    <li><a href="#dom-backgroundfetchevent-backgroundfetchevent">BackgroundFetchEvent(type, init)</a><span>, in §6.6</span>
@@ -3335,6 +3374,12 @@ complete-length = ( 1*DIGIT / "*" )</pre>
     <li><a href="#ref-for-dom-event-istrusted">6.7.1. updateUI()</a>
    </ul>
   </aside>
+  <aside class="dfn-panel" data-for="term-for-concept-document-url">
+   <a href="https://dom.spec.whatwg.org/#concept-document-url">https://dom.spec.whatwg.org/#concept-document-url</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-concept-document-url">7.1. Click</a>
+   </ul>
+  </aside>
   <aside class="dfn-panel" data-for="term-for-realm">
    <a href="https://tc39.github.io/ecma262/#realm">https://tc39.github.io/ecma262/#realm</a><b>Referenced in:</b>
    <ul>
@@ -3496,6 +3541,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
    <ul>
     <li><a href="#ref-for-concept-request-method">3.2. Background fetch</a> <a href="#ref-for-concept-request-method①">(2)</a>
     <li><a href="#ref-for-concept-request-method②">4.2. Complete a record</a> <a href="#ref-for-concept-request-method③">(2)</a> <a href="#ref-for-concept-request-method④">(3)</a> <a href="#ref-for-concept-request-method⑤">(4)</a>
+    <li><a href="#ref-for-concept-request-method⑥">7.1. Click</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-concept-request-mode">
@@ -3567,6 +3613,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
    <ul>
     <li><a href="#ref-for-concept-response-status">4.2. Complete a record</a> <a href="#ref-for-concept-response-status①">(2)</a> <a href="#ref-for-concept-response-status②">(3)</a> <a href="#ref-for-concept-response-status③">(4)</a>
     <li><a href="#ref-for-concept-response-status④">4.6. Validate a partial response</a> <a href="#ref-for-concept-response-status⑤">(2)</a>
+    <li><a href="#ref-for-concept-response-status⑥">7.1. Click</a> <a href="#ref-for-concept-response-status⑦">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-concept-body-stream">
@@ -3581,7 +3628,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
    <a href="https://fetch.spec.whatwg.org/#concept-fetch-terminate">https://fetch.spec.whatwg.org/#concept-fetch-terminate</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-concept-fetch-terminate">4.2. Complete a record</a> <a href="#ref-for-concept-fetch-terminate①">(2)</a>
-    <li><a href="#ref-for-concept-fetch-terminate②">7. Privacy and bandwidth usage</a>
+    <li><a href="#ref-for-concept-fetch-terminate②">8. Privacy and bandwidth usage</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-concept-body-total-bytes">
@@ -3620,6 +3667,12 @@ complete-length = ( 1*DIGIT / "*" )</pre>
    <ul>
     <li><a href="#ref-for-eventhandler">6.1. Extensions to ServiceWorkerGlobalScope</a> <a href="#ref-for-eventhandler①">(2)</a> <a href="#ref-for-eventhandler②">(3)</a> <a href="#ref-for-eventhandler③">(4)</a>
     <li><a href="#ref-for-eventhandler④">6.4. BackgroundFetchRegistration</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-active-document">
+   <a href="https://html.spec.whatwg.org/multipage/browsers.html#active-document">https://html.spec.whatwg.org/multipage/browsers.html#active-document</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-active-document">7.1. Click</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-enqueue-the-following-steps">
@@ -3973,6 +4026,12 @@ complete-length = ( 1*DIGIT / "*" )</pre>
     <li><a href="#ref-for-fire-functional-event①">4.4. Fire a background fetch click event</a>
    </ul>
   </aside>
+  <aside class="dfn-panel" data-for="term-for-match-service-worker-registration">
+   <a href="https://w3c.github.io/ServiceWorker/#match-service-worker-registration">https://w3c.github.io/ServiceWorker/#match-service-worker-registration</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-match-service-worker-registration">7.1. Click</a>
+   </ul>
+  </aside>
   <aside class="dfn-panel" data-for="term-for-request-matches-cached-item">
    <a href="https://w3c.github.io/ServiceWorker/#request-matches-cached-item">https://w3c.github.io/ServiceWorker/#request-matches-cached-item</a><b>Referenced in:</b>
    <ul>
@@ -4012,6 +4071,67 @@ complete-length = ( 1*DIGIT / "*" )</pre>
    <ul>
     <li><a href="#ref-for-concept-url-origin">3.2. Background fetch</a>
     <li><a href="#ref-for-concept-url-origin①">4.3. Update background fetch instances</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dfn-current-top-level-browsing-context">
+   <a href="https://w3c.github.io/webdriver/webdriver-spec.html#dfn-current-top-level-browsing-context">https://w3c.github.io/webdriver/webdriver-spec.html#dfn-current-top-level-browsing-context</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dfn-current-top-level-browsing-context">7.1. Click</a> <a href="#ref-for-dfn-current-top-level-browsing-context①">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dfn-extension-command">
+   <a href="https://w3c.github.io/webdriver/webdriver-spec.html#dfn-extension-command">https://w3c.github.io/webdriver/webdriver-spec.html#dfn-extension-command</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dfn-extension-command">7. Automation</a>
+    <li><a href="#ref-for-dfn-extension-command①">7.1. Click</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dfn-extension-command-uri-template">
+   <a href="https://w3c.github.io/webdriver/webdriver-spec.html#dfn-extension-command-uri-template">https://w3c.github.io/webdriver/webdriver-spec.html#dfn-extension-command-uri-template</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dfn-extension-command-uri-template">7.1. Click</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dfn-no-longer-open">
+   <a href="https://w3c.github.io/webdriver/webdriver-spec.html#dfn-no-longer-open">https://w3c.github.io/webdriver/webdriver-spec.html#dfn-no-longer-open</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dfn-no-longer-open">7.1. Click</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dfn-no-such-window">
+   <a href="https://w3c.github.io/webdriver/webdriver-spec.html#dfn-no-such-window">https://w3c.github.io/webdriver/webdriver-spec.html#dfn-no-such-window</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dfn-no-such-window">7.1. Click</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dfn-remote-end-steps">
+   <a href="https://w3c.github.io/webdriver/webdriver-spec.html#dfn-remote-end-steps">https://w3c.github.io/webdriver/webdriver-spec.html#dfn-remote-end-steps</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dfn-remote-end-steps">7.1. Click</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dfn-url-variables">
+   <a href="https://w3c.github.io/webdriver/webdriver-spec.html#dfn-url-variables">https://w3c.github.io/webdriver/webdriver-spec.html#dfn-url-variables</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dfn-url-variables">7.1. Click</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dfn-errors">
+   <a href="https://w3c.github.io/webdriver/webdriver-spec.html#dfn-errors">https://w3c.github.io/webdriver/webdriver-spec.html#dfn-errors</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dfn-errors">7.1. Click</a> <a href="#ref-for-dfn-errors①">(2)</a> <a href="#ref-for-dfn-errors②">(3)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dfn-error-code">
+   <a href="https://w3c.github.io/webdriver/webdriver-spec.html#dfn-error-code">https://w3c.github.io/webdriver/webdriver-spec.html#dfn-error-code</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dfn-error-code">7.1. Click</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dfn-success">
+   <a href="https://w3c.github.io/webdriver/webdriver-spec.html#dfn-success">https://w3c.github.io/webdriver/webdriver-spec.html#dfn-success</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dfn-success">7.1. Click</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-aborterror">
@@ -4116,6 +4236,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
      <li><span class="dfn-paneled" id="term-for-context-object" style="color:initial">context object</span>
      <li><span class="dfn-paneled" id="term-for-concept-event-fire" style="color:initial">fire an event</span>
      <li><span class="dfn-paneled" id="term-for-dom-event-istrusted" style="color:initial">isTrusted</span>
+     <li><span class="dfn-paneled" id="term-for-concept-document-url" style="color:initial">url</span>
     </ul>
    <li>
     <a data-link-type="biblio">[ECMASCRIPT]</a> defines the following terms:
@@ -4171,6 +4292,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
     <a data-link-type="biblio">[HTML]</a> defines the following terms:
     <ul>
      <li><span class="dfn-paneled" id="term-for-eventhandler" style="color:initial">EventHandler</span>
+     <li><span class="dfn-paneled" id="term-for-active-document" style="color:initial">active document</span>
      <li><span class="dfn-paneled" id="term-for-enqueue-the-following-steps" style="color:initial">enqueue the following steps</span>
      <li><span class="dfn-paneled" id="term-for-environment-settings-object" style="color:initial">environment settings object</span>
      <li><span class="dfn-paneled" id="term-for-event-handlers" style="color:initial">event handler</span>
@@ -4235,6 +4357,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
      <li><span class="dfn-paneled" id="term-for-extendableevent-active" style="color:initial">active</span>
      <li><span class="dfn-paneled" id="term-for-dfn-active-worker" style="color:initial">active worker</span>
      <li><span class="dfn-paneled" id="term-for-fire-functional-event" style="color:initial">fire a functional event</span>
+     <li><span class="dfn-paneled" id="term-for-match-service-worker-registration" style="color:initial">match service worker registration</span>
      <li><span class="dfn-paneled" id="term-for-request-matches-cached-item" style="color:initial">request matches cached item</span>
      <li><span class="dfn-paneled" id="term-for-dfn-scope-url" style="color:initial">scope url</span>
      <li><span class="dfn-paneled" id="term-for-dfn-service-worker" style="color:initial">service worker</span>
@@ -4245,6 +4368,20 @@ complete-length = ( 1*DIGIT / "*" )</pre>
     <a data-link-type="biblio">[URL]</a> defines the following terms:
     <ul>
      <li><span class="dfn-paneled" id="term-for-concept-url-origin" style="color:initial">origin</span>
+    </ul>
+   <li>
+    <a data-link-type="biblio">[WebDriver]</a> defines the following terms:
+    <ul>
+     <li><span class="dfn-paneled" id="term-for-dfn-current-top-level-browsing-context" style="color:initial">current top-level browsing context</span>
+     <li><span class="dfn-paneled" id="term-for-dfn-extension-command" style="color:initial">extension command</span>
+     <li><span class="dfn-paneled" id="term-for-dfn-extension-command-uri-template" style="color:initial">extension command uri template</span>
+     <li><span class="dfn-paneled" id="term-for-dfn-no-longer-open" style="color:initial">no longer open</span>
+     <li><span class="dfn-paneled" id="term-for-dfn-no-such-window" style="color:initial">no such window</span>
+     <li><span class="dfn-paneled" id="term-for-dfn-remote-end-steps" style="color:initial">remote end steps</span>
+     <li><span class="dfn-paneled" id="term-for-dfn-url-variables" style="color:initial">url variable</span>
+     <li><span class="dfn-paneled" id="term-for-dfn-errors" style="color:initial">webdriver error</span>
+     <li><span class="dfn-paneled" id="term-for-dfn-error-code" style="color:initial">webdriver error code</span>
+     <li><span class="dfn-paneled" id="term-for-dfn-success" style="color:initial">webdriver success</span>
     </ul>
    <li>
     <a data-link-type="biblio">[WebIDL]</a> defines the following terms:
@@ -4287,6 +4424,8 @@ complete-length = ( 1*DIGIT / "*" )</pre>
    <dd>Alex Russell; et al. <a href="https://www.w3.org/TR/service-workers-1/">Service Workers 1</a>. 2 November 2017. WD. URL: <a href="https://www.w3.org/TR/service-workers-1/">https://www.w3.org/TR/service-workers-1/</a>
    <dt id="biblio-url">[URL]
    <dd>Anne van Kesteren. <a href="https://url.spec.whatwg.org/">URL Standard</a>. Living Standard. URL: <a href="https://url.spec.whatwg.org/">https://url.spec.whatwg.org/</a>
+   <dt id="biblio-webdriver">[WebDriver]
+   <dd>Simon Stewart; David Burns. <a href="https://www.w3.org/TR/webdriver1/">WebDriver</a>. 5 June 2018. REC. URL: <a href="https://www.w3.org/TR/webdriver1/">https://www.w3.org/TR/webdriver1/</a>
    <dt id="biblio-webidl">[WebIDL]
    <dd>Cameron McCormack; Boris Zbarsky; Tobie Langel. <a href="https://heycam.github.io/webidl/">Web IDL</a>. 15 December 2016. ED. URL: <a href="https://heycam.github.io/webidl/">https://heycam.github.io/webidl/</a>
   </dl>
@@ -4440,7 +4579,8 @@ complete-length = ( 1*DIGIT / "*" )</pre>
     <li><a href="#ref-for-background-fetch①③">6.3.1. fetch()</a>
     <li><a href="#ref-for-background-fetch①④">6.4. BackgroundFetchRegistration</a>
     <li><a href="#ref-for-background-fetch①⑤">6.6. BackgroundFetchEvent</a>
-    <li><a href="#ref-for-background-fetch①⑥">7. Privacy and bandwidth usage</a>
+    <li><a href="#ref-for-background-fetch①⑥">7.1. Click</a> <a href="#ref-for-background-fetch①⑦">(2)</a>
+    <li><a href="#ref-for-background-fetch①⑧">8. Privacy and bandwidth usage</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="background-fetch-id">
@@ -4451,6 +4591,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
     <li><a href="#ref-for-background-fetch-id②">6.3.1. fetch()</a>
     <li><a href="#ref-for-background-fetch-id③">6.4. BackgroundFetchRegistration</a>
     <li><a href="#ref-for-background-fetch-id④">6.4.2. abort()</a>
+    <li><a href="#ref-for-background-fetch-id⑤">7.1. Click</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="background-fetch-records">
@@ -4460,7 +4601,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
     <li><a href="#ref-for-background-fetch-records②">4.1. Perform a background fetch</a> <a href="#ref-for-background-fetch-records③">(2)</a>
     <li><a href="#ref-for-background-fetch-records④">6.3.1. fetch()</a>
     <li><a href="#ref-for-background-fetch-records⑤">6.4.4. matchAll()</a>
-    <li><a href="#ref-for-background-fetch-records⑥">7. Privacy and bandwidth usage</a>
+    <li><a href="#ref-for-background-fetch-records⑥">8. Privacy and bandwidth usage</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="background-fetch-title">
@@ -4469,7 +4610,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
     <li><a href="#ref-for-background-fetch-title">3.2. Background fetch</a>
     <li><a href="#ref-for-background-fetch-title①">6.3.1. fetch()</a>
     <li><a href="#ref-for-background-fetch-title②">6.7.1. updateUI()</a>
-    <li><a href="#ref-for-background-fetch-title③">7. Privacy and bandwidth usage</a>
+    <li><a href="#ref-for-background-fetch-title③">8. Privacy and bandwidth usage</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="background-fetch-download-total">
@@ -4529,7 +4670,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
     <li><a href="#ref-for-background-fetch-icons">3.2. Background fetch</a>
     <li><a href="#ref-for-background-fetch-icons①">6.3.1. fetch()</a>
     <li><a href="#ref-for-background-fetch-icons②">6.7.1. updateUI()</a>
-    <li><a href="#ref-for-background-fetch-icons③">7. Privacy and bandwidth usage</a>
+    <li><a href="#ref-for-background-fetch-icons③">8. Privacy and bandwidth usage</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="background-fetch-service-worker-registration">
@@ -4541,6 +4682,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
     <li><a href="#ref-for-background-fetch-service-worker-registration③">4.4. Fire a background fetch click event</a>
     <li><a href="#ref-for-background-fetch-service-worker-registration④">6.3.1. fetch()</a>
     <li><a href="#ref-for-background-fetch-service-worker-registration⑤">6.4.2. abort()</a>
+    <li><a href="#ref-for-background-fetch-service-worker-registration⑥">7.1. Click</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="background-fetch-update-handling-queue">
@@ -4579,6 +4721,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
    <b><a href="#background-fetch-display">#background-fetch-display</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-background-fetch-display">6.3.1. fetch()</a>
+    <li><a href="#ref-for-background-fetch-display①">7.1. Click</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="background-fetch-record">
@@ -4676,6 +4819,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
    <ul>
     <li><a href="#ref-for-fire-a-background-fetch-click-event">3.2. Background fetch</a>
     <li><a href="#ref-for-fire-a-background-fetch-click-event①">4.4. Fire a background fetch click event</a>
+    <li><a href="#ref-for-fire-a-background-fetch-click-event②">7.1. Click</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="get-a-backgroundfetchregistration-instance">
@@ -5089,6 +5233,12 @@ complete-length = ( 1*DIGIT / "*" )</pre>
    <ul>
     <li><a href="#ref-for-dom-backgroundfetchupdateuievent-updateui">6.7. BackgroundFetchUpdateUIEvent</a>
     <li><a href="#ref-for-dom-backgroundfetchupdateuievent-updateui①">6.7.1. updateUI()</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="background-fetch-click">
+   <b><a href="#background-fetch-click">#background-fetch-click</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-background-fetch-click">7.1. Click</a>
    </ul>
   </aside>
 <script>/* script-var-click-highlighting */
