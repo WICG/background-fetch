@@ -1214,7 +1214,7 @@ Possible extra rowspan handling
 </style>
   <meta content="Bikeshed version dff342f4b23fb230b71436fb31b55f5f169715bd" name="generator">
   <link href="https://wicg.github.io/background-fetch/" rel="canonical">
-  <meta content="932647092c46fdfa585e61a49274f7afd43afc12" name="document-revision">
+  <meta content="3cd08be47d0917aa3128fbcc30611fd3bb99e433" name="document-revision">
 <style>
   .algorithm dl {
     overflow: hidden;
@@ -1609,26 +1609,22 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
   </nav>
   <main>
    <h2 class="heading settled" data-level="1" id="intro"><span class="secno">1. </span><span class="content">Introduction</span><a class="self-link" href="#intro"></a></h2>
-   <p>A <a data-link-type="dfn" href="https://w3c.github.io/ServiceWorker/#dfn-service-worker" id="ref-for-dfn-service-worker">service worker</a> is capable of fetching and caching assets, the size of which is restricted only by <a href="https://storage.spec.whatwg.org/#usage-and-quota">origin storage</a>. However, if the user navigates away from the site or closes the browser, the service worker is <a href="https://www.w3.org/TR/service-workers-1/#service-worker-lifetime">likely to be killed</a>. This can happen even if there’s a pending promise passed to <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/ServiceWorker/#dom-extendableevent-waituntil" id="ref-for-dom-extendableevent-waituntil">waitUntil()</a></code>; if it hasn’t resolved within a few minutes the browser may consider it an abuse of <a data-link-type="dfn" href="https://w3c.github.io/ServiceWorker/#dfn-service-worker" id="ref-for-dfn-service-worker①">service worker</a> and kill the process.</p>
-   <p>This makes it difficult to download and cache large assets such as podcasts and movies, and upload video and images. Even if the <a data-link-type="dfn" href="https://w3c.github.io/ServiceWorker/#dfn-service-worker" id="ref-for-dfn-service-worker②">service worker</a> isn’t killed, having to keep the <a data-link-type="dfn" href="https://w3c.github.io/ServiceWorker/#dfn-service-worker" id="ref-for-dfn-service-worker③">service worker</a> in memory during this potentially long operation is wasteful.</p>
+   <p>A <a data-link-type="dfn" href="https://w3c.github.io/ServiceWorker/#dfn-service-worker" id="ref-for-dfn-service-worker">service worker</a> is capable of fetching and caching assets, the size of which is restricted only by <a href="https://storage.spec.whatwg.org/#usage-and-quota">origin storage</a>. However, if the user navigates away from the site or closes the browser, the service worker is <a href="https://www.w3.org/TR/service-workers-1/#service-worker-lifetime">likely to be killed</a>. This can happen even if there’s a pending promise passed to <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/ServiceWorker/#dom-extendableevent-waituntil" id="ref-for-dom-extendableevent-waituntil">waitUntil()</a></code> - if it hasn’t resolved within a few minutes the browser may consider it an abuse of <a data-link-type="dfn" href="https://w3c.github.io/ServiceWorker/#dfn-service-worker" id="ref-for-dfn-service-worker①">service worker</a> and kill the process.</p>
+   <p>This is excellent for battery and privacy, but it makes it difficult to download and cache large assets such as podcasts and movies, and upload video and images.</p>
    <p>This specification aims to:</p>
    <ul>
     <li data-md>
-     <p>Allow <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-fetch" id="ref-for-concept-fetch">fetches</a> to continue even if the user closes all windows &amp; worker to the origin.</p>
+     <p>Allow fetches (requests &amp; responses) to continue even if the user closes all windows &amp; workers to the origin.</p>
     <li data-md>
      <p>Allow a single job to involve many requests, as defined by the app.</p>
     <li data-md>
-     <p>Allow the browser/OS to show UI to indicate the progress of the <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-fetch" id="ref-for-concept-fetch①">fetch</a>, and allow the user to pause/abort.</p>
+     <p>Allow the browser/OS to show UI to indicate the progress of that job, and allow the user to pause/abort.</p>
     <li data-md>
-     <p>Allow the browser/OS to deal with poor connectivity by pausing/resuming the download/upload (may be tricky with uploads, as ranged uploads aren’t standardized).</p>
+     <p>Allow the browser/OS to deal with poor connectivity by pausing/resuming the download.</p>
     <li data-md>
-     <p>Allow the app to react to success/failure of the background fetch group, perhaps by caching the results.</p>
+     <p>Allow the app to react to success/failure of the job, perhaps by caching the results.</p>
     <li data-md>
-     <p>Allow access to background-fetched resources as they <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-fetch" id="ref-for-concept-fetch②">fetch</a>.</p>
-    <li data-md>
-     <p>Allow the app to display progress information about a background fetch.</p>
-    <li data-md>
-     <p>Allow the app to suggest which connection types the <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-fetch" id="ref-for-concept-fetch③">fetch</a> should be restricted to.</p>
+     <p>Allow access to background-fetched resources as they fetch.</p>
    </ul>
    <h2 class="heading settled" data-level="2" id="realms"><span class="secno">2. </span><span class="content">Realms</span><a class="self-link" href="#realms"></a></h2>
    <p>All platform objects are created in the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object">context object</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-realm" id="ref-for-concept-relevant-realm">relevant Realm</a> unless otherwise specified.</p>
@@ -1714,7 +1710,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
       <li data-md>
        <p>The UI may display <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-title" id="ref-for-background-fetch-title">title</a>.</p>
       <li data-md>
-       <p>The UI may <a data-link-type="dfn">select an icon</a> for display from <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-icons" id="ref-for-background-fetch-icons">icons</a>, and <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-fetch" id="ref-for-concept-fetch④">fetch</a> it using a new <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request" id="ref-for-concept-request">request</a> with the following properties:</p>
+       <p>The UI may <a data-link-type="dfn">select an icon</a> for display from <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-icons" id="ref-for-background-fetch-icons">icons</a>, and <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-fetch" id="ref-for-concept-fetch">fetch</a> it using a new <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request" id="ref-for-concept-request">request</a> with the following properties:</p>
        <dl>
         <dt data-md><a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-url" id="ref-for-concept-request-url">URL</a>
         <dd data-md>
@@ -1916,7 +1912,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
      <li data-md>
       <p>Let <var>lastTransmittedSize</var> be 0.</p>
      <li data-md>
-      <p><a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-fetch" id="ref-for-concept-fetch⑤">Fetch</a> <var>request</var>.</p>
+      <p><a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-fetch" id="ref-for-concept-fetch①">Fetch</a> <var>request</var>.</p>
       <p class="issue" id="issue-775cdb79"><a class="self-link" href="#issue-775cdb79"></a> The remainder of this step uses fetch "callbacks" which currently queue tasks. This isn’t desirable or possible here, so let’s pretend that tasks aren’t queued. (<a href="https://github.com/whatwg/fetch/issues/536#issuecomment-330184276">issue</a>)</p>
       <p>To <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#process-request-body" id="ref-for-process-request-body">process request body</a> for <var>request</var>, run these steps:</p>
       <ol>
@@ -2999,7 +2995,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
     </ol>
    </div>
    <h2 class="heading settled" data-level="8" id="privacy-and-bandwidth-use"><span class="secno">8. </span><span class="content">Privacy and bandwidth usage</span><a class="self-link" href="#privacy-and-bandwidth-use"></a></h2>
-   <p>It’s the recommendation of this standard that user agents make background fetch operations highly visible and easily abortable rather than asking permission up front. However, given that background fetches can be paused and retried, a user agent that immediately paused a background fetch and user interaction to resume would be compliant.</p>
+   <p>It’s the recommendation of this standard that user agents make background fetch operations highly visible and easily abortable rather than asking permission up front. However, given that background fetches can be paused and retried, a user agent that immediately pauses a background fetch and requires user interaction to resume is compliant.</p>
    <p>The <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/origin.html#concept-origin" id="ref-for-concept-origin">origin</a> of a background fetch should have equal or great visibility to the developer-provided information, such as a the <a data-link-type="dfn" href="#background-fetch-icons" id="ref-for-background-fetch-icons③">icons</a> and <a data-link-type="dfn" href="#background-fetch-title" id="ref-for-background-fetch-title③">title</a>.</p>
    <p>A user agent may pause background downloads depending on network conditions or battery state. For example, a user agent may download automatically when connected to WiFi, but require user confirmation to download using mobile data. If an implementation has this restriction, the user should be able to persist granting mobile data use for the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/origin.html#concept-origin" id="ref-for-concept-origin①">origin</a>.</p>
    <p>If the user agent provides a way for a user to abort a background fetch operation, it should <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-fetch-terminate" id="ref-for-concept-fetch-terminate②">terminate</a> all fetches associated with the <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch①⑧">background fetch</a>'s <a data-link-type="dfn" href="#background-fetch-records" id="ref-for-background-fetch-records⑥">records</a>, with the <em>abort</em> flag set.</p>
@@ -3503,9 +3499,8 @@ complete-length = ( 1*DIGIT / "*" )</pre>
   <aside class="dfn-panel" data-for="term-for-concept-fetch">
    <a href="https://fetch.spec.whatwg.org/#concept-fetch">https://fetch.spec.whatwg.org/#concept-fetch</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-concept-fetch">1. Introduction</a> <a href="#ref-for-concept-fetch①">(2)</a> <a href="#ref-for-concept-fetch②">(3)</a> <a href="#ref-for-concept-fetch③">(4)</a>
-    <li><a href="#ref-for-concept-fetch④">3.2. Background fetch</a>
-    <li><a href="#ref-for-concept-fetch⑤">4.2. Complete a record</a>
+    <li><a href="#ref-for-concept-fetch">3.2. Background fetch</a>
+    <li><a href="#ref-for-concept-fetch①">4.2. Complete a record</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-concept-header">
@@ -4048,7 +4043,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
   <aside class="dfn-panel" data-for="term-for-dfn-service-worker">
    <a href="https://w3c.github.io/ServiceWorker/#dfn-service-worker">https://w3c.github.io/ServiceWorker/#dfn-service-worker</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dfn-service-worker">1. Introduction</a> <a href="#ref-for-dfn-service-worker①">(2)</a> <a href="#ref-for-dfn-service-worker②">(3)</a> <a href="#ref-for-dfn-service-worker③">(4)</a>
+    <li><a href="#ref-for-dfn-service-worker">1. Introduction</a> <a href="#ref-for-dfn-service-worker①">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-dfn-service-worker-registration">
