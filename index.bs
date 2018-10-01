@@ -81,6 +81,11 @@ All platform objects are created in the [=context object=]'s [=relevant Realm=] 
 
 # Infrastructure # {#infrastructure}
 
+A resource is considered <dfn>temporarily unavailable</dfn> if the user agent believes the resource may soon become available. Reasons may include:
+
+* The user agent is offline.
+* The user agent is behind a captive portal.
+
 The <dfn>background fetch task source</dfn> is a [=task source=].
 
 <div algorithm>
@@ -290,9 +295,7 @@ Note: This algorithm manages the fetching of a [=/background fetch record=]. One
 
     To [=process response=] for |response|, run these steps:
       1. If |response| is a [=network error=], then:
-        1. If the user agent is offline and |request|'s [=request/method=] is \``GET`\`, then wait until the user agent is not offline then set |fetchAttemptComplete| to true and abort these steps.
-
-          Issue: Is "user agent is offline" hand-waving too much? Also discussed in [fetch/526](https://github.com/whatwg/fetch/issues/526#issuecomment-380686368).
+        1. If the resource is [=temporarily unavailable=] and |request|'s [=request/method=] is \``GET`\`, then wait until the resource is not [=temporarily unavailable=], then set |fetchAttemptComplete| to true and abort these steps.
 
           Note: If |request|'s [=request/method=] is not \``GET`\`, reissuing the request may have unwanted side effects. If a standard method to resume requests becomes available, it'll be adopted here.
 
@@ -331,7 +334,7 @@ Note: This algorithm manages the fetching of a [=/background fetch record=]. One
         1. Otherwise, set |responseData|'s [=background fetch response/result=] to `"success"`.
         1. Set |fetchAttemptComplete| to true.
       1. If at any point |stream| becomes [=ReadableStream/errored=], then:
-        1. If the user agent is offline and |request|'s [=request/method=] is \``GET`\`, then wait until the user agent is not offline, then set |fetchAttemptComplete| to true.
+        1. If the resource is [=temporarily unavailable=] and |request|'s [=request/method=] is \``GET`\`, then   wait until the resource is not [=temporarily unavailable=], then set |fetchAttemptComplete| to true.
         1. Otherwise, set |responseData|'s [=background fetch response/result=] to `"fetch-error"` and |fetchAttemptComplete| to true.
   1. Let |result| be the empty string.
   1. Run these steps, but [=abort when=] |bgFetch|'s [=background fetch/paused flag=] or [=background fetch/abort all flag=] is set:
