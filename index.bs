@@ -26,6 +26,19 @@ urlPrefix: https://tc39.github.io/ecma262/; spec: ECMA-262
 urlPrefix: https://tools.ietf.org/html/rfc7230
   type: dfn
     text: HTTP ABNF; url: section-7
+
+spec: webdriver; urlPrefix: https://w3c.github.io/webdriver/webdriver-spec.html#
+  type: dfn
+    text: extension command; url: dfn-extension-command
+    text: extension command URI template; url: dfn-extension-command-uri-template
+    text: remote end steps; url: dfn-remote-end-steps
+    text: current top-level browsing context; url: dfn-current-top-level-browsing-context
+    text: no longer open; url: dfn-no-longer-open
+    text: WebDriver success; url: dfn-success
+    text: WebDriver error; url: dfn-errors
+    text: WebDriver error code; url: dfn-error-code
+    text: no such window; url: dfn-no-such-window
+    text: url variable; url: dfn-url-variables
 </pre>
 
 <style>
@@ -152,7 +165,7 @@ A <dfn>background fetch</dfn> consists of:
 
       Note: If a [=request/method=] is not \``GET`\`, reissuing the request may have unwanted side effects.
 
-    * The UI may be activated (for example, by clicking), in which case [=fire a background fetch click event=].
+    * The UI may be activated (for example, by clicking), in which case [=fire a background fetch click event=] for |bgFetch|.
     * The UI may remain once the operation is complete, in which case it can still be activated.
 
     Let |permission| be the [=permission state=] for a {{PermissionDescriptor}} with {{PermissionDescriptor/name}} `"background-fetch"` and |environment|. If |permission| is `"prompt"`, then the user agent may set |bgFetch|'s [=background fetch/paused flag=] at the beginning of this algorithm. The user agent should allow the user to either accept the background fetch (unsetting |bgFetch|'s [=background fetch/paused flag=]), or refuse the background fetch (setting |bgFetch|'s [=background fetch/abort all flag=]). The user agent may also provide always-allow and alway-deny options, which can be used as [=new information about the user's intent=] for this permission.
@@ -930,6 +943,38 @@ interface BackgroundFetchUpdateUIEvent : BackgroundFetchEvent {
     1. If |options|'s {{BackgroundFetchUIOptions/title}} member is present, set |bgFetch|'s [=background fetch/title=] to |options|'s {{BackgroundFetchUIOptions/title}}.
     1. [=Resolve=] |promise|.
   </div>
+</div>
+
+# Automation # {#automation}
+
+For the purposes of user-agent automation and application testing, this document defines the following [=extension command=] for the [[WebDriver]] specification.
+
+## [=background fetch click|Click=] ## {#automation-click}
+
+<div algorithm>
+  <table>
+    <tbody>
+      <tr>
+        <th>[=request/Method=]</th>
+        <th>[=extension command URI template|URI Template=]</a></th>
+      </tr>
+      <tr>
+        <td>POST</td>
+        <td>/session/{session id}/backgroundfetch/{|id|}/click</td>
+      </tr>
+    </tbody>
+  </table>
+
+  The <dfn>background fetch click</dfn> [=extension command=] simulates the user activating the [=background fetch/display=] of a [=background fetch=]. The [=remote end steps=] are:
+
+  1. If the [=current top-level browsing context=] is [=no longer open=], then return a [=WebDriver error=] with [=WebDriver error code=] [=no such window=].
+  1. Let |pageURL| be the [=current top-level browsing context=]'s [=active document=]'s [=Document/URL=].
+  1. Let |swRegistration| be the [=Match Service Worker Registration|matching service worker registration=] for |pageURL|.
+  1. If |swRegistration| is null, then return a [=WebDriver error=] with [=response/status=] `400` and JSON error code "`invalid service worker state`".
+  1. Let |bgFetch| be the newest [=background fetch=] with an [=background fetch/id=] of [=url variable=] |id| and a [=background fetch/service worker registration=] of |swRegistration|, or null if none exists.
+  1. If |bgFetch| is null, then return a [=WebDriver error=] with [=response/status=] `404` and JSON error code "`background fetch not found`".
+  1. [=Fire a background fetch click event=] for |bgFetch|.
+  1. Return [=WebDriver success=].
 </div>
 
 # Privacy and bandwidth usage # {#privacy-and-bandwidth-use}
