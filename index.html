@@ -1214,7 +1214,7 @@ Possible extra rowspan handling
 </style>
   <meta content="Bikeshed version dff342f4b23fb230b71436fb31b55f5f169715bd" name="generator">
   <link href="https://wicg.github.io/background-fetch/" rel="canonical">
-  <meta content="80155298a987e90ad4a64716428851b589ef3d96" name="document-revision">
+  <meta content="098fa430b338836e8d7dc5907c52807ab7753617" name="document-revision">
 <style>
   .algorithm dl {
     overflow: hidden;
@@ -1492,7 +1492,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">Background Fetch</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Editor’s Draft, <time class="dt-updated" datetime="2018-10-01">1 October 2018</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Editor’s Draft, <time class="dt-updated" datetime="2018-10-02">2 October 2018</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1551,6 +1551,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
       <li><a href="#extract-content-range-values-algorithm"><span class="secno">4.7</span> <span class="content"><span>Extract content-range values</span></span></a>
       <li><a href="#header-equality-algorithm"><span class="secno">4.8</span> <span class="content"><span>Header equality</span></span></a>
       <li><a href="#create-settled-fetches-algorithm"><span class="secno">4.9</span> <span class="content"><span>Create record objects</span></span></a>
+      <li><a href="#contains-background-fetch-algorithm"><span class="secno">4.10</span> <span class="content"><span>Contains background fetch</span></span></a>
      </ol>
     <li><a href="#header-syntax"><span class="secno">5</span> <span class="content">Header syntax</span></a>
     <li>
@@ -1648,19 +1649,6 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
       <p>An <dfn class="dfn-paneled" data-dfn-for="service worker registration" data-dfn-type="dfn" data-noexport id="service-worker-registration-active-background-fetches-edit-queue">active background fetches edit queue</dfn> (a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#parallel-queue" id="ref-for-parallel-queue">parallel queue</a>), initially the result of <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#starting-a-new-parallel-queue" id="ref-for-starting-a-new-parallel-queue">starting a new parallel queue</a>.</p>
     </ul>
    </div>
-   <div class="algorithm" data-algorithm="contains">
-     To determine whether an <a data-link-type="dfn" href="#service-worker-registration-active-background-fetches" id="ref-for-service-worker-registration-active-background-fetches">active background fetches</a> <dfn class="dfn-paneled" data-dfn-for="active background fetches" data-dfn-type="dfn" data-noexport id="active-background-fetches-contains">contains</dfn> <var>bgFetch</var> (a <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch①">background fetch</a>), run these steps: 
-    <ol>
-     <li data-md>
-      <p>Let <var>id</var> be <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-id" id="ref-for-background-fetch-id">id</a>.</p>
-     <li data-md>
-      <p>If <var>activeBgFetches</var>[<var>id</var>] does not <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#map-exists" id="ref-for-map-exists">exist</a>, then return false.</p>
-     <li data-md>
-      <p>If <var>activeBgFetches</var>[<var>id</var>] does not equal <var>bgFetch</var>, then return false.</p>
-     <li data-md>
-      <p>Return true.</p>
-    </ol>
-   </div>
    <h3 class="heading settled" data-level="3.2" id="background-fetch-concept"><span class="secno">3.2. </span><span class="content">Background fetch</span><a class="self-link" href="#background-fetch-concept"></a></h3>
    <p>A <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="background-fetch">background fetch</dfn> consists of:</p>
    <div>
@@ -1695,7 +1683,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
       <p>A <dfn class="dfn-paneled" data-dfn-for="background fetch" data-dfn-type="dfn" data-noexport id="background-fetch-abort-all-flag">abort all flag</dfn>, initially unset.</p>
     </ul>
     <div class="algorithm" data-algorithm="stored body bytes total">
-      To get a <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch②">background fetch</a>'s (<var>bgFetch</var>) <dfn class="dfn-paneled" data-dfn-for="background fetch" data-dfn-type="dfn" data-noexport id="background-fetch-stored-body-bytes-total">stored body bytes total</dfn>, run these steps: 
+      To get a <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch①">background fetch</a>'s (<var>bgFetch</var>) <dfn class="dfn-paneled" data-dfn-for="background fetch" data-dfn-type="dfn" data-noexport id="background-fetch-stored-body-bytes-total">stored body bytes total</dfn>, run these steps: 
      <ol>
       <li data-md>
        <p>Let <var>total</var> be 0.</p>
@@ -1710,7 +1698,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
      </ol>
     </div>
     <div class="algorithm" data-algorithm="display">
-      To <dfn class="dfn-paneled" data-dfn-for="background fetch" data-dfn-type="dfn" data-noexport id="background-fetch-display">display</dfn> a <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch③">background fetch</a> (<var>bgFetch</var>) for a given <var>environment</var> (an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object" id="ref-for-environment-settings-object">environment settings object</a>), the user agent must present a user interface that follows these rules: 
+      To <dfn class="dfn-paneled" data-dfn-for="background fetch" data-dfn-type="dfn" data-noexport id="background-fetch-display">display</dfn> a <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch②">background fetch</a> (<var>bgFetch</var>) for a given <var>environment</var> (an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object" id="ref-for-environment-settings-object">environment settings object</a>), the user agent must present a user interface that follows these rules: 
      <ul>
       <li data-md>
        <p>The <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-service-worker-registration" id="ref-for-background-fetch-service-worker-registration">service worker registration</a>'s <a data-link-type="dfn" href="https://w3c.github.io/ServiceWorker/#dfn-scope-url" id="ref-for-dfn-scope-url">scope url</a>'s <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url-origin" id="ref-for-concept-url-origin">origin</a> must be displayed.</p>
@@ -1783,9 +1771,9 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
    </div>
    <h2 class="heading settled" data-level="4" id="algorithms"><span class="secno">4. </span><span class="content">Algorithms</span><a class="self-link" href="#algorithms"></a></h2>
    <h3 class="heading settled" data-level="4.1" id="perform-a-background-fetch-algorithm"><span class="secno">4.1. </span><span class="content"><a data-link-type="dfn" href="#perform-a-background-fetch" id="ref-for-perform-a-background-fetch">Perform a background fetch</a></span><a class="self-link" href="#perform-a-background-fetch-algorithm"></a></h3>
-   <p class="note" role="note"><span>Note:</span> This is the algorithm that manages the 'background' parts of a background fetch. Only one instance of this algorithm runs per <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch④">background fetch</a>.</p>
+   <p class="note" role="note"><span>Note:</span> This is the algorithm that manages the 'background' parts of a background fetch. Only one instance of this algorithm runs per <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch③">background fetch</a>.</p>
    <div class="algorithm" data-algorithm="perform a background fetch">
-     To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="perform-a-background-fetch">perform a background fetch</dfn> for <var>bgFetch</var> (a <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch⑤">background fetch</a>), run these steps: 
+     To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="perform-a-background-fetch">perform a background fetch</dfn> for <var>bgFetch</var> (a <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch④">background fetch</a>), run these steps: 
     <ol>
      <li data-md>
       <p>Let <var>swRegistration</var> be <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-service-worker-registration" id="ref-for-background-fetch-service-worker-registration①">service worker registration</a>.</p>
@@ -1824,11 +1812,11 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
       <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#enqueue-the-following-steps" id="ref-for-enqueue-the-following-steps">Enqueue the following steps</a> to <var>swRegistration</var>’s <a data-link-type="dfn" href="#service-worker-registration-active-background-fetches-edit-queue" id="ref-for-service-worker-registration-active-background-fetches-edit-queue">active background fetches edit queue</a>:</p>
       <ol>
        <li data-md>
-        <p>Let <var>activeBgFetches</var> be <var>swRegistration</var>’s <a data-link-type="dfn" href="#service-worker-registration-active-background-fetches" id="ref-for-service-worker-registration-active-background-fetches①">active background fetches</a>.</p>
+        <p>Let <var>activeBgFetches</var> be <var>swRegistration</var>’s <a data-link-type="dfn" href="#service-worker-registration-active-background-fetches" id="ref-for-service-worker-registration-active-background-fetches">active background fetches</a>.</p>
        <li data-md>
-        <p>Let <var>id</var> be <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-id" id="ref-for-background-fetch-id①">id</a>.</p>
+        <p>Let <var>id</var> be <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-id" id="ref-for-background-fetch-id">id</a>.</p>
        <li data-md>
-        <p>If <var>activeBgFetches</var> <a data-link-type="dfn" href="#active-background-fetches-contains" id="ref-for-active-background-fetches-contains">contains</a> <var>bgFetch</var>, then remove <var>activeBgFetches</var>[<var>id</var>].</p>
+        <p>If <var>activeBgFetches</var> <a data-link-type="dfn" href="#contains-background-fetch" id="ref-for-contains-background-fetch">contains background fetch</a> <var>bgFetch</var>, then remove <var>activeBgFetches</var>[<var>id</var>].</p>
        <li data-md>
         <p>Otherwise, set <var>failureReason</var> to <code>"aborted"</code>.</p>
         <p class="note" role="note"><span>Note:</span> This handles a race condition where <code class="idl"><a data-link-type="idl" href="#dom-backgroundfetchregistration-abort" id="ref-for-dom-backgroundfetchregistration-abort">abort()</a></code> was successfully called but one of the fetches failed at the same time. If we’ve returned true from <code class="idl"><a data-link-type="idl" href="#dom-backgroundfetchregistration-abort" id="ref-for-dom-backgroundfetchregistration-abort①">abort()</a></code>, this ensures we fire the related abort event.</p>
@@ -1895,7 +1883,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
    <h3 class="heading settled" data-level="4.2" id="complete-a-record-algorithm"><span class="secno">4.2. </span><span class="content"><a data-link-type="dfn" href="#complete-a-record" id="ref-for-complete-a-record②">Complete a record</a></span><a class="self-link" href="#complete-a-record-algorithm"></a></h3>
    <p class="note" role="note"><span>Note:</span> This algorithm manages the fetching of a <a data-link-type="dfn" href="#background-fetch-record" id="ref-for-background-fetch-record①">background fetch record</a>. One instance of this algorithm is started per <a data-link-type="dfn" href="#background-fetch-record" id="ref-for-background-fetch-record②">background fetch record</a>, but it is called recursively to retry fetches or to fetch the next part of a partial response.</p>
    <div class="algorithm" data-algorithm="complete a record">
-     To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="complete-a-record">complete a record</dfn> for <var>bgFetch</var> (a <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch⑥">background fetch</a>) and <var>record</var> (a <a data-link-type="dfn" href="#background-fetch-record" id="ref-for-background-fetch-record③">background fetch record</a>), run these steps: 
+     To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="complete-a-record">complete a record</dfn> for <var>bgFetch</var> (a <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch⑤">background fetch</a>) and <var>record</var> (a <a data-link-type="dfn" href="#background-fetch-record" id="ref-for-background-fetch-record③">background fetch record</a>), run these steps: 
     <ol>
      <li data-md>
       <p>Let <var>responseData</var> be <var>record</var>’s <a data-link-type="dfn" href="#background-fetch-record-response-data" id="ref-for-background-fetch-record-response-data②">response data</a>.</p>
@@ -2051,7 +2039,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
    </div>
    <h3 class="heading settled" data-level="4.3" id="update-background-fetch-instance-algorithm"><span class="secno">4.3. </span><span class="content"><a data-link-type="dfn" href="#update-background-fetch-instances" id="ref-for-update-background-fetch-instances⑤">Update background fetch instances</a></span><a class="self-link" href="#update-background-fetch-instance-algorithm"></a></h3>
    <div class="algorithm" data-algorithm="update background fetch instances">
-     To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="update-background-fetch-instances">update background fetch instances</dfn> for <var>bgFetch</var> (a <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch⑦">background fetch</a>), <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#enqueue-the-following-steps" id="ref-for-enqueue-the-following-steps①">enqueue the following steps</a> to <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-update-handling-queue" id="ref-for-background-fetch-update-handling-queue">update handling queue</a>: 
+     To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="update-background-fetch-instances">update background fetch instances</dfn> for <var>bgFetch</var> (a <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch⑥">background fetch</a>), <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#enqueue-the-following-steps" id="ref-for-enqueue-the-following-steps①">enqueue the following steps</a> to <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-update-handling-queue" id="ref-for-background-fetch-update-handling-queue">update handling queue</a>: 
     <ol>
      <li data-md>
       <p>Let <var>downloaded</var> be <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-stored-body-bytes-total" id="ref-for-background-fetch-stored-body-bytes-total②">stored body bytes total</a>.</p>
@@ -2105,7 +2093,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
    </div>
    <h3 class="heading settled" data-level="4.4" id="fire-a-background-fetch-click-event-algorithm"><span class="secno">4.4. </span><span class="content"><a data-link-type="dfn" href="#fire-a-background-fetch-click-event" id="ref-for-fire-a-background-fetch-click-event①">Fire a background fetch click event</a></span><a class="self-link" href="#fire-a-background-fetch-click-event-algorithm"></a></h3>
    <div class="algorithm" data-algorithm="fire a background fetch click event">
-     To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="fire-a-background-fetch-click-event">fire a background fetch click event</dfn> for a <var>bgFetch</var> (a <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch⑧">background fetch</a>), <a data-link-type="dfn" href="https://w3c.github.io/ServiceWorker/#fire-functional-event" id="ref-for-fire-functional-event①">fire a functional event</a> named "<code>backgroundfetchclick</code>" using <code class="idl"><a data-link-type="idl" href="#backgroundfetchevent" id="ref-for-backgroundfetchevent①">BackgroundFetchEvent</a></code> on <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-service-worker-registration" id="ref-for-background-fetch-service-worker-registration③">service worker registration</a> with the following properties: 
+     To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="fire-a-background-fetch-click-event">fire a background fetch click event</dfn> for a <var>bgFetch</var> (a <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch⑦">background fetch</a>), <a data-link-type="dfn" href="https://w3c.github.io/ServiceWorker/#fire-functional-event" id="ref-for-fire-functional-event①">fire a functional event</a> named "<code>backgroundfetchclick</code>" using <code class="idl"><a data-link-type="idl" href="#backgroundfetchevent" id="ref-for-backgroundfetchevent①">BackgroundFetchEvent</a></code> on <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-service-worker-registration" id="ref-for-background-fetch-service-worker-registration③">service worker registration</a> with the following properties: 
     <dl>
      <dt data-md><code class="idl"><a data-link-type="idl" href="#dom-backgroundfetchevent-registration" id="ref-for-dom-backgroundfetchevent-registration①">registration</a></code>
      <dd data-md>
@@ -2113,14 +2101,14 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
     </dl>
    </div>
    <h3 class="heading settled" data-level="4.5" id="get-a-backgroundfetchregistration-instance-algorithm"><span class="secno">4.5. </span><span class="content"><a data-link-type="dfn" href="#get-a-backgroundfetchregistration-instance" id="ref-for-get-a-backgroundfetchregistration-instance③">Get a BackgroundFetchRegistration instance</a></span><a class="self-link" href="#get-a-backgroundfetchregistration-instance-algorithm"></a></h3>
-   <p class="note" role="note"><span>Note:</span> This algorithm ensures the same <code class="idl"><a data-link-type="idl" href="#backgroundfetchregistration" id="ref-for-backgroundfetchregistration①">BackgroundFetchRegistration</a></code> instance is returned for a given <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch⑨">background fetch</a> throughout the life of a <code class="idl"><a data-link-type="idl" href="#backgroundfetchmanager" id="ref-for-backgroundfetchmanager">BackgroundFetchManager</a></code>. It’s okay for browsers to optimise this, as long as there’s no way to tell that more than one instance has been created for a given <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch①⓪">background fetch</a> (e.g through equality, expandos, or weakly-associated data).</p>
+   <p class="note" role="note"><span>Note:</span> This algorithm ensures the same <code class="idl"><a data-link-type="idl" href="#backgroundfetchregistration" id="ref-for-backgroundfetchregistration①">BackgroundFetchRegistration</a></code> instance is returned for a given <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch⑧">background fetch</a> throughout the life of a <code class="idl"><a data-link-type="idl" href="#backgroundfetchmanager" id="ref-for-backgroundfetchmanager">BackgroundFetchManager</a></code>. It’s okay for browsers to optimise this, as long as there’s no way to tell that more than one instance has been created for a given <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch⑨">background fetch</a> (e.g through equality, expandos, or weakly-associated data).</p>
    <div class="algorithm" data-algorithm="get a BackgroundFetchRegistration instance">
-     To <dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="get a BackgroundFetchRegistration instance|getting a BackgroundFetchRegistration instance" data-noexport id="get-a-backgroundfetchregistration-instance">get a BackgroundFetchRegistration instance</dfn> for a <var>bgFetch</var> (a <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch①①">background fetch</a>) in <var>realm</var> (a <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#realm" id="ref-for-realm">Realm</a>), run these steps: 
+     To <dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="get a BackgroundFetchRegistration instance|getting a BackgroundFetchRegistration instance" data-noexport id="get-a-backgroundfetchregistration-instance">get a BackgroundFetchRegistration instance</dfn> for a <var>bgFetch</var> (a <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch①⓪">background fetch</a>) in <var>realm</var> (a <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#realm" id="ref-for-realm">Realm</a>), run these steps: 
     <ol>
      <li data-md>
       <p>Let <var>instancesMap</var> be the <a data-link-type="dfn" href="#backgroundfetchmanager-backgroundfetchregistration-instances" id="ref-for-backgroundfetchmanager-backgroundfetchregistration-instances">backgroundFetchRegistration instances</a> of the only instance of <code class="idl"><a data-link-type="idl" href="#backgroundfetchmanager" id="ref-for-backgroundfetchmanager①">BackgroundFetchManager</a></code> within this <var>realm</var>.</p>
      <li data-md>
-      <p>If <var>instancesMap</var>[<var>bgFetch</var>] <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#map-exists" id="ref-for-map-exists①">exists</a>, then return <var>instancesMap</var>[<var>bgFetch</var>].</p>
+      <p>If <var>instancesMap</var>[<var>bgFetch</var>] <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#map-exists" id="ref-for-map-exists">exists</a>, then return <var>instancesMap</var>[<var>bgFetch</var>].</p>
      <li data-md>
       <p>Let <var>instance</var> be a new <code class="idl"><a data-link-type="idl" href="#backgroundfetchregistration" id="ref-for-backgroundfetchregistration②">BackgroundFetchRegistration</a></code> in <var>realm</var>, with its <a data-link-type="dfn" href="#backgroundfetchregistration-background-fetch" id="ref-for-backgroundfetchregistration-background-fetch①">background fetch</a> set to <var>bgFetch</var>.</p>
      <li data-md>
@@ -2318,6 +2306,29 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
       </ol>
      <li data-md>
       <p>Return <var>recordObjects</var>.</p>
+    </ol>
+   </div>
+   <h3 class="heading settled" data-level="4.10" id="contains-background-fetch-algorithm"><span class="secno">4.10. </span><span class="content"><a data-link-type="dfn" href="#contains-background-fetch" id="ref-for-contains-background-fetch①">Contains background fetch</a></span><a class="self-link" href="#contains-background-fetch-algorithm"></a></h3>
+   <div class="algorithm" data-algorithm="contains background fetch">
+     To determine whether a <var>map</var> (a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#ordered-map" id="ref-for-ordered-map②">map</a>) <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="contains-background-fetch">contains background fetch</dfn> <var>bgFetch</var> (a <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch①①">background fetch</a>), run these steps: 
+    <ol>
+     <li data-md>
+      <p>Let <var>id</var> be <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-id" id="ref-for-background-fetch-id①">id</a>.</p>
+     <li data-md>
+      <p>If <var>map</var>[<var>id</var>] does not <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#map-exists" id="ref-for-map-exists①">exist</a>, then return false.</p>
+     <li data-md>
+      <p>If <var>map</var>[<var>id</var>] does not equal <var>bgFetch</var>, then return false.</p>
+     <li data-md>
+      <p>Return true.</p>
+    </ol>
+   </div>
+   <div class="algorithm" data-algorithm="does not contain background fetch">
+     To determine whether a <var>map</var> (a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#ordered-map" id="ref-for-ordered-map③">map</a>) <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="does-not-contain-background-fetch">does not contain background fetch</dfn> <var>bgFetch</var> (a <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch①②">background fetch</a>), run these steps: 
+    <ol>
+     <li data-md>
+      <p>If <var>map</var> <a data-link-type="dfn" href="#contains-background-fetch" id="ref-for-contains-background-fetch②">contains background fetch</a> <var>bgFetch</var>, then return false.</p>
+     <li data-md>
+      <p>Return true.</p>
     </ol>
    </div>
    <h2 class="heading settled" data-level="5" id="header-syntax"><span class="secno">5. </span><span class="content">Header syntax</span><a class="self-link" href="#header-syntax"></a></h2>
@@ -2594,7 +2605,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
     <div>
      <ul>
       <li data-md>
-       <p><dfn class="dfn-paneled" data-dfn-for="BackgroundFetchManager" data-dfn-type="dfn" data-noexport id="backgroundfetchmanager-backgroundfetchregistration-instances">BackgroundFetchRegistration instances</dfn> (a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#ordered-map" id="ref-for-ordered-map②">map</a>), where the keys are <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch①②">background fetches</a> and the values are <code class="idl"><a data-link-type="idl" href="#backgroundfetchregistration" id="ref-for-backgroundfetchregistration⑤">BackgroundFetchRegistration</a></code> objects. It is initially an empty <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#ordered-map" id="ref-for-ordered-map③">map</a>.</p>
+       <p><dfn class="dfn-paneled" data-dfn-for="BackgroundFetchManager" data-dfn-type="dfn" data-noexport id="backgroundfetchmanager-backgroundfetchregistration-instances">BackgroundFetchRegistration instances</dfn> (a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#ordered-map" id="ref-for-ordered-map④">map</a>), where the keys are <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch①③">background fetches</a> and the values are <code class="idl"><a data-link-type="idl" href="#backgroundfetchregistration" id="ref-for-backgroundfetchregistration⑤">BackgroundFetchRegistration</a></code> objects. It is initially an empty <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#ordered-map" id="ref-for-ordered-map⑤">map</a>.</p>
       <li data-md>
        <p>A <dfn class="dfn-paneled" data-dfn-for="BackgroundFetchManager" data-dfn-type="dfn" data-noexport id="backgroundfetchmanager-service-worker-registration">service worker registration</dfn> (a <a data-link-type="dfn" href="https://w3c.github.io/ServiceWorker/#dfn-service-worker-registration" id="ref-for-dfn-service-worker-registration③">service worker registration</a>).</p>
      </ul>
@@ -2639,7 +2650,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
         <li data-md>
          <p>If <var>permission</var> is <code>"denied"</code>, then reject <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#notallowederror" id="ref-for-notallowederror">NotAllowedError</a></code> <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#idl-DOMException" id="ref-for-idl-DOMException②">DOMException</a></code> and abort these steps.</p>
         <li data-md>
-         <p>Let <var>bgFetchMap</var> be <var>registration</var>’s <a data-link-type="dfn" href="#service-worker-registration-active-background-fetches" id="ref-for-service-worker-registration-active-background-fetches②">active background fetches</a>.</p>
+         <p>Let <var>bgFetchMap</var> be <var>registration</var>’s <a data-link-type="dfn" href="#service-worker-registration-active-background-fetches" id="ref-for-service-worker-registration-active-background-fetches①">active background fetches</a>.</p>
         <li data-md>
          <p>If <var>registration</var>’s <a data-link-type="dfn" href="https://w3c.github.io/ServiceWorker/#dfn-active-worker" id="ref-for-dfn-active-worker">active worker</a> is null, then reject <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#exceptiondef-typeerror" id="ref-for-exceptiondef-typeerror④">TypeError</a></code> and abort these steps.</p>
         <li data-md>
@@ -2682,7 +2693,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
         <li data-md>
          <p>If <var>requestReadFailed</var> is true, then <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise" id="ref-for-reject-promise④">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#exceptiondef-typeerror" id="ref-for-exceptiondef-typeerror⑥">TypeError</a></code> and abort these steps.</p>
         <li data-md>
-         <p>Let <var>bgFetch</var> be a new <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch①③">background fetch</a> with:</p>
+         <p>Let <var>bgFetch</var> be a new <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch①④">background fetch</a> with:</p>
          <dl>
           <dt data-md><a data-link-type="dfn" href="#background-fetch-id" id="ref-for-background-fetch-id②">id</a>
           <dd data-md>
@@ -2730,7 +2741,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
       <li data-md>
        <p>Let <var>registration</var> be the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object⑧">context object</a>'s associated <a data-link-type="dfn" href="#backgroundfetchmanager-service-worker-registration" id="ref-for-backgroundfetchmanager-service-worker-registration②">service worker registration</a>.</p>
       <li data-md>
-       <p>Let <var>bgFetch</var> be <var>registration</var>’s <a data-link-type="dfn" href="#service-worker-registration-active-background-fetches" id="ref-for-service-worker-registration-active-background-fetches③">active background fetches</a>[<var>id</var>].</p>
+       <p>Let <var>bgFetch</var> be <var>registration</var>’s <a data-link-type="dfn" href="#service-worker-registration-active-background-fetches" id="ref-for-service-worker-registration-active-background-fetches②">active background fetches</a>[<var>id</var>].</p>
       <li data-md>
        <p>If <var>bgFetch</var> is undefined, then <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#resolve-promise" id="ref-for-resolve-promise③">resolve</a> <var>promise</var> with undefined and abort these steps.</p>
       <li data-md>
@@ -2757,7 +2768,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
       <li data-md>
        <p>Let <var>registration</var> be the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object" id="ref-for-context-object①⓪">context object</a>'s associated <a data-link-type="dfn" href="#backgroundfetchmanager-service-worker-registration" id="ref-for-backgroundfetchmanager-service-worker-registration③">service worker registration</a>.</p>
       <li data-md>
-       <p><a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#resolve-promise" id="ref-for-resolve-promise⑤">Resolve</a> <var>promise</var> with the result of <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#map-getting-the-keys" id="ref-for-map-getting-the-keys">getting the keys</a> of <var>registration</var>’s <a data-link-type="dfn" href="#service-worker-registration-active-background-fetches" id="ref-for-service-worker-registration-active-background-fetches④">active background fetches</a>.</p>
+       <p><a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#resolve-promise" id="ref-for-resolve-promise⑤">Resolve</a> <var>promise</var> with the result of <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#map-getting-the-keys" id="ref-for-map-getting-the-keys">getting the keys</a> of <var>registration</var>’s <a data-link-type="dfn" href="#service-worker-registration-active-background-fetches" id="ref-for-service-worker-registration-active-background-fetches③">active background fetches</a>.</p>
      </ol>
     </div>
    </div>
@@ -2802,7 +2813,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
     <p>A <code class="idl"><a data-link-type="idl" href="#backgroundfetchregistration" id="ref-for-backgroundfetchregistration⑧">BackgroundFetchRegistration</a></code> instance has:</p>
     <ul>
      <li data-md>
-      <p>A <dfn class="dfn-paneled" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="dfn" data-noexport id="backgroundfetchregistration-background-fetch">background fetch</dfn> (a <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch①④">background fetch</a>).</p>
+      <p>A <dfn class="dfn-paneled" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="dfn" data-noexport id="backgroundfetchregistration-background-fetch">background fetch</dfn> (a <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch①⑤">background fetch</a>).</p>
      <li data-md>
       <p>A <dfn class="dfn-paneled" data-dfn-for="BackgroundFetchRegistration" data-dfn-type="dfn" data-noexport id="backgroundfetchregistration-downloaded">downloaded</dfn> (a number), initially a copy of <a data-link-type="dfn" href="#backgroundfetchregistration-background-fetch" id="ref-for-backgroundfetchregistration-background-fetch②">background fetch</a>'s <a data-link-type="dfn" href="#background-fetch-stored-body-bytes-total" id="ref-for-background-fetch-stored-body-bytes-total③">stored body bytes total</a>.</p>
      <li data-md>
@@ -2844,11 +2855,11 @@ complete-length = ( 1*DIGIT / "*" )</pre>
        <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#enqueue-the-following-steps" id="ref-for-enqueue-the-following-steps④">Enqueue the following steps</a> to <var>swRegistration</var>’s <a data-link-type="dfn" href="#service-worker-registration-active-background-fetches-edit-queue" id="ref-for-service-worker-registration-active-background-fetches-edit-queue②">active background fetches edit queue</a>:</p>
        <ol>
         <li data-md>
-         <p>Let <var>activeBgFetches</var> be <var>swRegistration</var>’s <a data-link-type="dfn" href="#service-worker-registration-active-background-fetches" id="ref-for-service-worker-registration-active-background-fetches⑤">active background fetches</a>.</p>
+         <p>Let <var>activeBgFetches</var> be <var>swRegistration</var>’s <a data-link-type="dfn" href="#service-worker-registration-active-background-fetches" id="ref-for-service-worker-registration-active-background-fetches④">active background fetches</a>.</p>
         <li data-md>
          <p>Let <var>id</var> be <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-id" id="ref-for-background-fetch-id④">id</a>.</p>
         <li data-md>
-         <p>If <var>activeBgFetches</var> does not <a data-link-type="dfn" href="#active-background-fetches-contains" id="ref-for-active-background-fetches-contains①">contain</a> <var>bgFetch</var>, then <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#resolve-promise" id="ref-for-resolve-promise⑥">resolve</a> <var>promise</var> with false and abort these steps.</p>
+         <p>If <var>activeBgFetches</var> <a data-link-type="dfn" href="#does-not-contain-background-fetch" id="ref-for-does-not-contain-background-fetch">does not contain background fetch</a> <var>bgFetch</var>, then <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#resolve-promise" id="ref-for-resolve-promise⑥">resolve</a> <var>promise</var> with false and abort these steps.</p>
         <li data-md>
          <p>Remove <var>activeBgFetches</var>[<var>id</var>].</p>
         <li data-md>
@@ -2925,7 +2936,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
 };
 </pre>
    <div>
-     A <code class="idl"><a data-link-type="idl" href="#backgroundfetchevent" id="ref-for-backgroundfetchevent⑤">BackgroundFetchEvent</a></code> has a <dfn class="dfn-paneled" data-dfn-for="BackgroundFetchEvent" data-dfn-type="dfn" data-noexport id="backgroundfetchevent-background-fetch">background fetch</dfn> (a <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch①⑤">background fetch</a>), initially the <a data-link-type="dfn" href="#backgroundfetchregistration-background-fetch" id="ref-for-backgroundfetchregistration-background-fetch①②">background fetch</a> of the value <code class="idl"><a data-link-type="idl" href="#dom-backgroundfetchevent-registration" id="ref-for-dom-backgroundfetchevent-registration③">registration</a></code> was initialized to. 
+     A <code class="idl"><a data-link-type="idl" href="#backgroundfetchevent" id="ref-for-backgroundfetchevent⑤">BackgroundFetchEvent</a></code> has a <dfn class="dfn-paneled" data-dfn-for="BackgroundFetchEvent" data-dfn-type="dfn" data-noexport id="backgroundfetchevent-background-fetch">background fetch</dfn> (a <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch①⑥">background fetch</a>), initially the <a data-link-type="dfn" href="#backgroundfetchregistration-background-fetch" id="ref-for-backgroundfetchregistration-background-fetch①②">background fetch</a> of the value <code class="idl"><a data-link-type="idl" href="#dom-backgroundfetchevent-registration" id="ref-for-dom-backgroundfetchevent-registration③">registration</a></code> was initialized to. 
     <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="BackgroundFetchEvent" data-dfn-type="attribute" data-export id="dom-backgroundfetchevent-registration"><code>registration</code></dfn> attribute must return the value it was initialized to.</p>
    </div>
    <h3 class="heading settled" data-level="6.7" id="background-fetch-update-ui-event"><span class="secno">6.7. </span><span class="content"><code class="idl"><a data-link-type="idl" href="#backgroundfetchupdateuievent" id="ref-for-backgroundfetchupdateuievent④">BackgroundFetchUpdateUIEvent</a></code></span><a class="self-link" href="#background-fetch-update-ui-event"></a></h3>
@@ -2980,7 +2991,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
        <td>POST
        <td>/session/{session id}/backgroundfetch/{<var>id</var>}/click
     </table>
-    <p>The <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="background-fetch-click">background fetch click</dfn> <a data-link-type="dfn" href="https://w3c.github.io/webdriver/webdriver-spec.html#dfn-extension-command" id="ref-for-dfn-extension-command①">extension command</a> simulates the user activating the <a data-link-type="dfn" href="#background-fetch-display" id="ref-for-background-fetch-display①">display</a> of a <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch①⑥">background fetch</a>. The <a data-link-type="dfn" href="https://w3c.github.io/webdriver/webdriver-spec.html#dfn-remote-end-steps" id="ref-for-dfn-remote-end-steps">remote end steps</a> are:</p>
+    <p>The <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="background-fetch-click">background fetch click</dfn> <a data-link-type="dfn" href="https://w3c.github.io/webdriver/webdriver-spec.html#dfn-extension-command" id="ref-for-dfn-extension-command①">extension command</a> simulates the user activating the <a data-link-type="dfn" href="#background-fetch-display" id="ref-for-background-fetch-display①">display</a> of a <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch①⑦">background fetch</a>. The <a data-link-type="dfn" href="https://w3c.github.io/webdriver/webdriver-spec.html#dfn-remote-end-steps" id="ref-for-dfn-remote-end-steps">remote end steps</a> are:</p>
     <ol>
      <li data-md>
       <p>If the <a data-link-type="dfn" href="https://w3c.github.io/webdriver/webdriver-spec.html#dfn-current-top-level-browsing-context" id="ref-for-dfn-current-top-level-browsing-context">current top-level browsing context</a> is <a data-link-type="dfn" href="https://w3c.github.io/webdriver/webdriver-spec.html#dfn-no-longer-open" id="ref-for-dfn-no-longer-open">no longer open</a>, then return a <a data-link-type="dfn" href="https://w3c.github.io/webdriver/webdriver-spec.html#dfn-errors" id="ref-for-dfn-errors">WebDriver error</a> with <a data-link-type="dfn" href="https://w3c.github.io/webdriver/webdriver-spec.html#dfn-error-code" id="ref-for-dfn-error-code">WebDriver error code</a> <a data-link-type="dfn" href="https://w3c.github.io/webdriver/webdriver-spec.html#dfn-no-such-window" id="ref-for-dfn-no-such-window">no such window</a>.</p>
@@ -2991,7 +3002,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
      <li data-md>
       <p>If <var>swRegistration</var> is null, then return a <a data-link-type="dfn" href="https://w3c.github.io/webdriver/webdriver-spec.html#dfn-errors" id="ref-for-dfn-errors①">WebDriver error</a> with <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-status" id="ref-for-concept-response-status⑥">status</a> <code>400</code> and JSON error code "<code>invalid service worker state</code>".</p>
      <li data-md>
-      <p>Let <var>bgFetch</var> be the newest <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch①⑦">background fetch</a> with an <a data-link-type="dfn" href="#background-fetch-id" id="ref-for-background-fetch-id⑤">id</a> of <a data-link-type="dfn" href="https://w3c.github.io/webdriver/webdriver-spec.html#dfn-url-variables" id="ref-for-dfn-url-variables">url variable</a> <var>id</var> and a <a data-link-type="dfn" href="#background-fetch-service-worker-registration" id="ref-for-background-fetch-service-worker-registration⑥">service worker registration</a> of <var>swRegistration</var>, or null if none exists.</p>
+      <p>Let <var>bgFetch</var> be the newest <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch①⑧">background fetch</a> with an <a data-link-type="dfn" href="#background-fetch-id" id="ref-for-background-fetch-id⑤">id</a> of <a data-link-type="dfn" href="https://w3c.github.io/webdriver/webdriver-spec.html#dfn-url-variables" id="ref-for-dfn-url-variables">url variable</a> <var>id</var> and a <a data-link-type="dfn" href="#background-fetch-service-worker-registration" id="ref-for-background-fetch-service-worker-registration⑥">service worker registration</a> of <var>swRegistration</var>, or null if none exists.</p>
      <li data-md>
       <p>If <var>bgFetch</var> is null, then return a <a data-link-type="dfn" href="https://w3c.github.io/webdriver/webdriver-spec.html#dfn-errors" id="ref-for-dfn-errors②">WebDriver error</a> with <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-status" id="ref-for-concept-response-status⑦">status</a> <code>404</code> and JSON error code "<code>background fetch not found</code>".</p>
      <li data-md>
@@ -3004,7 +3015,7 @@ complete-length = ( 1*DIGIT / "*" )</pre>
    <p>It’s the recommendation of this standard that user agents make background fetch operations highly visible and easily abortable rather than asking permission up front. However, given that background fetches can be paused and retried, a user agent that immediately pauses a background fetch and requires user interaction to resume is compliant.</p>
    <p>The <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/origin.html#concept-origin" id="ref-for-concept-origin">origin</a> of a background fetch should have equal or great visibility to the developer-provided information, such as a the <a data-link-type="dfn" href="#background-fetch-icons" id="ref-for-background-fetch-icons③">icons</a> and <a data-link-type="dfn" href="#background-fetch-title" id="ref-for-background-fetch-title③">title</a>.</p>
    <p>A user agent may pause background downloads depending on network conditions or battery state. For example, a user agent may download automatically when connected to WiFi, but require user confirmation to download using mobile data. If an implementation has this restriction, the user should be able to persist granting mobile data use for the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/origin.html#concept-origin" id="ref-for-concept-origin①">origin</a>.</p>
-   <p>If the user agent provides a way for a user to abort a background fetch operation, it should <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-fetch-terminate" id="ref-for-concept-fetch-terminate②">terminate</a> all fetches associated with the <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch①⑧">background fetch</a>'s <a data-link-type="dfn" href="#background-fetch-records" id="ref-for-background-fetch-records⑥">records</a>, with the <em>abort</em> flag set.</p>
+   <p>If the user agent provides a way for a user to abort a background fetch operation, it should <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-fetch-terminate" id="ref-for-concept-fetch-terminate②">terminate</a> all fetches associated with the <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch①⑨">background fetch</a>'s <a data-link-type="dfn" href="#background-fetch-records" id="ref-for-background-fetch-records⑥">records</a>, with the <em>abort</em> flag set.</p>
    <p>A background fetch exposes the user’s external IPs to the server throughout the duration of the background fetch. An attacker could use an extremely slow background fetch as a way to persistently track the user once they’ve left the site. Good visibility into the progress of the background fetch will help the user identify unwanted use.</p>
   </main>
   <div data-fill-with="conformance">
@@ -3200,10 +3211,11 @@ complete-length = ( 1*DIGIT / "*" )</pre>
    <li><a href="#dom-backgroundfetchfailurereason-bad-status">"bad-status"</a><span>, in §6.4</span>
    <li><a href="#background-fetch-response-bytes">Bytes</a><span>, in §3.4</span>
    <li><a href="#complete-a-record">complete a record</a><span>, in §4.2</span>
-   <li><a href="#active-background-fetches-contains">contains</a><span>, in §3.1</span>
+   <li><a href="#contains-background-fetch">contains background fetch</a><span>, in §4.10</span>
    <li><a href="#create-record-objects">create record objects</a><span>, in §4.9</span>
    <li><a href="#create-record-objects">creating record objects</a><span>, in §4.9</span>
    <li><a href="#background-fetch-display">display</a><span>, in §3.2</span>
+   <li><a href="#does-not-contain-background-fetch">does not contain background fetch</a><span>, in §4.10</span>
    <li>
     downloaded
     <ul>
@@ -3844,8 +3856,8 @@ complete-length = ( 1*DIGIT / "*" )</pre>
   <aside class="dfn-panel" data-for="term-for-map-exists">
    <a href="https://infra.spec.whatwg.org/#map-exists">https://infra.spec.whatwg.org/#map-exists</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-map-exists">3.1. Extensions to service worker registration</a>
-    <li><a href="#ref-for-map-exists①">4.5. Get a BackgroundFetchRegistration instance</a>
+    <li><a href="#ref-for-map-exists">4.5. Get a BackgroundFetchRegistration instance</a>
+    <li><a href="#ref-for-map-exists①">4.10. Contains background fetch</a>
     <li><a href="#ref-for-map-exists②">6.3.1. fetch()</a>
    </ul>
   </aside>
@@ -3892,7 +3904,8 @@ complete-length = ( 1*DIGIT / "*" )</pre>
    <a href="https://infra.spec.whatwg.org/#ordered-map">https://infra.spec.whatwg.org/#ordered-map</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-ordered-map">3.1. Extensions to service worker registration</a> <a href="#ref-for-ordered-map①">(2)</a>
-    <li><a href="#ref-for-ordered-map②">6.3. BackgroundFetchManager</a> <a href="#ref-for-ordered-map③">(2)</a>
+    <li><a href="#ref-for-ordered-map②">4.10. Contains background fetch</a> <a href="#ref-for-ordered-map③">(2)</a>
+    <li><a href="#ref-for-ordered-map④">6.3. BackgroundFetchManager</a> <a href="#ref-for-ordered-map⑤">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-list-size">
@@ -4549,12 +4562,11 @@ complete-length = ( 1*DIGIT / "*" )</pre>
   <aside class="dfn-panel" data-for="service-worker-registration-active-background-fetches">
    <b><a href="#service-worker-registration-active-background-fetches">#service-worker-registration-active-background-fetches</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-service-worker-registration-active-background-fetches">3.1. Extensions to service worker registration</a>
-    <li><a href="#ref-for-service-worker-registration-active-background-fetches①">4.1. Perform a background fetch</a>
-    <li><a href="#ref-for-service-worker-registration-active-background-fetches②">6.3.1. fetch()</a>
-    <li><a href="#ref-for-service-worker-registration-active-background-fetches③">6.3.2. get()</a>
-    <li><a href="#ref-for-service-worker-registration-active-background-fetches④">6.3.3. getIds()</a>
-    <li><a href="#ref-for-service-worker-registration-active-background-fetches⑤">6.4.2. abort()</a>
+    <li><a href="#ref-for-service-worker-registration-active-background-fetches">4.1. Perform a background fetch</a>
+    <li><a href="#ref-for-service-worker-registration-active-background-fetches①">6.3.1. fetch()</a>
+    <li><a href="#ref-for-service-worker-registration-active-background-fetches②">6.3.2. get()</a>
+    <li><a href="#ref-for-service-worker-registration-active-background-fetches③">6.3.3. getIds()</a>
+    <li><a href="#ref-for-service-worker-registration-active-background-fetches④">6.4.2. abort()</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="service-worker-registration-active-background-fetches-edit-queue">
@@ -4565,36 +4577,30 @@ complete-length = ( 1*DIGIT / "*" )</pre>
     <li><a href="#ref-for-service-worker-registration-active-background-fetches-edit-queue②">6.4.2. abort()</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="active-background-fetches-contains">
-   <b><a href="#active-background-fetches-contains">#active-background-fetches-contains</a></b><b>Referenced in:</b>
-   <ul>
-    <li><a href="#ref-for-active-background-fetches-contains">4.1. Perform a background fetch</a>
-    <li><a href="#ref-for-active-background-fetches-contains①">6.4.2. abort()</a>
-   </ul>
-  </aside>
   <aside class="dfn-panel" data-for="background-fetch">
    <b><a href="#background-fetch">#background-fetch</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-background-fetch">3.1. Extensions to service worker registration</a> <a href="#ref-for-background-fetch①">(2)</a>
-    <li><a href="#ref-for-background-fetch②">3.2. Background fetch</a> <a href="#ref-for-background-fetch③">(2)</a>
-    <li><a href="#ref-for-background-fetch④">4.1. Perform a background fetch</a> <a href="#ref-for-background-fetch⑤">(2)</a>
-    <li><a href="#ref-for-background-fetch⑥">4.2. Complete a record</a>
-    <li><a href="#ref-for-background-fetch⑦">4.3. Update background fetch instances</a>
-    <li><a href="#ref-for-background-fetch⑧">4.4. Fire a background fetch click event</a>
-    <li><a href="#ref-for-background-fetch⑨">4.5. Get a BackgroundFetchRegistration instance</a> <a href="#ref-for-background-fetch①⓪">(2)</a> <a href="#ref-for-background-fetch①①">(3)</a>
-    <li><a href="#ref-for-background-fetch①②">6.3. BackgroundFetchManager</a>
-    <li><a href="#ref-for-background-fetch①③">6.3.1. fetch()</a>
-    <li><a href="#ref-for-background-fetch①④">6.4. BackgroundFetchRegistration</a>
-    <li><a href="#ref-for-background-fetch①⑤">6.6. BackgroundFetchEvent</a>
-    <li><a href="#ref-for-background-fetch①⑥">7.1. Click</a> <a href="#ref-for-background-fetch①⑦">(2)</a>
-    <li><a href="#ref-for-background-fetch①⑧">8. Privacy and bandwidth usage</a>
+    <li><a href="#ref-for-background-fetch">3.1. Extensions to service worker registration</a>
+    <li><a href="#ref-for-background-fetch①">3.2. Background fetch</a> <a href="#ref-for-background-fetch②">(2)</a>
+    <li><a href="#ref-for-background-fetch③">4.1. Perform a background fetch</a> <a href="#ref-for-background-fetch④">(2)</a>
+    <li><a href="#ref-for-background-fetch⑤">4.2. Complete a record</a>
+    <li><a href="#ref-for-background-fetch⑥">4.3. Update background fetch instances</a>
+    <li><a href="#ref-for-background-fetch⑦">4.4. Fire a background fetch click event</a>
+    <li><a href="#ref-for-background-fetch⑧">4.5. Get a BackgroundFetchRegistration instance</a> <a href="#ref-for-background-fetch⑨">(2)</a> <a href="#ref-for-background-fetch①⓪">(3)</a>
+    <li><a href="#ref-for-background-fetch①①">4.10. Contains background fetch</a> <a href="#ref-for-background-fetch①②">(2)</a>
+    <li><a href="#ref-for-background-fetch①③">6.3. BackgroundFetchManager</a>
+    <li><a href="#ref-for-background-fetch①④">6.3.1. fetch()</a>
+    <li><a href="#ref-for-background-fetch①⑤">6.4. BackgroundFetchRegistration</a>
+    <li><a href="#ref-for-background-fetch①⑥">6.6. BackgroundFetchEvent</a>
+    <li><a href="#ref-for-background-fetch①⑦">7.1. Click</a> <a href="#ref-for-background-fetch①⑧">(2)</a>
+    <li><a href="#ref-for-background-fetch①⑨">8. Privacy and bandwidth usage</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="background-fetch-id">
    <b><a href="#background-fetch-id">#background-fetch-id</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-background-fetch-id">3.1. Extensions to service worker registration</a>
-    <li><a href="#ref-for-background-fetch-id①">4.1. Perform a background fetch</a>
+    <li><a href="#ref-for-background-fetch-id">4.1. Perform a background fetch</a>
+    <li><a href="#ref-for-background-fetch-id①">4.10. Contains background fetch</a>
     <li><a href="#ref-for-background-fetch-id②">6.3.1. fetch()</a>
     <li><a href="#ref-for-background-fetch-id③">6.4. BackgroundFetchRegistration</a>
     <li><a href="#ref-for-background-fetch-id④">6.4.2. abort()</a>
@@ -4868,6 +4874,19 @@ complete-length = ( 1*DIGIT / "*" )</pre>
     <li><a href="#ref-for-create-record-objects">4.2. Complete a record</a>
     <li><a href="#ref-for-create-record-objects①">4.9. Create record objects</a>
     <li><a href="#ref-for-create-record-objects②">6.4.4. matchAll()</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="contains-background-fetch">
+   <b><a href="#contains-background-fetch">#contains-background-fetch</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-contains-background-fetch">4.1. Perform a background fetch</a>
+    <li><a href="#ref-for-contains-background-fetch①">4.10. Contains background fetch</a> <a href="#ref-for-contains-background-fetch②">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="does-not-contain-background-fetch">
+   <b><a href="#does-not-contain-background-fetch">#does-not-contain-background-fetch</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-does-not-contain-background-fetch">6.4.2. abort()</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="single-byte-content-range">
