@@ -102,7 +102,7 @@ A [=/service worker registration=] additionally has:
 </div>
 
 <div algorithm>
-  To determine whether an [=active background fetches=] <dfn for="active background fetches">contains</dfn> |bgFetch| (a [=/background fetch=]), run these steps:
+  To determine whether an [=active background fetches=], |activeBgFetches|, <dfn for="active background fetches">contains</dfn> |bgFetch| (a [=/background fetch=]), run these steps:
 
   1. Let |id| be |bgFetch|'s [=background fetch/id=].
   1. If |activeBgFetches|[|id|] does not [=map/exist=], then return false.
