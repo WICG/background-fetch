@@ -101,15 +101,6 @@ A [=/service worker registration=] additionally has:
   * An <dfn>active background fetches edit queue</dfn> (a [=parallel queue=]), initially the result of [=starting a new parallel queue=].
 </div>
 
-<div algorithm>
-  To determine whether an [=active background fetches=] <dfn for="active background fetches">contains</dfn> |bgFetch| (a [=/background fetch=]), run these steps:
-
-  1. Let |id| be |bgFetch|'s [=background fetch/id=].
-  1. If |activeBgFetches|[|id|] does not [=map/exist=], then return false.
-  1. If |activeBgFetches|[|id|] does not equal |bgFetch|, then return false.
-  1. Return true.
-</div>
-
 ## Background fetch ## {#background-fetch-concept}
 
 A <dfn>background fetch</dfn> consists of:
@@ -227,7 +218,7 @@ Note: This is the algorithm that manages the 'background' parts of a background 
   1. [=Enqueue the following steps=] to |swRegistration|'s [=active background fetches edit queue=]:
     1. Let |activeBgFetches| be |swRegistration|'s [=active background fetches=].
     1. Let |id| be |bgFetch|'s [=background fetch/id=].
-    1. If |activeBgFetches| [=active background fetches/contains=] |bgFetch|, then remove |activeBgFetches|[|id|].
+    1. If |activeBgFetches| [=contains background fetch=] |bgFetch|, then remove |activeBgFetches|[|id|].
     1. Otherwise, set |failureReason| to `"aborted"`.
 
       Note: This handles a race condition where {{BackgroundFetchRegistration/abort()}} was successfully called but one of the fetches failed at the same time. If we've returned true from {{BackgroundFetchRegistration/abort()}}, this ensures we fire the related abort event.
@@ -520,6 +511,24 @@ Note: This algorithm creates platform objects for [=background fetch records=]. 
       1. Otherwise, [=reject=] |recordObject|'s {{BackgroundFetchRecord/responseReady}} with a {{TypeError}}.
     1. [=list/Append=] |recordObject| to |recordObjects|.
   1. Return |recordObjects|.
+</div>
+
+## [=Contains background fetch=] ## {#contains-background-fetch-algorithm}
+
+<div algorithm>
+  To determine whether a |map| (a [=map=]) <dfn>contains background fetch</dfn> |bgFetch| (a [=/background fetch=]), run these steps:
+
+  1. Let |id| be |bgFetch|'s [=background fetch/id=].
+  1. If |map|[|id|] does not [=map/exist=], then return false.
+  1. If |map|[|id|] does not equal |bgFetch|, then return false.
+  1. Return true.
+</div>
+
+<div algorithm>
+  To determine whether a |map| (a [=map=]) <dfn>does not contain background fetch</dfn> |bgFetch| (a [=/background fetch=]), run these steps:
+
+  1. If |map| [=contains background fetch=] |bgFetch|, then return false.
+  1. Return true.
 </div>
 
 # Header syntax # {#header-syntax}
@@ -837,7 +846,7 @@ enum BackgroundFetchFailureReason {
     1. [=Enqueue the following steps=] to |swRegistration|'s [=active background fetches edit queue=]:
       1. Let |activeBgFetches| be |swRegistration|'s [=active background fetches=].
       1. Let |id| be |bgFetch|'s [=background fetch/id=].
-      1. If |activeBgFetches| does not [=active background fetches/contain=] |bgFetch|, then [=resolve=] |promise| with false and abort these steps.
+      1. If |activeBgFetches| [=does not contain background fetch=] |bgFetch|, then [=resolve=] |promise| with false and abort these steps.
       1. Remove |activeBgFetches|[|id|].
       1. [=Resolve=] |promise| with true.
       1. Set |bgFetch|'s [=background fetch/abort all flag=].
