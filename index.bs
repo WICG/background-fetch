@@ -516,18 +516,18 @@ Note: This algorithm creates platform objects for [=background fetch records=]. 
 ## [=Contains background fetch=] ## {#contains-background-fetch-algorithm}
 
 <div algorithm>
-  To determine whether an [=active background fetches=], |activeBgFetches|, <dfn>contains background fetch</dfn> |bgFetch| (a [=/background fetch=]), run these steps:
+  To determine whether a |map| (a [=map=]) <dfn>contains background fetch</dfn> |bgFetch| (a [=/background fetch=]), run these steps:
 
   1. Let |id| be |bgFetch|'s [=background fetch/id=].
-  1. If |activeBgFetches|[|id|] does not [=map/exist=], then return false.
-  1. If |activeBgFetches|[|id|] does not equal |bgFetch|, then return false.
+  1. If |map|[|id|] does not [=map/exist=], then return false.
+  1. If |map|[|id|] does not equal |bgFetch|, then return false.
   1. Return true.
 </div>
 
 <div algorithm>
-  To determine whether an [=active background fetches=], |activeBgFetches|, <dfn>does not contain background fetch</dfn> |bgFetch| (a [=/background fetch=]), run these steps:
+  To determine whether a |map| (a [=map=]) <dfn>does not contain background fetch</dfn> |bgFetch| (a [=/background fetch=]), run these steps:
 
-  1. If |activeBgFetches| [=contains background fetch=] |bgFetch|, then return false.
+  1. If |map| [=contains background fetch=] |bgFetch|, then return false.
   1. Return true.
 </div>
 
