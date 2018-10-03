@@ -1214,7 +1214,7 @@ Possible extra rowspan handling
 </style>
   <meta content="Bikeshed version dff342f4b23fb230b71436fb31b55f5f169715bd" name="generator">
   <link href="https://wicg.github.io/background-fetch/" rel="canonical">
-  <meta content="1cfa33418be9c4959a2845830567a4c3da411cfa" name="document-revision">
+  <meta content="542a5ddac1a1eddde0a78043b0bce58b77d139f3" name="document-revision">
 <style>
   .algorithm dl {
     overflow: hidden;
@@ -1902,6 +1902,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
       <p>Wait for <var>bgFetch</var>’s <a data-link-type="dfn" href="#background-fetch-paused-flag" id="ref-for-background-fetch-paused-flag⑥">paused flag</a> to be unset.</p>
      <li data-md>
       <p>Let <var>request</var> be a copy of <var>record</var>’s <a data-link-type="dfn" href="#background-fetch-record-request" id="ref-for-background-fetch-record-request①">request</a>.</p>
+      <p class="note" role="note"><span>Note:</span> At this point the request is entirely held in storage, even if it started as a stream.</p>
      <li data-md>
       <p>Set <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#request-keepalive-flag" id="ref-for-request-keepalive-flag①">keepalive flag</a>.</p>
      <li data-md>
@@ -2110,7 +2111,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
     </dl>
    </div>
    <h3 class="heading settled" data-level="4.5" id="get-a-backgroundfetchregistration-instance-algorithm"><span class="secno">4.5. </span><span class="content"><a data-link-type="dfn" href="#get-a-backgroundfetchregistration-instance" id="ref-for-get-a-backgroundfetchregistration-instance③">Get a BackgroundFetchRegistration instance</a></span><a class="self-link" href="#get-a-backgroundfetchregistration-instance-algorithm"></a></h3>
-   <p class="note" role="note"><span>Note:</span> This algorithm ensures the same <code class="idl"><a data-link-type="idl" href="#backgroundfetchregistration" id="ref-for-backgroundfetchregistration①">BackgroundFetchRegistration</a></code> instance is returned for a given <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch⑨">background fetch</a> throughout the life of a <code class="idl"><a data-link-type="idl" href="#backgroundfetchmanager" id="ref-for-backgroundfetchmanager">BackgroundFetchManager</a></code>. It’s okay for browsers to optimise this, as long as there’s no way to tell that more than one instance has been created for a given <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch①⓪">background fetch</a> (e.g through equality, expandos, or weakly-associated data).</p>
+   <p class="note" role="note"><span>Note:</span> This algorithm ensures the same <code class="idl"><a data-link-type="idl" href="#backgroundfetchregistration" id="ref-for-backgroundfetchregistration①">BackgroundFetchRegistration</a></code> instance is returned for a given <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch⑨">background fetch</a> throughout the life of a <code class="idl"><a data-link-type="idl" href="#backgroundfetchmanager" id="ref-for-backgroundfetchmanager">BackgroundFetchManager</a></code>. It’s okay for browsers to optimise this, as long as there’s no way to tell that more than one instance has been created for a given <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch①⓪">background fetch</a> (e.g. through equality, expandos, or weakly-associated data).</p>
    <div class="algorithm" data-algorithm="get a BackgroundFetchRegistration instance">
      To <dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="get a BackgroundFetchRegistration instance|getting a BackgroundFetchRegistration instance" data-noexport id="get-a-backgroundfetchregistration-instance">get a BackgroundFetchRegistration instance</dfn> for a <var>bgFetch</var> (a <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch①①">background fetch</a>) in <var>realm</var> (a <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#realm" id="ref-for-realm">Realm</a>), run these steps: 
     <ol>
