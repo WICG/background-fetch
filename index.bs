@@ -393,7 +393,7 @@ Note: This algorithm manages the fetching of a [=/background fetch record=]. One
 
 ## [=Get a BackgroundFetchRegistration instance=] ## {#get-a-backgroundfetchregistration-instance-algorithm}
 
-Note: This algorithm ensures the same {{BackgroundFetchRegistration}} instance is returned for a given [=/background fetch=] throughout the life of a {{BackgroundFetchManager}}. It's okay for browsers to optimise this, as long as there's no way to tell that more than one instance has been created for a given [=/background fetch=] (e.g through equality, expandos, or weakly-associated data).
+Note: This algorithm ensures the same {{BackgroundFetchRegistration}} instance is returned for a given [=/background fetch=] throughout the life of a {{BackgroundFetchManager}}. It's okay for browsers to optimise this, as long as there's no way to tell that more than one instance has been created for a given [=/background fetch=] (e.g. through equality, expandos, or weakly-associated data).
 
 <div algorithm>
   To <dfn data-lt="get a BackgroundFetchRegistration instance|getting a BackgroundFetchRegistration instance">get a BackgroundFetchRegistration instance</dfn> for a |bgFetch| (a [=/background fetch=]) in |realm| (a [=Realm=]), run these steps:
