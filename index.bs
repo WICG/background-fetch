@@ -417,7 +417,7 @@ Note: This algorithm checks if a partial response reasonably matches what was re
   1. If |responseFirstBytePos| does not equal |expectedRangeStart|, then return invalid.
   1. If |previousResponse| is not null, then:
     1. For |headerName| of « \``ETag`\`, \``Last-Modified`\` »:
-      1. If |previousResponse|'s [=response/header list=] [=header list/contains=] |headerName| and the [=combined value=] of |headerName| for |previousResponse|'s [=response/header list=] does not equal the [=combined value=] of |headerName| for |partialResponse|'s [=response/header list=], then return invalid.
+      1. If |previousResponse|'s [=response/header list=] [=header list/contains=] |headerName| and the [=combined value=] of |headerName| in |previousResponse|'s [=response/header list=] does not equal the [=combined value=] of |headerName| in |partialResponse|'s [=response/header list=], then return invalid.
     1. If |previousResponse|'s [=response/status=] is `206`, then:
       1. Let <var ignore>previousResponseFirstBytePos</var>, <var ignore>previousResponseLastBytePos</var>, and |previousResponseCompleteLength| be the result of [=extracting content-range values=] from |previousResponse|. If this fails, then return invalid.
       1. If |previousResponseCompleteLength| is not null, and |responseCompleteLength| does not equal |previousResponseCompleteLength|, then return invalid.
