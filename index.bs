@@ -398,7 +398,7 @@ Note: This algorithm ensures the same {{BackgroundFetchRegistration}} instance i
 <div algorithm>
   To <dfn data-lt="get a BackgroundFetchRegistration instance|getting a BackgroundFetchRegistration instance">get a BackgroundFetchRegistration instance</dfn> for a |bgFetch| (a [=/background fetch=]) in |realm| (a [=Realm=]), run these steps:
 
-  1. Let |instancesMap| be the [=backgroundFetchRegistration instances=] of the only instance of {{BackgroundFetchManager}} within this |realm|.
+  1. Let |instancesMap| be the [=BackgroundFetchRegistration instances=] of the only instance of {{BackgroundFetchManager}} within this |realm|.
   1. If |instancesMap|[|bgFetch|] [=map/exists=], then return |instancesMap|[|bgFetch|].
   1. Let |instance| be a new {{BackgroundFetchRegistration}} in |realm|, with its [=BackgroundFetchRegistration/background fetch=] set to |bgFetch|.
   1. Set |instancesMap|[|bgFetch|] to |instance|.
