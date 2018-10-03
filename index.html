@@ -1214,7 +1214,7 @@ Possible extra rowspan handling
 </style>
   <meta content="Bikeshed version dff342f4b23fb230b71436fb31b55f5f169715bd" name="generator">
   <link href="https://wicg.github.io/background-fetch/" rel="canonical">
-  <meta content="2b1cc1079d6f5a5c2a57320e3b41d508e4a1da21" name="document-revision">
+  <meta content="ba99c28bd4e6a8872d7b7faec3593f0c3920a6d4" name="document-revision">
 <style>
   .algorithm dl {
     overflow: hidden;
@@ -2110,12 +2110,12 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
     </dl>
    </div>
    <h3 class="heading settled" data-level="4.5" id="get-a-backgroundfetchregistration-instance-algorithm"><span class="secno">4.5. </span><span class="content"><a data-link-type="dfn" href="#get-a-backgroundfetchregistration-instance" id="ref-for-get-a-backgroundfetchregistration-instance③">Get a BackgroundFetchRegistration instance</a></span><a class="self-link" href="#get-a-backgroundfetchregistration-instance-algorithm"></a></h3>
-   <p class="note" role="note"><span>Note:</span> This algorithm ensures the same <code class="idl"><a data-link-type="idl" href="#backgroundfetchregistration" id="ref-for-backgroundfetchregistration①">BackgroundFetchRegistration</a></code> instance is returned for a given <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch⑨">background fetch</a> throughout the life of a <code class="idl"><a data-link-type="idl" href="#backgroundfetchmanager" id="ref-for-backgroundfetchmanager">BackgroundFetchManager</a></code>. It’s okay for browsers to optimise this, as long as there’s no way to tell that more than one instance has been created for a given <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch①⓪">background fetch</a> (e.g through equality, expandos, or weakly-associated data).</p>
+   <p class="note" role="note"><span>Note:</span> This algorithm ensures the same <code class="idl"><a data-link-type="idl" href="#backgroundfetchregistration" id="ref-for-backgroundfetchregistration①">BackgroundFetchRegistration</a></code> instance is returned for a given <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch⑨">background fetch</a> throughout the life of a <code class="idl"><a data-link-type="idl" href="#backgroundfetchmanager" id="ref-for-backgroundfetchmanager">BackgroundFetchManager</a></code>. It’s okay for browsers to optimise this, as long as there’s no way to tell that more than one instance has been created for a given <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch①⓪">background fetch</a> (e.g. through equality, expandos, or weakly-associated data).</p>
    <div class="algorithm" data-algorithm="get a BackgroundFetchRegistration instance">
      To <dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="get a BackgroundFetchRegistration instance|getting a BackgroundFetchRegistration instance" data-noexport id="get-a-backgroundfetchregistration-instance">get a BackgroundFetchRegistration instance</dfn> for a <var>bgFetch</var> (a <a data-link-type="dfn" href="#background-fetch" id="ref-for-background-fetch①①">background fetch</a>) in <var>realm</var> (a <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#realm" id="ref-for-realm">Realm</a>), run these steps: 
     <ol>
      <li data-md>
-      <p>Let <var>instancesMap</var> be the <a data-link-type="dfn" href="#backgroundfetchmanager-backgroundfetchregistration-instances" id="ref-for-backgroundfetchmanager-backgroundfetchregistration-instances">backgroundFetchRegistration instances</a> of the only instance of <code class="idl"><a data-link-type="idl" href="#backgroundfetchmanager" id="ref-for-backgroundfetchmanager①">BackgroundFetchManager</a></code> within this <var>realm</var>.</p>
+      <p>Let <var>instancesMap</var> be the <a data-link-type="dfn" href="#backgroundfetchmanager-backgroundfetchregistration-instances" id="ref-for-backgroundfetchmanager-backgroundfetchregistration-instances">BackgroundFetchRegistration instances</a> of the only instance of <code class="idl"><a data-link-type="idl" href="#backgroundfetchmanager" id="ref-for-backgroundfetchmanager①">BackgroundFetchManager</a></code> within this <var>realm</var>.</p>
      <li data-md>
       <p>If <var>instancesMap</var>[<var>bgFetch</var>] <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#map-exists" id="ref-for-map-exists">exists</a>, then return <var>instancesMap</var>[<var>bgFetch</var>].</p>
      <li data-md>
