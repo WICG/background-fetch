@@ -269,6 +269,9 @@ Note: This algorithm manages the fetching of a [=/background fetch record=]. One
   1. Let |downloadTotal| be |bgFetch|'s [=background fetch/download total=] if it is not 0, otherwise infinity.
   1. Wait for |bgFetch|'s [=background fetch/paused flag=] to be unset.
   1. Let |request| be a copy of |record|'s [=background fetch record/request=].
+
+    Note: At this point the request is entirely held in storage, even if it started as a stream.
+
   1. Set |request|'s [=request/keepalive flag=].
   1. Set |request|'s [=request/service-workers mode=] to "`none`".
   1. Let |rangeStart| be the [=byte sequence/length=] of |responseData|'s [=background fetch response/bytes=].
