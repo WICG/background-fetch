@@ -993,12 +993,15 @@ For the purposes of user-agent automation and application testing, this document
 
 # Privacy and bandwidth usage # {#privacy-and-bandwidth-use}
 
-It's the recommendation of this standard that user agents make background fetch operations highly visible and easily abortable rather than asking permission up front. However, given that background fetches can be paused and retried, a user agent that immediately pauses a background fetch and requires user interaction to resume is compliant.
+Fetches can be large and take a long time to complete. During this time the user will be fetching data from one or more servers. The user's IP address, which may change during the operation, could be used to track the user's location over time.
 
-The [=/origin=] of a background fetch should have equal or great visibility to the developer-provided information, such as a the [=background fetch/icons=] and [=background fetch/title=].
+To mitigate this, the steps for [=background fetch/displaying=] a [=/background fetch=] require:
 
-A user agent may pause background downloads depending on network conditions or battery state. For example, a user agent may download automatically when connected to WiFi, but require user confirmation to download using mobile data. If an implementation has this restriction, the user should be able to persist granting mobile data use for the [=/origin=].
+* Displaying the [=url/origin=] of the site making the fetch.
+* The UI cannot be dismissed while the [=/background fetch=] is active.
+* Allowing the operation to be easily aborted.
+* Allowing the operation to start in a paused state, requiring user interaction to begin.
 
-If the user agent provides a way for a user to abort a background fetch operation, it should [=fetch/terminate=] all fetches associated with the [=/background fetch=]'s [=background fetch/records=], with the *abort* flag set.
+The steps also allow a user agent to pause the [=/background fetch=] if the user is on a metered connection.
 
-A background fetch exposes the user's external IPs to the server throughout the duration of the background fetch. An attacker could use an extremely slow background fetch as a way to persistently track the user once they've left the site. Good visibility into the progress of the background fetch will help the user identify unwanted use.
+All data stored is associated with a particular [=/service worker registration=]. Clearing a [=/service worker registration=] will clear all associated [=/background fetches=].
