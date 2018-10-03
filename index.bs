@@ -101,7 +101,7 @@ A [=/service worker registration=] additionally has:
   * An <dfn>active background fetches edit queue</dfn> (a [=parallel queue=]), initially the result of [=starting a new parallel queue=].
 </div>
 
-## Background fetch ## {#background-fetch-concept}
+## [=/Background fetch=] ## {#background-fetch-concept}
 
 A <dfn>background fetch</dfn> consists of:
 
@@ -130,10 +130,14 @@ A <dfn>background fetch</dfn> consists of:
     1. Return |total|.
   </div>
 
+  ### [=background fetch/Display=] ### {#background-fetch-display-algorithm}
+
   <div algorithm>
     To <dfn>display</dfn> a [=/background fetch=] (|bgFetch|) for a given |environment| (an [=environment settings object=]), the user agent must present a user interface that follows these rules:
 
-    * The |bgFetch|'s [=background fetch/service worker registration=]'s [=service worker registration/scope url=]'s [=url/origin=] must be displayed.
+    * The UI must prominently display the |bgFetch|'s [=background fetch/service worker registration=]'s [=service worker registration/scope url=]'s [=url/origin=]
+    * If the |bgFetch|'s [=background fetch/paused flag=] is unset, and |bgFetch|'s [=background fetch/result=] is not the empty string, then the UI must indicate that bandwidth is being used.
+    * The UI cannot be dismissed without aborting (e.g. swiped away) until |bgFetch|'s [=background fetch/result=] is not the empty string.
     * The UI may display |bgFetch|'s [=background fetch/title=].
     * The UI may [=select an icon=] for display from |bgFetch|'s [=background fetch/icons=], and [=/fetch=] it using a new [=/request=] with the following properties:
       : [=request/URL=]
@@ -164,7 +168,7 @@ A <dfn>background fetch</dfn> consists of:
 
     Let |permission| be the [=permission state=] for a {{PermissionDescriptor}} with {{PermissionDescriptor/name}} `"background-fetch"` and |environment|. If |permission| is `"prompt"`, then the user agent may set |bgFetch|'s [=background fetch/paused flag=] at the beginning of this algorithm. The user agent should allow the user to either accept the background fetch (unsetting |bgFetch|'s [=background fetch/paused flag=]), or refuse the background fetch (setting |bgFetch|'s [=background fetch/abort all flag=]). The user agent may also provide always-allow and alway-deny options, which can be used as [=new information about the user's intent=] for this permission.
 
-    The user agent may also consider initially setting |bgFetch|'s [=background fetch/paused flag=] if the user is on a metered connection, or the background fetch was started in the background.
+    The user agent may also consider setting |bgFetch|'s [=background fetch/paused flag=] if the user is on a metered connection, or the background fetch was started in the background.
   </div>
 </div>
 
