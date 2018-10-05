@@ -112,7 +112,7 @@ addEventListener('backgroundfetchsuccess', bgFetchEvent => {
 `bgFetchEvent` extends [`ExtendableEvent`](https://w3c.github.io/ServiceWorker/#extendableevent), with the following additional members:
 
 * `registration` - The background fetch registration.
-* `updateUI({ title, icons})` - update the UI, eg "Uploaded 'Holiday in Rome'", "Downloaded 'Catastrophe season 2 episode 1'", or "Level 5 ready to play!".
+* `updateUI({ title, icons })` - update the UI, eg "Uploaded 'Holiday in Rome'", "Downloaded 'Catastrophe season 2 episode 1'", or "Level 5 ready to play!".
 
 Once this event is fired, the background fetch job is no longer stored against the registration, so `backgroundFetch.get(bgFetchEvent.id)` will resolve with undefined.
 
