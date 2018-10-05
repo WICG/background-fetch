@@ -245,7 +245,7 @@ addEventListener('backgroundfetchsuccess', (event) => {
         const response = await record.responseReady;
         await cache.put(record.request, response);
       });
-      await promises;
+      await Promise.all(promises);
       const movieData = await getMovieDataSomehow(event.registration.id);
       await event.updateUI({ title: `${movieData.title} downloaded!` });
     } catch (err) {
@@ -268,7 +268,7 @@ addEventListener('backgroundfetchfail', (event) => {
           await cache.put(record.request, response);
         }
       });
-      await promises;
+      await Promise.all(promises);
     } finally {
       const movieData = await getMovieDataSomehow(event.registration.id);
       await event.updateUI({ title: `${movieData.title} download failed.` });
