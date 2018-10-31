@@ -6,7 +6,7 @@ A service worker is capable of fetching and caching assets, the size of which is
 
 This is excellent for battery and privacy, but it makes it difficult to download and cache large assets such as podcasts and movies, and upload video and images.
 
-This spec aims to solve the long-running fetch case, without impacting battery live or privacy beyond that of a long-running download.
+This spec aims to solve the long-running fetch case, without impacting battery life or privacy beyond that of a long-running download.
 
 # Features
 
