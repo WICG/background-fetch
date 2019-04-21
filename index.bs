@@ -2,7 +2,7 @@
 Title: Background Fetch
 Shortname: background-fetch
 Level: 1
-Status: ED
+Status: CG-DRAFT
 Group: wicg
 URL: https://wicg.github.io/background-fetch/
 Editor: Jake Archibald, Google, jakearchibald@google.com
