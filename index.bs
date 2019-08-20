@@ -635,7 +635,7 @@ partial interface ServiceWorkerRegistration {
 <script type="idl">
 [Exposed=(Window,Worker)]
 interface BackgroundFetchManager {
-  Promise<BackgroundFetchRegistration> fetch(DOMString id, (RequestInfo or sequence<RequestInfo>) requests, optional BackgroundFetchOptions options);
+  Promise<BackgroundFetchRegistration> fetch(DOMString id, (RequestInfo or sequence<RequestInfo>) requests, optional BackgroundFetchOptions options = {});
   Promise<BackgroundFetchRegistration?> get(DOMString id);
   Promise<sequence<DOMString>> getIds();
 };
@@ -767,8 +767,8 @@ interface BackgroundFetchRegistration : EventTarget {
   attribute EventHandler onprogress;
 
   Promise<boolean> abort();
-  Promise<BackgroundFetchRecord> match(RequestInfo request, optional CacheQueryOptions options);
-  Promise<sequence<BackgroundFetchRecord>> matchAll(optional RequestInfo request, optional CacheQueryOptions options);
+  Promise<BackgroundFetchRecord> match(RequestInfo request, optional CacheQueryOptions options = {});
+  Promise<sequence<BackgroundFetchRecord>> matchAll(optional RequestInfo request, optional CacheQueryOptions options = {});
 };
 
 enum BackgroundFetchResult { "", "success", "failure" };
@@ -916,7 +916,7 @@ dictionary BackgroundFetchEventInit : ExtendableEventInit {
 <script type="idl">
 [Constructor(DOMString type, BackgroundFetchEventInit init), Exposed=ServiceWorker]
 interface BackgroundFetchUpdateUIEvent : BackgroundFetchEvent {
-  Promise<void> updateUI(optional BackgroundFetchUIOptions options);
+  Promise<void> updateUI(optional BackgroundFetchUIOptions options = {});
 };
 </script>
 
