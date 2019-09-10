@@ -42,10 +42,6 @@ spec: webdriver; urlPrefix: https://w3c.github.io/webdriver/webdriver-spec.html#
 
 spec: appmanifest; urlPrefix: https://www.w3.org/TR/appmanifest/
   type: dictionary; text: ImageResource; url: dom-imageresource
-  type: dfn; text: src; for:ImageResource; url: dom-imageresource-src
-
-spec: fetch; urlPrefix: https://fetch.spec.whatwg.org
-  type: dfn; text: combined value; url: concept-header-list-combine
 </pre>
 
 <style>
@@ -148,7 +144,7 @@ A <dfn>background fetch</dfn> consists of:
     * The UI may display |bgFetch|'s [=background fetch/title=].
     * The UI may select an icon for display from |bgFetch|'s [=background fetch/icons=], and [=/fetch=] it using a new [=/request=] with the following properties:
       : [=request/URL=]
-      :: The {{ImageResource}}'s [=ImageResource/src=].
+      :: The {{ImageResource}}'s {{ImageResource/src}}.
       : [=request/Client=]
       :: |environment|.
       : [=request/Keepalive flag=]
@@ -427,7 +423,7 @@ Note: This algorithm checks if a partial response reasonably matches what was re
   1. If |responseFirstBytePos| does not equal |expectedRangeStart|, then return invalid.
   1. If |previousResponse| is not null, then:
     1. For |headerName| of « \``ETag`\`, \``Last-Modified`\` »:
-      1. If |previousResponse|'s [=response/header list=] [=header list/contains=] |headerName| and the [=combined value=] of |headerName| in |previousResponse|'s [=response/header list=] does not equal the [=combined value=] of |headerName| in |partialResponse|'s [=response/header list=], then return invalid.
+      1. If |previousResponse|'s [=response/header list=] [=header list/contains=] |headerName| and the [=header list/combined=] value of |headerName| in |previousResponse|'s [=response/header list=] does not equal the [=header list/combined=] value of |headerName| in |partialResponse|'s [=response/header list=], then return invalid.
     1. If |previousResponse|'s [=response/status=] is `206`, then:
       1. Let <var ignore>previousResponseFirstBytePos</var>, <var ignore>previousResponseLastBytePos</var>, and |previousResponseCompleteLength| be the result of [=extracting content-range values=] from |previousResponse|. If this fails, then return invalid.
       1. If |previousResponseCompleteLength| is not null, and |responseCompleteLength| does not equal |previousResponseCompleteLength|, then return invalid.
