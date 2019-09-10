@@ -15,7 +15,7 @@ Indent: 2
 <pre class="link-defaults">
 spec:infra; type:dfn; text:list
 spec:fetch; type:interface; text:ReadableStream
-spec:promises-guide-1; type:dfn; text:resolve
+spec:webidl; type:dfn; text:resolve
 </pre>
 
 <pre class="anchors">
@@ -638,7 +638,7 @@ partial interface ServiceWorkerRegistration {
 <script type="idl">
 [Exposed=(Window,Worker)]
 interface BackgroundFetchManager {
-  Promise<BackgroundFetchRegistration> fetch(DOMString id, (RequestInfo or sequence<RequestInfo>) requests, optional BackgroundFetchOptions options);
+  Promise<BackgroundFetchRegistration> fetch(DOMString id, (RequestInfo or sequence<RequestInfo>) requests, optional BackgroundFetchOptions options = {});
   Promise<BackgroundFetchRegistration?> get(DOMString id);
   Promise<sequence<DOMString>> getIds();
 };
@@ -770,8 +770,8 @@ interface BackgroundFetchRegistration : EventTarget {
   attribute EventHandler onprogress;
 
   Promise<boolean> abort();
-  Promise<BackgroundFetchRecord> match(RequestInfo request, optional CacheQueryOptions options);
-  Promise<sequence<BackgroundFetchRecord>> matchAll(optional RequestInfo request, optional CacheQueryOptions options);
+  Promise<BackgroundFetchRecord> match(RequestInfo request, optional CacheQueryOptions options = {});
+  Promise<sequence<BackgroundFetchRecord>> matchAll(optional RequestInfo request, optional CacheQueryOptions options = {});
 };
 
 enum BackgroundFetchResult { "", "success", "failure" };
@@ -853,7 +853,7 @@ enum BackgroundFetchFailureReason {
     The <dfn method>match(|request|, |options|)</dfn> method, when invoked, must run these steps:
 
     1. Let |promise| be the result of calling the algorithm {{BackgroundFetchRegistration/matchAll()}} passing |request| and |options|.
-    1. Return the result of [=transforming=] |promise| with a fulfilment handler that, when called with argument |matches|, returns |matches|[0].
+    1. Return the result of [=promise/reacting=] to |promise| with a fulfilment handler that, when called with argument |matches|, returns |matches|[0].
 
     Note: User agents are encouraged to optimise the above so it's faster than calling {{BackgroundFetchRegistration/matchAll()}}.
   </div>
@@ -898,8 +898,9 @@ interface BackgroundFetchRecord {
 ## {{BackgroundFetchEvent}} ## {#background-fetch-event}
 
 <script type="idl">
-[Constructor(DOMString type, BackgroundFetchEventInit init), Exposed=ServiceWorker]
+[Exposed=ServiceWorker]
 interface BackgroundFetchEvent : ExtendableEvent {
+  constructor(DOMString type, BackgroundFetchEventInit init);
   readonly attribute BackgroundFetchRegistration registration;
 };
 
@@ -917,9 +918,10 @@ dictionary BackgroundFetchEventInit : ExtendableEventInit {
 ## {{BackgroundFetchUpdateUIEvent}} ## {#background-fetch-update-ui-event}
 
 <script type="idl">
-[Constructor(DOMString type, BackgroundFetchEventInit init), Exposed=ServiceWorker]
+[Exposed=ServiceWorker]
 interface BackgroundFetchUpdateUIEvent : BackgroundFetchEvent {
-  Promise<void> updateUI(optional BackgroundFetchUIOptions options);
+  constructor(DOMString type, BackgroundFetchEventInit init);
+  Promise<void> updateUI(optional BackgroundFetchUIOptions options = {});
 };
 </script>
 
