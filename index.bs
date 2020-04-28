@@ -40,8 +40,9 @@ spec: webdriver; urlPrefix: https://w3c.github.io/webdriver/webdriver-spec.html#
     text: no such window; url: dfn-no-such-window
     text: url variable; url: dfn-url-variables
 
-spec: appmanifest; urlPrefix: https://www.w3.org/TR/appmanifest/
+spec: image-resource; urlPrefix: https://w3c.github.io/image-resource/
   type: dictionary; text: ImageResource; url: dom-imageresource
+  type: dfn; text: src; for:ImageResource; url: dom-imageresource-src
 </pre>
 
 <style>
@@ -144,7 +145,7 @@ A <dfn>background fetch</dfn> consists of:
     * The UI may display |bgFetch|'s [=background fetch/title=].
     * The UI may select an icon for display from |bgFetch|'s [=background fetch/icons=], and [=/fetch=] it using a new [=/request=] with the following properties:
       : [=request/URL=]
-      :: The {{ImageResource}}'s {{ImageResource/src}}.
+      :: The {{ImageResource}}'s [=ImageResource/src=].
       : [=request/Client=]
       :: |environment|.
       : [=request/Keepalive flag=]
