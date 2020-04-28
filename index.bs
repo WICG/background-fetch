@@ -42,7 +42,9 @@ spec: webdriver; urlPrefix: https://w3c.github.io/webdriver/webdriver-spec.html#
 
 spec: image-resource; urlPrefix: https://w3c.github.io/image-resource/
   type: dictionary; text: ImageResource; url: dom-imageresource
-  type: dfn; text: src; for:ImageResource; url: dom-imageresource-src
+  type: dfn; text: processing; url: processing-an-imageresource-from-an-api
+  type: dfn; text: image resource; url: image-resource
+  type: dfn; text: src; for:image resource; url: dfn-src
 </pre>
 
 <style>
@@ -143,9 +145,9 @@ A <dfn>background fetch</dfn> consists of:
     * If the |bgFetch|'s [=background fetch/paused flag=] is unset, and |bgFetch|'s [=background fetch/result=] is not the empty string, then the UI must indicate that bandwidth is being used.
     * The UI cannot be dismissed without aborting (e.g. swiped away) until |bgFetch|'s [=background fetch/result=] is not the empty string.
     * The UI may display |bgFetch|'s [=background fetch/title=].
-    * The UI may select an icon for display from |bgFetch|'s [=background fetch/icons=], and [=/fetch=] it using a new [=/request=] with the following properties:
+    * The UI may select an [=image resource=] (|icon|) for display from |bgFetch|'s [=background fetch/icons=], after successfully [=processing=] it, and [=/fetch=] it using a new [=/request=] with the following properties:
       : [=request/URL=]
-      :: The {{ImageResource}}'s [=ImageResource/src=].
+      :: |icon|'s [=image resource/src=].
       : [=request/Client=]
       :: |environment|.
       : [=request/Keepalive flag=]
