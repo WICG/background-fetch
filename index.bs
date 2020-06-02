@@ -27,7 +27,7 @@ urlPrefix: https://tools.ietf.org/html/rfc7230
   type: dfn
     text: HTTP ABNF; url: section-7
 
-spec: webdriver; urlPrefix: https://w3c.github.io/webdriver/webdriver-spec.html#
+spec: webdriver; urlPrefix: https://w3c.github.io/webdriver/#
   type: dfn
     text: extension command; url: dfn-extension-command
     text: extension command URI template; url: dfn-extension-command-uri-template
