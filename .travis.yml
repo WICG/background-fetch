@@ -1,10 +1,9 @@
 sudo: false
 language: python
 python:
-  - "2.7"
+  - "3.8"
 install:
-  - git clone https://github.com/tabatkins/bikeshed.git
-  - pip install --editable bikeshed
+  - pip install bikeshed
   - bikeshed update
 script: bash ./deploy.sh
 env:
