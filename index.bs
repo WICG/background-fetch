@@ -85,6 +85,10 @@ This specification aims to:
 
 All platform objects are created in the [=context object=]'s [=relevant Realm=] unless otherwise specified.
 
+# Permissions # {#permissions}
+
+<cite>Background Fetch</cite> is a [=default powerful feature=] that is identified by the [=powerful feature/name=] "background-fetch".
+
 # Infrastructure # {#infrastructure}
 
 A resource is considered <dfn>temporarily unavailable</dfn> if the user agent believes the resource may soon become available. Reasons may include:
