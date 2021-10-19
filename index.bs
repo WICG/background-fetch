@@ -151,8 +151,8 @@ A <dfn>background fetch</dfn> consists of:
       :: |icon|'s [=image resource/src=].
       : [=request/Client=]
       :: |environment|.
-      : [=request/Keepalive|keepalive flag=] flag
-      :: Set.
+      : [=request/Keepalive=]
+      :: True.
       : [=request/Service-workers mode=]
       :: "`none`".
       : [=request/Destination=]
@@ -279,7 +279,7 @@ Note: This algorithm manages the fetching of a [=/background fetch record=]. One
 
     Note: At this point the request is entirely held in storage, even if it started as a stream.
 
-  1. Set |request|'s [=request/keepalive|keepalive flag=].
+  1. Set |request|'s [=request/keepalive=] to true.
   1. Set |request|'s [=request/service-workers mode=] to "`none`".
   1. Let |rangeStart| be the [=byte sequence/length=] of |responseData|'s [=background fetch response/bytes=].
   1. If |rangeStart| is not 0, then [=request/add a range header=] to |request| with |rangeStart|.
