@@ -291,60 +291,60 @@ Note: This algorithm manages the fetching of a [=/background fetch record=]. One
     Note: If the |rangeStart| is 0, a normal request is made. This allows the initial request to make use of content encoding, since `Accept-Encoding: identity` is added to requests with a range header.
 
   1. Let |fetchAttemptComplete| be false.
-  1. Let |lastTransmittedSize| be 0.
-  1. [=/Fetch=] |request|.
-
-    Issue: The remainder of this step uses fetch "callbacks" which currently queue tasks. This isn't desirable or possible here, so let's pretend that tasks aren't queued. ([issue](https://github.com/whatwg/fetch/issues/536#issuecomment-330184276))
-
-    To [=process request body=] for |request|, run these steps:
-      1. Let |transmittedSize| be |request|'s [=request/body=]'s [=body/transmitted bytes=].
-      1. Increment |bgFetch|'s [=background fetch/uploaded=] by |transmittedSize| minus |lastTransmittedSize|.
-      1. Set |lastTransmittedSize| to |transmittedSize|.
-      1. [=Update background fetch instances=] for |bgFetch|.
-
-    To [=process response=] for |response|, run these steps:
-      1. If |response| is a [=network error=], then:
-        1. If the resource is [=temporarily unavailable=] and |request|'s [=request/method=] is \``GET`\`, then wait until the resource is not [=temporarily unavailable=], then set |fetchAttemptComplete| to true and abort these steps.
-
-          Note: If |request|'s [=request/method=] is not \``GET`\`, reissuing the request may have unwanted side effects. If a standard method to resume requests becomes available, it'll be adopted here.
-
-        1. If |response| is an [=aborted network error=], then set |responseData|'s [=background fetch response/result=] to `"aborted"`, otherwise `"fetch-error"`.
-        1. Set |fetchAttemptComplete| to true, and abort these steps.
-      1. If |response|'s [=response/status=] is `206`, then:
-        1. If [=validate a partial response=] for |rangeStart|, |response|, and |responseData|'s [=background fetch response/response=] returns invalid, then:
-          1. Set |responseData|'s [=background fetch response/result=] to `"fetch-error"`.
-          1. Set |fetchAttemptComplete| to true.
-          1. [=fetch/Terminate=] the ongoing fetch, and abort these steps.
-      1. Otherwise:
-        1. Set |responseData|'s [=background fetch response/result=] to `"redundant"`.
-        1. Set |responseData| to a new [=background fetch response=].
-        1. Set |record|'s [=background fetch record/response data=] to |responseData|.
-
-          Note: The [=create record objects=] algorithm may hold a reference to the previous [=background fetch response=].
-
+  1. [=/Fetch=] |request| with the following arguments:
+    <dl class="compact">
+      : [=fetch/useParallelQueue=]
+      :: True.
+      : [=fetch/processRequestBodyChunkLength=]
+      :: The following steps given |chunkLength| (a number):
+        1. Increment |bgFetch|'s [=background fetch/uploaded=] by |chunkLength|.
         1. [=Update background fetch instances=] for |bgFetch|.
-      1. If |rangeStart| is 0 or |response|'s [=response/status=] is not `206`, then set |responseData|'s [=background fetch response/response=] to a copy of |response| except for its [=response/body=].
-      1. Let |stream| be the |response| [=response/body=]'s [=body/stream=].
-      1. Whenever one or more bytes are transmitted from |stream|, let |bytes| be the transmitted bytes and run these steps:
-        1. If |bgFetch|'s [=background fetch/stored body bytes total=] plus the size of |bytes| is greater than |downloadTotal|, then:
-          1. [=ReadableStream/Cancel=] |stream|.
-          1. Set |responseData|'s [=background fetch response/result=] to `"download-total-exceeded"`, |fetchAttemptComplete| to true, and abort these steps.
-        1. Append |bytes| to |responseData|'s [=background fetch response/bytes=].
-        1. If the previous step fails due to exceeding a quota limit, set |responseData|'s [=background fetch response/result=] to `"quota-exceeded"`, |fetchAttemptComplete| to true, and abort these steps.
-        1. [=Update background fetch instances=] for |bgFetch|.
-      1. If at any point the bytes transmission for |stream| is done normally, then:
+      : [=fetch/processResponse=]
+      :: The following steps given |response| (a [=/response=]):
+        1. If |response| is a [=network error=], then:
+          1. If the resource is [=temporarily unavailable=] and |request|'s [=request/method=] is \``GET`\`, then wait until the resource is not [=temporarily unavailable=], then set |fetchAttemptComplete| to true and abort these steps.
+
+            Note: If |request|'s [=request/method=] is not \``GET`\`, reissuing the request may have unwanted side effects. If a standard method to resume requests becomes available, it'll be adopted here.
+
+          1. If |response| is an [=aborted network error=], then set |responseData|'s [=background fetch response/result=] to `"aborted"`, otherwise `"fetch-error"`.
+          1. Set |fetchAttemptComplete| to true, and abort these steps.
         1. If |response|'s [=response/status=] is `206`, then:
-          1. Let <var ignore>firstBytePos</var>, <var ignore>lastBytePos</var>, and |completeLength| be the result of [=extracting content-range values=] from |response|.
-          1. If |completeLength| is not null, and equal to the [=byte sequence/length=] of |responseData|'s [=background fetch response/bytes=], set |responseData|'s [=background fetch response/result=] to `"success"`.
+          1. If [=validate a partial response=] for |rangeStart|, |response|, and |responseData|'s [=background fetch response/response=] returns invalid, then:
+            1. Set |responseData|'s [=background fetch response/result=] to `"fetch-error"`.
+            1. Set |fetchAttemptComplete| to true.
+            1. [=fetch/Terminate=] the ongoing fetch, and abort these steps.
+        1. Otherwise:
+          1. Set |responseData|'s [=background fetch response/result=] to `"redundant"`.
+          1. Set |responseData| to a new [=background fetch response=].
+          1. Set |record|'s [=background fetch record/response data=] to |responseData|.
 
-            Note: Although we ask for the whole resource, or the remainder of the resource, the server may not have returned the remainder, in which case we need to make an additional request.
+            Note: The [=create record objects=] algorithm may hold a reference to the previous [=background fetch response=].
 
-        1. Otherwise, if |response|'s [=response/status=] is not an [=ok status=], set |responseData|'s [=background fetch response/result=] to `"bad-status"`.
-        1. Otherwise, set |responseData|'s [=background fetch response/result=] to `"success"`.
-        1. Set |fetchAttemptComplete| to true.
-      1. If at any point |stream| becomes [=ReadableStream/errored=], then:
-        1. If the resource is [=temporarily unavailable=] and |request|'s [=request/method=] is \``GET`\`, then   wait until the resource is not [=temporarily unavailable=], then set |fetchAttemptComplete| to true.
-        1. Otherwise, set |responseData|'s [=background fetch response/result=] to `"fetch-error"` and |fetchAttemptComplete| to true.
+          1. [=Update background fetch instances=] for |bgFetch|.
+        1. If |rangeStart| is 0 or |response|'s [=response/status=] is not `206`, then set |responseData|'s [=background fetch response/response=] to a copy of |response| except for its [=response/body=].
+        1. Let |stream| be the |response| [=response/body=]'s [=body/stream=].
+        1. Whenever one or more bytes are transmitted from |stream|, let |bytes| be the transmitted bytes and run these steps:
+          1. If |bgFetch|'s [=background fetch/stored body bytes total=] plus the size of |bytes| is greater than |downloadTotal|, then:
+            1. [=ReadableStream/Cancel=] |stream|.
+            1. Set |responseData|'s [=background fetch response/result=] to `"download-total-exceeded"`, |fetchAttemptComplete| to true, and abort these steps.
+          1. Append |bytes| to |responseData|'s [=background fetch response/bytes=].
+          1. If the previous step fails due to exceeding a quota limit, set |responseData|'s [=background fetch response/result=] to `"quota-exceeded"`, |fetchAttemptComplete| to true, and abort these steps.
+          1. [=Update background fetch instances=] for |bgFetch|.
+        1. If at any point the bytes transmission for |stream| is done normally, then:
+          1. If |response|'s [=response/status=] is `206`, then:
+            1. Let <var ignore>firstBytePos</var>, <var ignore>lastBytePos</var>, and |completeLength| be the result of [=extracting content-range values=] from |response|.
+            1. If |completeLength| is not null, and equal to the [=byte sequence/length=] of |responseData|'s [=background fetch response/bytes=], set |responseData|'s [=background fetch response/result=] to `"success"`.
+
+              Note: Although we ask for the whole resource, or the remainder of the resource, the server may not have returned the remainder, in which case we need to make an additional request.
+
+          1. Otherwise, if |response|'s [=response/status=] is not an [=ok status=], set |responseData|'s [=background fetch response/result=] to `"bad-status"`.
+          1. Otherwise, set |responseData|'s [=background fetch response/result=] to `"success"`.
+          1. Set |fetchAttemptComplete| to true.
+        1. If at any point |stream| becomes [=ReadableStream/errored=], then:
+          1. If the resource is [=temporarily unavailable=] and |request|'s [=request/method=] is \``GET`\`, then   wait until the resource is not [=temporarily unavailable=], then set |fetchAttemptComplete| to true.
+          1. Otherwise, set |responseData|'s [=background fetch response/result=] to `"fetch-error"` and |fetchAttemptComplete| to true.
+    </dl>
+
   1. Let |result| be the empty string.
   1. Run these steps, but [=abort when=] |bgFetch|'s [=background fetch/paused flag=] or [=background fetch/abort all flag=] is set:
     1. Wait for |fetchAttemptComplete| to be true.
