@@ -13,9 +13,7 @@ Indent: 2
 </pre>
 
 <pre class="link-defaults">
-spec:html; type:dfn; for:agent; text:event loop
 spec:infra; type:dfn; text:list
-spec:service-workers; type:dfn; for:/; text:service worker
 spec:webidl; type:dfn; text:resolve
 </pre>
 
@@ -49,27 +47,27 @@ spec: image-resource; urlPrefix: https://w3c.github.io/image-resource/
 </pre>
 
 <style>
-  .algorithm dl {
+  dl.compact {
     overflow: hidden;
   }
-  .algorithm dt {
+  dl.compact dt {
     font-weight: normal;
     float: left;
     clear: left;
     line-height: 1.5;
     margin-right: 0.3em;
   }
-  .algorithm dt::after {
+  dl.compact dt::after {
     content: '- ';
   }
-  .algorithm dd {
+  dl.compact dd {
     margin-left: 0em;
   }
 </style>
 
 # Introduction # {#intro}
 
-A [=service worker=] is capable of fetching and caching assets, the size of which is restricted only by [origin storage](https://storage.spec.whatwg.org/#usage-and-quota). However, if the user navigates away from the site or closes the browser, the service worker is [[service-workers#service-worker-lifetime|likely to be killed]]. This can happen even if there's a pending promise passed to {{ExtendableEvent/waitUntil()}} - if it hasn't resolved within a few minutes the browser may consider it an abuse of [=service worker=] and kill the process.
+A [=/service worker=] is capable of fetching and caching assets, the size of which is restricted only by [origin storage](https://storage.spec.whatwg.org/#usage-and-quota). However, if the user navigates away from the site or closes the browser, the service worker is [[service-workers#service-worker-lifetime|likely to be killed]]. This can happen even if there's a pending promise passed to {{ExtendableEvent/waitUntil()}} - if it hasn't resolved within a few minutes the browser may consider it an abuse of [=/service worker=] and kill the process.
 
 This is excellent for battery and privacy, but it makes it difficult to download and cache large assets such as podcasts and movies, and upload video and images.
 
@@ -100,7 +98,7 @@ A resource is considered <dfn>temporarily unavailable</dfn> if the user agent be
 The <dfn>background fetch task source</dfn> is a [=task source=].
 
 <div algorithm>
-  To <dfn>queue a bgfetch task</dfn> on an optional |eventLoop| (an [=event loop=], defaulting to the caller's [=this=]'s [=relevant settings object=]'s [=responsible event loop=]) with |steps| (steps), [=queue a task=] on |eventLoop| using the [=background fetch task source=] to run |steps|.
+  To <dfn>queue a bgfetch task</dfn> on an optional |eventLoop| (an [=/event loop=], defaulting to the caller's [=this=]'s [=relevant settings object=]'s [=responsible event loop=]) with |steps| (steps), [=queue a task=] on |eventLoop| using the [=background fetch task source=] to run |steps|.
 </div>
 
 ## Extensions to service worker registration ## {#service-worker-registration-concept-extensions}
@@ -151,20 +149,22 @@ A <dfn>background fetch</dfn> consists of:
     * The UI cannot be dismissed without aborting (e.g. swiped away) until |bgFetch|'s [=background fetch/result=] is not the empty string.
     * The UI may display |bgFetch|'s [=background fetch/title=].
     * The UI may select an [=image resource=] (|icon|) for display from |bgFetch|'s [=background fetch/icons=], after successfully [=processing=] it, and [=/fetch=] it using a new [=/request=] with the following properties:
-      : [=request/URL=]
-      :: |icon|'s [=image resource/src=].
-      : [=request/Client=]
-      :: |environment|.
-      : [=request/Keepalive=]
-      :: True.
-      : [=request/Service-workers mode=]
-      :: "`none`".
-      : [=request/Destination=]
-      :: "`image`".
-      : [=request/Mode=]
-      :: "`no-cors`".
-      : [=request/Credentials mode=]
-      :: "`include`".
+      <dl class="compact">
+        : [=request/URL=]
+        :: |icon|'s [=image resource/src=].
+        : [=request/Client=]
+        :: |environment|.
+        : [=request/Keepalive=]
+        :: True.
+        : [=request/Service-workers mode=]
+        :: "`none`".
+        : [=request/Destination=]
+        :: "`image`".
+        : [=request/Mode=]
+        :: "`no-cors`".
+        : [=request/Credentials mode=]
+        :: "`include`".
+      </dl>
 
       Issue: [manifest/pull/710](https://github.com/w3c/manifest/pull/710).
 
@@ -291,60 +291,60 @@ Note: This algorithm manages the fetching of a [=/background fetch record=]. One
     Note: If the |rangeStart| is 0, a normal request is made. This allows the initial request to make use of content encoding, since `Accept-Encoding: identity` is added to requests with a range header.
 
   1. Let |fetchAttemptComplete| be false.
-  1. Let |lastTransmittedSize| be 0.
-  1. [=/Fetch=] |request|.
-
-    Issue: The remainder of this step uses fetch "callbacks" which currently queue tasks. This isn't desirable or possible here, so let's pretend that tasks aren't queued. ([issue](https://github.com/whatwg/fetch/issues/536#issuecomment-330184276))
-
-    To [=process request body=] for |request|, run these steps:
-      1. Let |transmittedSize| be |request|'s [=request/body=]'s [=body/transmitted bytes=].
-      1. Increment |bgFetch|'s [=background fetch/uploaded=] by |transmittedSize| minus |lastTransmittedSize|.
-      1. Set |lastTransmittedSize| to |transmittedSize|.
-      1. [=Update background fetch instances=] for |bgFetch|.
-
-    To [=process response=] for |response|, run these steps:
-      1. If |response| is a [=network error=], then:
-        1. If the resource is [=temporarily unavailable=] and |request|'s [=request/method=] is \``GET`\`, then wait until the resource is not [=temporarily unavailable=], then set |fetchAttemptComplete| to true and abort these steps.
-
-          Note: If |request|'s [=request/method=] is not \``GET`\`, reissuing the request may have unwanted side effects. If a standard method to resume requests becomes available, it'll be adopted here.
-
-        1. If |response| is an [=aborted network error=], then set |responseData|'s [=background fetch response/result=] to `"aborted"`, otherwise `"fetch-error"`.
-        1. Set |fetchAttemptComplete| to true, and abort these steps.
-      1. If |response|'s [=response/status=] is `206`, then:
-        1. If [=validate a partial response=] for |rangeStart|, |response|, and |responseData|'s [=background fetch response/response=] returns invalid, then:
-          1. Set |responseData|'s [=background fetch response/result=] to `"fetch-error"`.
-          1. Set |fetchAttemptComplete| to true.
-          1. [=fetch/Terminate=] the ongoing fetch, and abort these steps.
-      1. Otherwise:
-        1. Set |responseData|'s [=background fetch response/result=] to `"redundant"`.
-        1. Set |responseData| to a new [=background fetch response=].
-        1. Set |record|'s [=background fetch record/response data=] to |responseData|.
-
-          Note: The [=create record objects=] algorithm may hold a reference to the previous [=background fetch response=].
-
+  1. [=/Fetch=] |request| with the following arguments:
+    <dl class="compact">
+      : [=fetch/useParallelQueue=]
+      :: True.
+      : [=fetch/processRequestBodyChunkLength=]
+      :: The following steps given |chunkLength| (a number):
+        1. Increment |bgFetch|'s [=background fetch/uploaded=] by |chunkLength|.
         1. [=Update background fetch instances=] for |bgFetch|.
-      1. If |rangeStart| is 0 or |response|'s [=response/status=] is not `206`, then set |responseData|'s [=background fetch response/response=] to a copy of |response| except for its [=response/body=].
-      1. Let |stream| be the |response| [=response/body=]'s [=body/stream=].
-      1. Whenever one or more bytes are transmitted from |stream|, let |bytes| be the transmitted bytes and run these steps:
-        1. If |bgFetch|'s [=background fetch/stored body bytes total=] plus the size of |bytes| is greater than |downloadTotal|, then:
-          1. [=ReadableStream/Cancel=] |stream|.
-          1. Set |responseData|'s [=background fetch response/result=] to `"download-total-exceeded"`, |fetchAttemptComplete| to true, and abort these steps.
-        1. Append |bytes| to |responseData|'s [=background fetch response/bytes=].
-        1. If the previous step fails due to exceeding a quota limit, set |responseData|'s [=background fetch response/result=] to `"quota-exceeded"`, |fetchAttemptComplete| to true, and abort these steps.
-        1. [=Update background fetch instances=] for |bgFetch|.
-      1. If at any point the bytes transmission for |stream| is done normally, then:
+      : [=fetch/processResponse=]
+      :: The following steps given |response| (a [=/response=]):
+        1. If |response| is a [=network error=], then:
+          1. If the resource is [=temporarily unavailable=] and |request|'s [=request/method=] is \``GET`\`, then wait until the resource is not [=temporarily unavailable=], then set |fetchAttemptComplete| to true and abort these steps.
+
+            Note: If |request|'s [=request/method=] is not \``GET`\`, reissuing the request may have unwanted side effects. If a standard method to resume requests becomes available, it'll be adopted here.
+
+          1. If |response| is an [=aborted network error=], then set |responseData|'s [=background fetch response/result=] to `"aborted"`, otherwise `"fetch-error"`.
+          1. Set |fetchAttemptComplete| to true, and abort these steps.
         1. If |response|'s [=response/status=] is `206`, then:
-          1. Let <var ignore>firstBytePos</var>, <var ignore>lastBytePos</var>, and |completeLength| be the result of [=extracting content-range values=] from |response|.
-          1. If |completeLength| is not null, and equal to the [=byte sequence/length=] of |responseData|'s [=background fetch response/bytes=], set |responseData|'s [=background fetch response/result=] to `"success"`.
+          1. If [=validate a partial response=] for |rangeStart|, |response|, and |responseData|'s [=background fetch response/response=] returns invalid, then:
+            1. Set |responseData|'s [=background fetch response/result=] to `"fetch-error"`.
+            1. Set |fetchAttemptComplete| to true.
+            1. [=fetch/Terminate=] the ongoing fetch, and abort these steps.
+        1. Otherwise:
+          1. Set |responseData|'s [=background fetch response/result=] to `"redundant"`.
+          1. Set |responseData| to a new [=background fetch response=].
+          1. Set |record|'s [=background fetch record/response data=] to |responseData|.
 
-            Note: Although we ask for the whole resource, or the remainder of the resource, the server may not have returned the remainder, in which case we need to make an additional request.
+            Note: The [=create record objects=] algorithm may hold a reference to the previous [=background fetch response=].
 
-        1. Otherwise, if |response|'s [=response/status=] is not an [=ok status=], set |responseData|'s [=background fetch response/result=] to `"bad-status"`.
-        1. Otherwise, set |responseData|'s [=background fetch response/result=] to `"success"`.
-        1. Set |fetchAttemptComplete| to true.
-      1. If at any point |stream| becomes [=ReadableStream/errored=], then:
-        1. If the resource is [=temporarily unavailable=] and |request|'s [=request/method=] is \``GET`\`, then   wait until the resource is not [=temporarily unavailable=], then set |fetchAttemptComplete| to true.
-        1. Otherwise, set |responseData|'s [=background fetch response/result=] to `"fetch-error"` and |fetchAttemptComplete| to true.
+          1. [=Update background fetch instances=] for |bgFetch|.
+        1. If |rangeStart| is 0 or |response|'s [=response/status=] is not `206`, then set |responseData|'s [=background fetch response/response=] to a copy of |response| except for its [=response/body=].
+        1. Let |stream| be the |response| [=response/body=]'s [=body/stream=].
+        1. Whenever one or more bytes are transmitted from |stream|, let |bytes| be the transmitted bytes and run these steps:
+          1. If |bgFetch|'s [=background fetch/stored body bytes total=] plus the size of |bytes| is greater than |downloadTotal|, then:
+            1. [=ReadableStream/Cancel=] |stream|.
+            1. Set |responseData|'s [=background fetch response/result=] to `"download-total-exceeded"`, |fetchAttemptComplete| to true, and abort these steps.
+          1. Append |bytes| to |responseData|'s [=background fetch response/bytes=].
+          1. If the previous step fails due to exceeding a quota limit, set |responseData|'s [=background fetch response/result=] to `"quota-exceeded"`, |fetchAttemptComplete| to true, and abort these steps.
+          1. [=Update background fetch instances=] for |bgFetch|.
+        1. If at any point the bytes transmission for |stream| is done normally, then:
+          1. If |response|'s [=response/status=] is `206`, then:
+            1. Let <var ignore>firstBytePos</var>, <var ignore>lastBytePos</var>, and |completeLength| be the result of [=extracting content-range values=] from |response|.
+            1. If |completeLength| is not null, and equal to the [=byte sequence/length=] of |responseData|'s [=background fetch response/bytes=], set |responseData|'s [=background fetch response/result=] to `"success"`.
+
+              Note: Although we ask for the whole resource, or the remainder of the resource, the server may not have returned the remainder, in which case we need to make an additional request.
+
+          1. Otherwise, if |response|'s [=response/status=] is not an [=ok status=], set |responseData|'s [=background fetch response/result=] to `"bad-status"`.
+          1. Otherwise, set |responseData|'s [=background fetch response/result=] to `"success"`.
+          1. Set |fetchAttemptComplete| to true.
+        1. If at any point |stream| becomes [=ReadableStream/errored=], then:
+          1. If the resource is [=temporarily unavailable=] and |request|'s [=request/method=] is \``GET`\`, then   wait until the resource is not [=temporarily unavailable=], then set |fetchAttemptComplete| to true.
+          1. Otherwise, set |responseData|'s [=background fetch response/result=] to `"fetch-error"` and |fetchAttemptComplete| to true.
+    </dl>
+
   1. Let |result| be the empty string.
   1. Run these steps, but [=abort when=] |bgFetch|'s [=background fetch/paused flag=] or [=background fetch/abort all flag=] is set:
     1. Wait for |fetchAttemptComplete| to be true.
@@ -401,8 +401,11 @@ Note: This algorithm manages the fetching of a [=/background fetch record=]. One
 
 <div algorithm>
   To <dfn>fire a background fetch click event</dfn> for a |bgFetch| (a [=/background fetch=]), [=fire a functional event=] named "`backgroundfetchclick`" using {{BackgroundFetchEvent}} on |bgFetch|'s [=background fetch/service worker registration=] with the following properties:
-      : {{BackgroundFetchEvent/registration}}
-      :: The result of [=getting a BackgroundFetchRegistration instance=] for |bgFetch| in the event object's [=relevant Realm=].
+
+  <dl class="compact">
+    : {{BackgroundFetchEvent/registration}}
+    :: The result of [=getting a BackgroundFetchRegistration instance=] for |bgFetch| in the event object's [=relevant Realm=].
+  </dl>
 </div>
 
 ## [=Get a BackgroundFetchRegistration instance=] ## {#get-a-backgroundfetchregistration-instance-algorithm}
@@ -472,10 +475,12 @@ Note: This algorithm creates platform objects for [=background fetch records=]. 
     1. Let |recordObject| be a new {{BackgroundFetchRecord}}.
     1. Set |recordObject|'s {{BackgroundFetchRecord/responseReady}} to [=a new promise=].
     1. Let |requestObject| be a new {{Request}} object with the following set:
-      : [=Request/Request=]
-      :: A copy of |record|'s [=background fetch record/request=], including its [=request/body=].
-      : [=Request/Headers=]
-      :: A new {{Headers}} object associated with this {{Request}}'s [=Request/request=]'s [=request/header list=].
+      <dl class="compact">
+        : [=Request/Request=]
+        :: A copy of |record|'s [=background fetch record/request=], including its [=request/body=].
+        : [=Request/Headers=]
+        :: A new {{Headers}} object associated with this {{Request}}'s [=Request/request=]'s [=request/header list=].
+      </dl>
     1. Set |recordObject|'s {{BackgroundFetchRecord/request}} to |requestObject|.
     1. Let |transmittedBytes| be 0.
     1. Let |stream| be a [=new=] {{ReadableStream}}.
@@ -506,10 +511,12 @@ Note: This algorithm creates platform objects for [=background fetch records=]. 
         1. Set |response|'s [=response/body=] to |body|.
         1. [=Queue a task=] in |recordObject|'s [=relevant settings object=]'s [=responsible event loop=] using the [=networking task source=] to run these steps:
           1. Let |responseObject| be a new {{Response}} object with the following set:
-            : [=Response/Response=]
-            :: |response|.
-            : [=Response/Headers=]
-            :: A new {{Headers}} object associated with this {{Response}}'s [=Response/response=]'s [=response/header list=].
+            <dl class="compact">
+              : [=Response/Response=]
+              :: |response|.
+              : [=Response/Headers=]
+              :: A new {{Headers}} object associated with this {{Response}}'s [=Response/response=]'s [=response/header list=].
+            </dl>
           1. [=Resolve=] |recordObject|'s {{BackgroundFetchRecord/responseReady}} with |responseObject|.
       1. Otherwise, if |responseData|'s [=background fetch response/result=] is `"aborted"`, then [=reject=] |recordObject|'s {{BackgroundFetchRecord/responseReady}} with an {{AbortError}} {{DOMException}}.
       1. Otherwise, [=reject=] |recordObject|'s {{BackgroundFetchRecord/responseReady}} with a {{TypeError}}.
@@ -713,20 +720,22 @@ dictionary BackgroundFetchOptions : BackgroundFetchUIOptions {
       1. Wait for |requestBodiesRemaining| to be 0, or |requestReadFailed| to be true.
       1. If |requestReadFailed| is true, then [=reject=] |promise| with a {{TypeError}} and abort these steps.
       1. Let |bgFetch| be a new [=/background fetch=] with:
-        : [=background fetch/id=]
-        :: |id|.
-        : [=background fetch/records=]
-        :: |records|.
-        : [=background fetch/download total=]
-        :: |options|' `downloadTotal` member.
-        : [=background fetch/upload total=]
-        :: |uploadTotal|.
-        : [=background fetch/icons=]
-        :: |options|' `icons` member if present, otherwise an empty [=/list=].
-        : [=background fetch/title=]
-        :: |options|' `title` member if present, otherwise the empty string.
-        : [=background fetch/service worker registration=]
-        :: |registration|.
+        <dl class="compact">
+          : [=background fetch/id=]
+          :: |id|.
+          : [=background fetch/records=]
+          :: |records|.
+          : [=background fetch/download total=]
+          :: |options|' `downloadTotal` member.
+          : [=background fetch/upload total=]
+          :: |uploadTotal|.
+          : [=background fetch/icons=]
+          :: |options|' `icons` member if present, otherwise an empty [=/list=].
+          : [=background fetch/title=]
+          :: |options|' `title` member if present, otherwise the empty string.
+          : [=background fetch/service worker registration=]
+          :: |registration|.
+        </dl>
       1. Set |bgFetchMap|[|id|] to |bgFetch|.
       1. [=Queue a bgfetch task=] to run these steps:
         1. [=Resolve=] |promise| with the result of [=getting a BackgroundFetchRegistration instance=] for |bgFetch| in [=this=]'s [=relevant Realm=].
