@@ -13,9 +13,7 @@ Indent: 2
 </pre>
 
 <pre class="link-defaults">
-spec:html; type:dfn; for:agent; text:event loop
 spec:infra; type:dfn; text:list
-spec:service-workers; type:dfn; for:/; text:service worker
 spec:webidl; type:dfn; text:resolve
 </pre>
 
@@ -69,7 +67,7 @@ spec: image-resource; urlPrefix: https://w3c.github.io/image-resource/
 
 # Introduction # {#intro}
 
-A [=service worker=] is capable of fetching and caching assets, the size of which is restricted only by [origin storage](https://storage.spec.whatwg.org/#usage-and-quota). However, if the user navigates away from the site or closes the browser, the service worker is [[service-workers#service-worker-lifetime|likely to be killed]]. This can happen even if there's a pending promise passed to {{ExtendableEvent/waitUntil()}} - if it hasn't resolved within a few minutes the browser may consider it an abuse of [=service worker=] and kill the process.
+A [=/service worker=] is capable of fetching and caching assets, the size of which is restricted only by [origin storage](https://storage.spec.whatwg.org/#usage-and-quota). However, if the user navigates away from the site or closes the browser, the service worker is [[service-workers#service-worker-lifetime|likely to be killed]]. This can happen even if there's a pending promise passed to {{ExtendableEvent/waitUntil()}} - if it hasn't resolved within a few minutes the browser may consider it an abuse of [=/service worker=] and kill the process.
 
 This is excellent for battery and privacy, but it makes it difficult to download and cache large assets such as podcasts and movies, and upload video and images.
 
@@ -100,7 +98,7 @@ A resource is considered <dfn>temporarily unavailable</dfn> if the user agent be
 The <dfn>background fetch task source</dfn> is a [=task source=].
 
 <div algorithm>
-  To <dfn>queue a bgfetch task</dfn> on an optional |eventLoop| (an [=event loop=], defaulting to the caller's [=this=]'s [=relevant settings object=]'s [=responsible event loop=]) with |steps| (steps), [=queue a task=] on |eventLoop| using the [=background fetch task source=] to run |steps|.
+  To <dfn>queue a bgfetch task</dfn> on an optional |eventLoop| (an [=/event loop=], defaulting to the caller's [=this=]'s [=relevant settings object=]'s [=responsible event loop=]) with |steps| (steps), [=queue a task=] on |eventLoop| using the [=background fetch task source=] to run |steps|.
 </div>
 
 ## Extensions to service worker registration ## {#service-worker-registration-concept-extensions}
