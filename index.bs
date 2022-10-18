@@ -88,7 +88,8 @@ All platform objects are created in [=this=]'s [=relevant Realm=] unless otherwi
 
 # Permissions # {#permissions}
 
-<cite>Background Fetch</cite> is a [=default powerful feature=] that is identified by the [=powerful feature/name=] "background-fetch".
+<cite>Background Fetch</cite> is a [=default powerful feature=] that is identified by the
+[=powerful feature/name=] "<dfn permission export>background-fetch</dfn>".
 
 # Infrastructure # {#infrastructure}
 
