@@ -93,7 +93,8 @@ All platform objects are created in [=this=]'s [=relevant Realm=] unless otherwi
 
 # Infrastructure # {#infrastructure}
 
-A resource is considered <dfn>temporarily unavailable</dfn> if the user agent believes the resource may soon become available. Reasons may include:
+A resource is considered <dfn>temporarily unavailable</dfn> if the user agent believes the resource
+may soon become available. Reasons may include:
 
 * The user agent is offline.
 * The user agent is behind a captive portal.
