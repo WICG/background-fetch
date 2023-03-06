@@ -706,7 +706,7 @@ dictionary BackgroundFetchOptions : BackgroundFetchUIOptions {
             1. If |stream| has [=ReadableStream/errored=], then set |requestReadFailed| to true.
 
             Note: This ensures we have a copy of the request bytes before resolving.
-          1. [=If aborted=] and |stream| is [=ReadableStream/readable=], then [=ReadableStream/error=] |stream| with an {{AbortError}} {{DOMException}} and abort these steps.
+          1. [=If aborted=] and |stream| is [=ReadableStream/readable=], then [=ReadableStream/cancel=] |stream| with an {{AbortError}} {{DOMException}} and abort these steps.
           1. Increment |uploadTotal| by |request|'s [=request/body=]'s [=body/length=].
           1. Decrement |requestBodiesRemaining| by 1.
       1. If at any point storing |requests| fails due to exceeding a quota limit, [=reject=] |promise| with a {{QuotaExceededError}} {{DOMException}} and abort these steps.
