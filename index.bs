@@ -291,18 +291,15 @@ Note: This algorithm manages the fetching of a [=/background fetch record=]. One
     Note: If the |rangeStart| is 0, a normal request is made. This allows the initial request to make use of content encoding, since `Accept-Encoding: identity` is added to requests with a range header.
 
   1. Let |fetchAttemptComplete| be false.
-  1. Let |lastTransmittedSize| be 0.
-  1. [=/Fetch=] |request|.
+  1. Let |controller| be the result of [=/fetching=] |request|, with [=fetch/processRequestBodyChunkLength=] and [=fetch/processResponse=] set to the steps below.
 
     Issue: The remainder of this step uses fetch "callbacks" which currently queue tasks. This isn't desirable or possible here, so let's pretend that tasks aren't queued. ([issue](https://github.com/whatwg/fetch/issues/536#issuecomment-330184276))
 
-    To [=process request body=] for |request|, run these steps:
-      1. Let |transmittedSize| be |request|'s [=request/body=]'s [=body/transmitted bytes=].
-      1. Increment |bgFetch|'s [=background fetch/uploaded=] by |transmittedSize| minus |lastTransmittedSize|.
-      1. Set |lastTransmittedSize| to |transmittedSize|.
+    [=fetch/processRequestBodyChunkLength=], given |bytesLength|, runs these steps:
+      1. Increment |bgFetch|'s [=background fetch/uploaded=] by |bytesLength|.
       1. [=Update background fetch instances=] for |bgFetch|.
 
-    To [=process response=] for |response|, run these steps:
+    [=fetch/processResponse=], given |response|, runs these steps:
       1. If |response| is a [=network error=], then:
         1. If the resource is [=temporarily unavailable=] and |request|'s [=request/method=] is \``GET`\`, then wait until the resource is not [=temporarily unavailable=], then set |fetchAttemptComplete| to true and abort these steps.
 
@@ -314,7 +311,7 @@ Note: This algorithm manages the fetching of a [=/background fetch record=]. One
         1. If [=validate a partial response=] for |rangeStart|, |response|, and |responseData|'s [=background fetch response/response=] returns invalid, then:
           1. Set |responseData|'s [=background fetch response/result=] to `"fetch-error"`.
           1. Set |fetchAttemptComplete| to true.
-          1. [=fetch/Terminate=] the ongoing fetch, and abort these steps.
+          1. [=fetch controller/Terminate=] |controller|, and abort these steps.
       1. Otherwise:
         1. Set |responseData|'s [=background fetch response/result=] to `"redundant"`.
         1. Set |responseData| to a new [=background fetch response=].
@@ -356,7 +353,7 @@ Note: This algorithm manages the fetching of a [=/background fetch record=]. One
 
       Note: The result is stored now, as terminating the fetch may change the result.
 
-    1. [=fetch/Terminate=] the ongoing fetch.
+    1. [=fetch controller/Terminate=] |controller|.
   1. If |result| is the empty string, then [=complete a record=] for |bgFetch| and |record|.
 </div>
 
@@ -972,7 +969,7 @@ For the purposes of user-agent automation and application testing, this document
     <tbody>
       <tr>
         <th>[=request/Method=]</th>
-        <th>[=extension command URI template|URI Template=]</a></th>
+        <th>[=extension command URI template|URI Template=]</th>
       </tr>
       <tr>
         <td>POST</td>
