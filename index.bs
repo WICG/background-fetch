@@ -24,10 +24,6 @@ urlPrefix: https://tc39.github.io/ecma262/; spec: ECMA-262
   type: dfn
     text: realm; url: realm
 
-urlPrefix: https://tools.ietf.org/html/rfc7230
-  type: dfn
-    text: HTTP ABNF; url: section-7
-
 spec: webdriver; urlPrefix: https://w3c.github.io/webdriver/#
   type: dfn
     text: extension command; url: dfn-extension-command
@@ -334,7 +330,7 @@ Note: This algorithm manages the fetching of a [=/background fetch record=]. One
         1. [=Update background fetch instances=] for |bgFetch|.
       1. If at any point the bytes transmission for |stream| is done normally, then:
         1. If |response|'s [=response/status=] is `206`, then:
-          1. Let <var ignore>firstBytePos</var>, <var ignore>lastBytePos</var>, and |completeLength| be the result of [=extracting content-range values=] from |response|.
+          1. Let (<var ignore>firstBytePos</var>, <var ignore>lastBytePos</var>, |completeLength|) be the result of [=extracting content-range values=] from |response|.
           1. If |completeLength| is not null, and equal to the [=byte sequence/length=] of |responseData|'s [=background fetch response/bytes=], set |responseData|'s [=background fetch response/result=] to `"success"`.
 
             Note: Although we ask for the whole resource, or the remainder of the resource, the server may not have returned the remainder, in which case we need to make an additional request.
@@ -419,44 +415,6 @@ Note: This algorithm ensures the same {{BackgroundFetchRegistration}} instance i
   1. Return |instance|.
 </div>
 
-## [=Validate a partial response=] ## {#validate-partial-response-algorithm}
-
-Note: This algorithm checks if a partial response reasonably matches what was requested, and optionally checks if it should be combined with a previous response.
-
-<div algorithm>
-  To <dfn>validate a partial response</dfn> for an |expectedRangeStart| (a number), a |partialResponse| (a [=/response=]), and an optional |previousResponse| (a [=/response=] or null, null unless otherwise specified), run these steps:
-
-  1. Assert: |partialResponse|'s [=response/status=] is `206`.
-  1. Let |responseFirstBytePos|, <var ignore>responseLastBytePos</var>, and |responseCompleteLength| be the result of [=extracting content-range values=] from |partialResponse|. If this fails, then return invalid.
-  1. If |responseFirstBytePos| does not equal |expectedRangeStart|, then return invalid.
-  1. If |previousResponse| is not null, then:
-    1. For |headerName| of « \``ETag`\`, \``Last-Modified`\` »:
-      1. If |previousResponse|'s [=response/header list=] [=header list/contains=] |headerName| and the [=header list/combined=] value of |headerName| in |previousResponse|'s [=response/header list=] does not equal the [=header list/combined=] value of |headerName| in |partialResponse|'s [=response/header list=], then return invalid.
-    1. If |previousResponse|'s [=response/status=] is `206`, then:
-      1. Let <var ignore>previousResponseFirstBytePos</var>, <var ignore>previousResponseLastBytePos</var>, and |previousResponseCompleteLength| be the result of [=extracting content-range values=] from |previousResponse|. If this fails, then return invalid.
-      1. If |previousResponseCompleteLength| is not null, and |responseCompleteLength| does not equal |previousResponseCompleteLength|, then return invalid.
-  1. Return valid.
-</div>
-
-## [=Extract content-range values=] ## {#extract-content-range-values-algorithm}
-
-Note: This algorithm parses \``Content-Range`\` as a [=single byte content-range=] and extracts the values.
-
-<div algorithm>
-  To <dfn lt="extract content-range values|extracting content-range values">extract content-range values</dfn> from a |response| (a [=/response=]), run these steps:
-
-  1. If |response|'s [=response/header list=] does not [=header list/contain=] \``Content-Range`\`, then return failure.
-  1. Let |contentRangeValue| be the [=header/value=] of the first [=header=] whose [=header/name=] is a [=byte-case-insensitive=] match for \``Content-Range`\` in |response|'s [=response/header list=].
-  1. If parsing |contentRangeValue| per [=single byte content-range=] fails, then return failure.
-  1. Let |firstBytePos| be the portion of |contentRangeValue| named `first-byte-pos` when parsed as [=single byte content-range=], parsed as an integer.
-  1. Let |lastBytePos| be the portion of |contentRangeValue| named `last-byte-pos` when parsed as [=single byte content-range=], parsed as an integer.
-  1. Let |completeLength| be the portion of |contentRangeValue| named `complete-length` when parsed as [=single byte content-range=].
-  1. If |completeLength| is `"*"`, then set |completeLength| to null, otherwise set |completeLength| to |completeLength| parsed as an integer.
-  1. Return |firstBytePos|, |lastBytePos|, and |completeLength|.
-
-  Issue: Parsing as an integer [infra/189](https://github.com/whatwg/infra/issues/189).
-</div>
-
 ## [=Create record objects=] ## {#create-settled-fetches-algorithm}
 
 Note: This algorithm creates platform objects for [=background fetch records=]. It also manages the streaming of the [=/response=] from the stored [=background fetch response/bytes=]. The background fetch operation may still be in progress at this point.
@@ -534,49 +492,6 @@ Note: This algorithm creates platform objects for [=background fetch records=]. 
   1. If |map| [=contains background fetch=] |bgFetch|, then return false.
   1. Return true.
 </div>
-
-# Header syntax # {#header-syntax}
-
-The following is [=HTTP ABNF=] for a <dfn>single byte content-range</dfn>:
-
-<pre>
-"bytes=" first-byte-pos "-" last-byte-pos "/" complete-length
-first-byte-pos = 1*DIGIT
-last-byte-pos  = 1*DIGIT
-complete-length = ( 1*DIGIT / "*" )</pre>
-
-Note: This is a subset of what <a href="https://tools.ietf.org/html/rfc7233#section-3.1">RFC 7233</a> allows.
-
-<div class="note">
-
-  The above as a railroad diagram:
-
-  <pre class="railroad">
-  T: "bytes="
-  Stack:
-    Sequence:
-      Comment: first-byte-pos
-      OneOrMore:
-        N: digit
-      Comment: /first-byte-pos
-      N: "/"
-    Sequence:
-      Comment: last-byte-pos
-      OneOrMore:
-        N: digit
-      Comment: /last-byte-pos
-      N: "/"
-    Sequence:
-      Comment: complete-length
-      Choice:
-        N: "*"
-        OneOrMore:
-          N: digit
-      Comment: /complete-length
-  </pre>
-</div>
-
-
 
 # API # {#api}
 
